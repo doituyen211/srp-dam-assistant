@@ -44,13 +44,16 @@ function NewProposalContent() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-950 md:text-3xl">
+          <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+            New proposal
+          </p>
+          <h1 className="mt-2 text-2xl font-medium tracking-[-0.02em] text-ink md:text-3xl">
             Tạo đề xuất mới
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-body-muted">
             Nhập thông tin cốt lõi của đề tài. Bạn có thể lưu nháp hoặc gửi
             ngay để bắt đầu quy trình xét duyệt.
           </p>
@@ -58,7 +61,7 @@ function NewProposalContent() {
 
         <Link
           href="/proposals"
-          className="inline-flex items-center justify-center rounded-lg bg-slate-200 px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+          className="inline-flex items-center justify-center rounded-lg border border-hairline px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-soft-stone focus:outline-none focus:ring-2 focus:ring-focus-blue/30 focus:ring-offset-2"
         >
           Quay lại
         </Link>

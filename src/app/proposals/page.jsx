@@ -95,13 +95,16 @@ function ProposalsContent() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
+    <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-950 md:text-3xl">
+          <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+            Proposal workspace
+          </p>
+          <h1 className="mt-2 text-2xl font-medium tracking-[-0.02em] text-ink md:text-3xl">
             Đề tài nghiên cứu
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-body-muted">
             Tìm kiếm, lọc trạng thái và mở nhanh từng đề xuất để theo dõi quá
             trình xử lý.
           </p>
@@ -110,7 +113,7 @@ function ProposalsContent() {
         {isStudent && (
           <Link
             href="/proposals/new"
-            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="inline-flex items-center justify-center rounded-pill bg-primary px-5 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-px hover:bg-[#2d2d35] focus:outline-none focus:ring-2 focus:ring-focus-blue/30 focus:ring-offset-2"
           >
             Tạo đề xuất mới
           </Link>
@@ -124,7 +127,7 @@ function ProposalsContent() {
       )}
 
       <Card>
-        <CardContent className="grid gap-4 md:grid-cols-[1fr_240px]">
+        <CardContent className="grid gap-4 p-5 md:grid-cols-[1fr_260px]">
           <Input
             label="Tìm kiếm"
             value={search}
@@ -158,7 +161,7 @@ function ProposalsContent() {
               isStudent && !hasFilters ? (
                 <Link
                   href="/proposals/new"
-                  className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="inline-flex items-center justify-center rounded-pill bg-primary px-5 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-px hover:bg-[#2d2d35] focus:outline-none focus:ring-2 focus:ring-focus-blue/30 focus:ring-offset-2"
                 >
                   Tạo đề xuất mới
                 </Link>
