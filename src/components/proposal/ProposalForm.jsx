@@ -72,95 +72,105 @@ export function ProposalForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
-          {initialData.id ? "Chỉnh sửa đề tài" : "Tạo đề tài mới"}
-        </CardTitle>
+        <div>
+          <CardTitle>
+            {initialData.id ? "Chỉnh sửa đề tài" : "Tạo đề tài mới"}
+          </CardTitle>
+          <p className="mt-1 text-sm text-body-muted">
+            Hoàn thiện các phần cốt lõi để hội đồng và AI có đủ ngữ cảnh đánh giá.
+          </p>
+        </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-7">
         {error && <Alert type="error">{error}</Alert>}
 
-        {/* Title */}
-        <Input
-          label="Tiêu đề đề tài"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          error={validationErrors.title}
-          placeholder="Nhập tiêu đề đề tài..."
-          required
-        />
+        <div className="grid gap-5 md:grid-cols-[1.6fr_1fr]">
+          <Input
+            label="Tiêu đề đề tài"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            error={validationErrors.title}
+            placeholder="Nhập tiêu đề đề tài..."
+            required
+          />
 
-        {/* Field */}
-        <Select
-          label="Lĩnh vực nghiên cứu"
-          name="field"
-          value={formData.field}
-          onChange={handleChange}
-          error={validationErrors.field}
-          options={fieldOptions}
-          required
-        />
+          <Select
+            label="Lĩnh vực nghiên cứu"
+            name="field"
+            value={formData.field}
+            onChange={handleChange}
+            error={validationErrors.field}
+            options={fieldOptions}
+            required
+          />
+        </div>
 
-        {/* Problem */}
-        <Textarea
-          label="Phát biểu vấn đề"
-          name="problem"
-          value={formData.problem}
-          onChange={handleChange}
-          error={validationErrors.problem}
-          placeholder="Mô tả vấn đề cần giải quyết..."
-          rows={4}
-          required
-        />
+        <div className="space-y-5">
+          <div className="border-b border-card-border pb-2">
+            <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+              Research core
+            </p>
+          </div>
 
-        {/* Objectives */}
-        <Textarea
-          label="Mục tiêu"
-          name="objectives"
-          value={formData.objectives}
-          onChange={handleChange}
-          placeholder="Các mục tiêu của đề tài..."
-          rows={4}
-        />
+          <Textarea
+            label="Phát biểu vấn đề"
+            name="problem"
+            value={formData.problem}
+            onChange={handleChange}
+            error={validationErrors.problem}
+            placeholder="Mô tả vấn đề cần giải quyết..."
+            rows={4}
+            required
+          />
 
-        {/* Methodology */}
-        <Textarea
-          label="Phương pháp nghiên cứu"
-          name="methodology"
-          value={formData.methodology}
-          onChange={handleChange}
-          placeholder="Phương pháp, công cụ, cách tiếp cận..."
-          rows={4}
-        />
+          <Textarea
+            label="Mục tiêu"
+            name="objectives"
+            value={formData.objectives}
+            onChange={handleChange}
+            placeholder="Các mục tiêu của đề tài..."
+            rows={4}
+          />
 
-        {/* Feasibility */}
-        <Textarea
-          label="Tính khả thi"
-          name="feasibility"
-          value={formData.feasibility}
-          onChange={handleChange}
-          placeholder="Đánh giá tính khả thi, nguồn lực, thời gian..."
-          rows={3}
-        />
+          <Textarea
+            label="Phương pháp nghiên cứu"
+            name="methodology"
+            value={formData.methodology}
+            onChange={handleChange}
+            placeholder="Phương pháp, công cụ, cách tiếp cận..."
+            rows={4}
+          />
+        </div>
 
-        {/* Expected Impact */}
-        <Textarea
-          label="Kết quả kỳ vọng"
-          name="expectedImpact"
-          value={formData.expectedImpact}
-          onChange={handleChange}
-          placeholder="Đầu ra, tác động dự kiến..."
-          rows={3}
-        />
+        <div className="grid gap-5 md:grid-cols-2">
+          <Textarea
+            label="Tính khả thi"
+            name="feasibility"
+            value={formData.feasibility}
+            onChange={handleChange}
+            placeholder="Đánh giá tính khả thi, nguồn lực, thời gian..."
+            rows={3}
+          />
 
-        {/* Actions */}
-        <div className="flex gap-3 pt-4">
+          <Textarea
+            label="Kết quả kỳ vọng"
+            name="expectedImpact"
+            value={formData.expectedImpact}
+            onChange={handleChange}
+            placeholder="Đầu ra, tác động dự kiến..."
+            rows={3}
+          />
+        </div>
+
+        <div className="flex flex-col gap-3 border-t border-hairline pt-5 sm:flex-row sm:justify-end">
           <Button
             variant="secondary"
             onClick={() => handleSubmit("draft")}
             loading={loading}
             disabled={loading}
+            className="sm:min-w-32"
           >
             Lưu nháp
           </Button>
@@ -169,6 +179,7 @@ export function ProposalForm({
             onClick={() => handleSubmit("submit")}
             loading={loading}
             disabled={loading}
+            className="sm:min-w-36"
           >
             Gửi đề tài
           </Button>

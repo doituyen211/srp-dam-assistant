@@ -21,5 +21,9 @@ export function ProposalStatusBadge({ status }) {
 
   const intent = colorMap[color] || "default";
 
-  return <Badge intent={intent}>{label}</Badge>;
+  return (
+    <Badge intent={intent} className="whitespace-nowrap">
+      {label}
+    </Badge>
+  );
 }
