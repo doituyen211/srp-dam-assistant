@@ -12,19 +12,19 @@ export function Badge({
   ...props
 }) {
   const intents = {
-    default: "bg-slate-100 text-slate-800",
-    success: "bg-green-100 text-green-800",
-    warning: "bg-amber-100 text-amber-800",
-    danger: "bg-red-100 text-red-800",
-    info: "bg-blue-100 text-blue-800",
-    muted: "bg-slate-50 text-slate-600",
+    default: "bg-soft-stone text-body-muted",
+    success: "bg-pale-green text-success",
+    warning: "bg-[#fff3e0] text-warning",
+    danger: "bg-[#fde8e8] text-error",
+    info: "bg-pale-blue text-action-blue",
+    muted: "bg-[#f8f8f5] text-muted",
   };
 
   const intentClass = intents[intent] || intents.default;
 
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${intentClass} ${className}`}
+      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-mono text-[11px] font-medium leading-none tracking-[0.02em] ${intentClass} ${className}`}
       {...props}
     >
       {children}

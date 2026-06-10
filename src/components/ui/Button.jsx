@@ -17,17 +17,17 @@ export function Button({
   ...props
 }) {
   const baseStyles =
-    "inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+    "inline-flex items-center justify-center gap-2 rounded-pill px-5 py-2.5 text-sm font-medium leading-[1.4] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-focus-blue/30 focus:ring-offset-2 focus:ring-offset-app-bg disabled:pointer-events-none disabled:opacity-55";
 
   const variants = {
     primary:
-      "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 disabled:hover:bg-blue-600",
+      "bg-primary text-on-primary hover:-translate-y-px hover:bg-[#2d2d35] disabled:hover:translate-y-0 disabled:hover:bg-primary",
     secondary:
-      "bg-slate-200 text-slate-900 hover:bg-slate-300 focus:ring-slate-400 disabled:hover:bg-slate-200",
+      "rounded-lg border border-hairline bg-transparent text-ink hover:bg-soft-stone disabled:hover:bg-transparent",
     ghost:
-      "bg-transparent text-slate-600 hover:bg-slate-100 focus:ring-slate-300 disabled:hover:bg-transparent",
+      "rounded-lg bg-transparent px-3 text-body-muted hover:bg-soft-stone hover:text-ink disabled:hover:bg-transparent disabled:hover:text-body-muted",
     danger:
-      "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 disabled:hover:bg-red-600",
+      "rounded-lg border border-[#f8b4b4] bg-[#fff0f0] text-error hover:bg-[#ffe0e0] disabled:hover:bg-[#fff0f0]",
   };
 
   const variantClass = variants[variant] || variants.primary;
@@ -40,26 +40,10 @@ export function Button({
       {...props}
     >
       {loading && (
-        <svg
-          className="w-4 h-4 animate-spin"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          />
-        </svg>
+        <span
+          aria-hidden="true"
+          className="h-4 w-4 animate-spin rounded-full border-2 border-current/25 border-t-current"
+        />
       )}
       {children}
     </button>

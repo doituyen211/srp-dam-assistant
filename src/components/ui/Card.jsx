@@ -6,7 +6,7 @@
 export function Card({ className = "", children, ...props }) {
   return (
     <div
-      className={`bg-white rounded-lg border border-slate-200 shadow-sm ${className}`}
+      className={`rounded-card border border-hairline bg-canvas shadow-[0_1px_0_rgb(0_0_0/0.02)] ${className}`}
       {...props}
     >
       {children}
@@ -20,7 +20,7 @@ export function Card({ className = "", children, ...props }) {
 export function CardHeader({ className = "", children, ...props }) {
   return (
     <div
-      className={`px-6 py-4 border-b border-slate-100 ${className}`}
+      className={`border-b border-hairline px-6 py-4 ${className}`}
       {...props}
     >
       {children}
@@ -34,7 +34,7 @@ export function CardHeader({ className = "", children, ...props }) {
 export function CardTitle({ className = "", children, ...props }) {
   return (
     <h3
-      className={`text-lg font-semibold text-slate-900 ${className}`}
+      className={`text-lg font-medium tracking-[-0.01em] text-ink ${className}`}
       {...props}
     >
       {children}
@@ -47,7 +47,7 @@ export function CardTitle({ className = "", children, ...props }) {
  */
 export function CardContent({ className = "", children, ...props }) {
   return (
-    <div className={`px-6 py-4 ${className}`} {...props}>
+    <div className={`px-6 py-5 ${className}`} {...props}>
       {children}
     </div>
   );
