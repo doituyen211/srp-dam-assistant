@@ -21,33 +21,27 @@ export function AppShell({ children }) {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50">
-      {/* Topbar */}
-      <Topbar onMenuToggle={handleMenuToggle} />
-
-      {/* Main Layout */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        {user && (
-          <>
-            <Sidebar
-              user={user}
-              isOpen={sidebarOpen}
-              onClose={handleCloseSidebar}
+    <div className="min-h-screen bg-app-bg text-ink">
+      {user && (
+        <>
+          <Sidebar user={user} isOpen={sidebarOpen} onClose={handleCloseSidebar} />
+          {sidebarOpen && (
+            <button
+              type="button"
+              aria-label="Đóng menu"
+              className="fixed inset-0 z-40 bg-primary/45 backdrop-blur-[1px] md:hidden"
+              onClick={handleCloseSidebar}
             />
-            {/* Mobile Overlay */}
-            {sidebarOpen && (
-              <div
-                className="fixed inset-0 bg-black/50 z-30 md:hidden"
-                onClick={handleCloseSidebar}
-              />
-            )}
-          </>
-        )}
+          )}
+        </>
+      )}
 
-        {/* Content Area */}
-        <main className="flex-1 overflow-auto">
-          <div className="mt-16 md:mt-0 p-4 md:p-6">{children}</div>
+      <div className={user ? "min-h-screen md:pl-[240px]" : "min-h-screen"}>
+        <Topbar onMenuToggle={handleMenuToggle} isMenuOpen={sidebarOpen} />
+        <main className="min-h-[calc(100vh-56px)] overflow-x-hidden">
+          <div className="w-full max-w-[1200px] px-5 py-6 md:px-8 md:py-8">
+            {children}
+          </div>
         </main>
       </div>
     </div>

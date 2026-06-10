@@ -47,9 +47,11 @@ export function ProtectedRoute({ children, allowedRoles = null }) {
   // Role check failed
   if (allowedRoles && !hasRole(user, allowedRoles)) {
     return (
-      <Alert type="error" title="Quyền hạn bị từ chối">
-        Bạn không có quyền truy cập trang này. Vui lòng liên hệ quản trị viên.
-      </Alert>
+      <div className="mx-auto max-w-2xl p-5 md:p-8">
+        <Alert type="error" title="Quyền hạn bị từ chối">
+          Bạn không có quyền truy cập trang này. Vui lòng liên hệ quản trị viên.
+        </Alert>
+      </div>
     );
   }
 

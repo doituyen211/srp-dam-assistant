@@ -3,12 +3,19 @@
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
-import { STATUS_LABELS } from "@/lib/constants";
+import { USER_ROLES } from "@/lib/constants";
+
+const roleLabels = {
+  [USER_ROLES.STUDENT]: "Student",
+  [USER_ROLES.REVIEWER]: "Reviewer",
+  [USER_ROLES.ADMIN]: "Admin",
+  [USER_ROLES.LECTURER]: "Lecturer",
+};
 
 /**
  * Topbar - Top navigation with user info and logout
  */
-export function Topbar({ onMenuToggle }) {
+export function Topbar({ onMenuToggle, isMenuOpen = false }) {
   const router = useRouter();
   const { user, logout, loading } = useAuth();
 
@@ -21,24 +28,22 @@ export function Topbar({ onMenuToggle }) {
     }
   };
 
-  // Map role to label
-  const roleLabel = user
-    ? STATUS_LABELS[user.role] ||
-      user.role.charAt(0).toUpperCase() + user.role.slice(1)
-    : "";
+  const roleLabel = user ? roleLabels[user.role] || user.role : "";
 
   return (
-    <div className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 shadow-sm z-50">
-      <div className="h-full px-4 md:px-6 flex items-center justify-between">
-        {/* Left: Logo & Menu Toggle */}
+    <header className="sticky top-0 z-30 h-14 border-b border-hairline bg-canvas">
+      <div className="flex h-full items-center justify-between px-5 md:px-8">
         <div className="flex items-center gap-4">
           <button
+            type="button"
             onClick={onMenuToggle}
-            className="md:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
-            aria-label="Toggle menu"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-body-muted transition-colors hover:bg-soft-stone hover:text-ink md:hidden"
+            aria-label={isMenuOpen ? "Đóng menu" : "Mở menu"}
+            aria-expanded={isMenuOpen}
           >
             <svg
-              className="w-6 h-6 text-slate-700"
+              aria-hidden="true"
+              className="h-5 w-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -46,35 +51,43 @@ export function Topbar({ onMenuToggle }) {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth={1.8}
                 d="M4 6h16M4 12h16M4 18h16"
               />
             </svg>
           </button>
-          <h1 className="text-xl font-semibold text-slate-900 hidden md:block">
-            SRP DAM
-          </h1>
+          <div>
+            <h1 className="text-[15px] font-medium text-ink">SRP D&M Assistant</h1>
+            <p className="hidden font-mono text-[10px] uppercase tracking-[0.12em] text-muted sm:block">
+              Student Research Platform
+            </p>
+          </div>
         </div>
 
-        {/* Right: User Info & Logout */}
         {user && (
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:block text-right">
-              <p className="text-sm font-medium text-slate-900">{user.name}</p>
-              <p className="text-xs text-slate-500">{user.email}</p>
-              <p className="text-xs text-blue-600 font-medium">{roleLabel}</p>
+          <div className="flex items-center gap-3">
+            <div className="hidden text-right sm:block">
+              <p className="max-w-[220px] truncate text-[13px] font-medium text-ink">
+                {user.name}
+              </p>
+              <p className="max-w-[220px] truncate text-xs text-body-muted">
+                {user.email}
+              </p>
+            </div>
+            <div className="hidden rounded bg-soft-stone px-2 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-body-muted md:block">
+              {roleLabel}
             </div>
             <Button
               variant="ghost"
               onClick={handleLogout}
               disabled={loading}
-              className="text-sm"
+              className="px-3 py-2 text-[13px] text-error hover:bg-[#fff0f0] hover:text-error"
             >
               Đăng xuất
             </Button>
           </div>
         )}
       </div>
-    </div>
+    </header>
   );
 }
