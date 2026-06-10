@@ -31,80 +31,80 @@ export function LecturerMatchCard({
         : "success";
 
   const capacityColors = {
-    success: "text-green-600",
-    warning: "text-amber-600",
-    danger: "text-red-600",
+    success: "text-success",
+    warning: "text-warning",
+    danger: "text-error",
+  };
+
+  const capacityBars = {
+    success: "bg-deep-green",
+    warning: "bg-warning",
+    danger: "bg-error",
   };
 
   return (
-    <Card>
-      <CardContent className="py-4 space-y-3">
-        {/* Name & Score */}
+    <Card className="h-full transition-all duration-150 hover:border-[#aaa] hover:shadow-card">
+      <CardContent className="flex h-full flex-col gap-4 p-5">
         <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="font-semibold text-slate-900">{lecturer.name}</h3>
-            <p className="text-sm text-slate-600">{lecturer.department}</p>
+          <div className="min-w-0">
+            <h3 className="truncate text-[15px] font-medium text-ink">
+              {lecturer.name}
+            </h3>
+            <p className="mt-1 text-sm text-body-muted">{lecturer.department}</p>
           </div>
-          <div className="text-right">
-            <div className="text-lg font-bold text-blue-600">
+          <div className="flex h-14 w-14 flex-shrink-0 flex-col items-center justify-center rounded-full bg-pale-green text-center text-deep-green">
+            <div className="text-base font-semibold leading-none">
               {lecturer.matchScore.toFixed(1)}
             </div>
-            <p className="text-xs text-slate-500">Match score</p>
+            <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.08em]">
+              Match
+            </p>
           </div>
         </div>
 
-        {/* Expertise Tags */}
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1.5">
           {lecturer.expertise.map((skill) => (
-            <Badge key={skill} intent="info" className="text-xs">
+            <Badge key={skill} intent="info">
               {skill}
             </Badge>
           ))}
         </div>
 
-        {/* Capacity */}
-        <div className="space-y-1">
+        <div className="space-y-2">
           <div className="flex justify-between text-xs">
-            <span className="font-medium text-slate-700">
-              Công việc hiện tại
+            <span className="font-mono uppercase tracking-[0.08em] text-muted">
+              Capacity
             </span>
             <span className={`font-semibold ${capacityColors[capacityStatus]}`}>
               {lecturer.currentLoad}/{lecturer.maxLoad}
             </span>
           </div>
-          <div className="w-full bg-slate-200 rounded-full h-2">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-soft-stone">
             <div
-              className={`h-2 rounded-full transition-all ${
-                capacityStatus === "danger"
-                  ? "bg-red-500"
-                  : capacityStatus === "warning"
-                    ? "bg-amber-500"
-                    : "bg-green-500"
-              }`}
+              className={`h-full rounded-full transition-all ${capacityBars[capacityStatus]}`}
               style={{ width: `${Math.min(capacityPercentage, 100)}%` }}
             />
           </div>
         </div>
 
-        {/* Reason */}
-        <div className="bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
-          <p className="text-xs text-blue-800">{lecturer.reason}</p>
+        <div className="rounded-lg border border-card-border bg-[#fafafa] px-3 py-2">
+          <p className="text-xs leading-5 text-body-muted">{lecturer.reason}</p>
         </div>
 
-        {/* Risk Note */}
         {lecturer.riskNote && (
-          <div className="bg-amber-50 px-3 py-2 rounded-lg border border-amber-100">
-            <p className="text-xs text-amber-800">{lecturer.riskNote}</p>
+          <div className="rounded-lg border border-[#ffe082] bg-[#fff8e1] px-3 py-2">
+            <p className="text-xs leading-5 text-[#5d4037]">
+              {lecturer.riskNote}
+            </p>
           </div>
         )}
 
-        {/* Recommend Button */}
         <Button
           variant="primary"
           onClick={() => onRecommend?.(lecturer.id)}
           loading={loading}
           disabled={loading || !canRecommend}
-          className="w-full"
+          className="mt-auto w-full"
         >
           {canRecommend ? buttonLabel : "Chỉ có quyền xem"}
         </Button>

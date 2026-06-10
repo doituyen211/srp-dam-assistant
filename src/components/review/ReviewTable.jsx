@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { ProposalStatusBadge } from "@/components/proposal/ProposalStatusBadge";
 
 /**
@@ -21,38 +22,39 @@ export function ReviewTable({
 }) {
   if (proposals.length === 0) {
     return (
-      <div className="text-center py-8 text-slate-500">
-        Không có đề tài cần xét duyệt
-      </div>
+      <EmptyState
+        title="Không có đề tài cần xét duyệt"
+        description="Danh sách review sẽ xuất hiện khi có đề tài được gửi lên hệ thống."
+      />
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200">
-      <table className="w-full text-sm">
-        <thead className="bg-slate-50 border-b border-slate-200">
+    <div className="overflow-x-auto rounded-[10px] border border-hairline bg-canvas">
+      <table className="w-full min-w-[840px] border-collapse text-sm">
+        <thead className="bg-soft-stone">
           <tr>
-            <th className="px-4 py-3 text-left font-semibold text-slate-700">
+            <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
               Đề tài
             </th>
-            <th className="px-4 py-3 text-left font-semibold text-slate-700">
+            <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
               Sinh viên
             </th>
-            <th className="px-4 py-3 text-left font-semibold text-slate-700">
+            <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
               Lĩnh vực
             </th>
-            <th className="px-4 py-3 text-left font-semibold text-slate-700">
+            <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
               Trạng thái
             </th>
-            <th className="px-4 py-3 text-left font-semibold text-slate-700">
+            <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
               Điểm
             </th>
-            <th className="px-4 py-3 text-left font-semibold text-slate-700">
+            <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
               Hành động
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-hairline">
           {proposals.map((proposal) => {
             const review = reviews[proposal.id];
             const score = review?.totalScore || "-";
@@ -60,44 +62,49 @@ export function ReviewTable({
             return (
               <tr
                 key={proposal.id}
-                className="border-b border-slate-200 hover:bg-blue-50 transition-colors"
+                className="transition-colors hover:bg-[#fafafa]"
               >
                 <td className="px-4 py-3">
-                  <p className="font-medium text-slate-900 line-clamp-1">
+                  <p className="line-clamp-1 font-medium text-ink">
                     {proposal.title}
                   </p>
                 </td>
-                <td className="px-4 py-3 text-slate-700">
+                <td className="px-4 py-3 text-body-muted">
                   {proposal.studentName}
                 </td>
-                <td className="px-4 py-3 text-slate-700">{proposal.field}</td>
+                <td className="px-4 py-3">
+                  <span className="rounded bg-soft-stone px-2 py-1 text-xs text-body-muted">
+                    {proposal.field}
+                  </span>
+                </td>
                 <td className="px-4 py-3">
                   <ProposalStatusBadge status={proposal.status} />
                 </td>
-                <td className="px-4 py-3 font-semibold text-blue-600">
+                <td className="px-4 py-3 font-mono text-sm font-medium text-action-blue">
                   {score}
                 </td>
                 <td className="px-4 py-3">
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Button
                       variant="ghost"
                       onClick={() => onViewDetail?.(proposal.id)}
-                      className="text-xs"
+                      className="px-3 py-2 text-xs"
                     >
                       Chi tiết
                     </Button>
-                    <button
+                    <Button
+                      variant="secondary"
                       onClick={() => onNeedsRevision?.(proposal.id)}
-                      className="text-xs text-amber-600 hover:text-amber-700 font-medium"
+                      className="px-3 py-2 text-xs text-warning"
                     >
                       Sửa
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => onRecommendApprove?.(proposal.id)}
-                      className="text-xs text-green-600 hover:text-green-700 font-medium"
+                      className="px-3 py-2 text-xs"
                     >
                       Phê
-                    </button>
+                    </Button>
                   </div>
                 </td>
               </tr>

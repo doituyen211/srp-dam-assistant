@@ -11,42 +11,64 @@ export function RubricScoreCard({ review }) {
   if (!review) return null;
 
   const criteria = review.criteria || [];
+  const totalScore = review.totalScore ?? 0;
+  const totalPercent = Math.min(totalScore * 10, 100);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Đánh giá theo tiêu chí</CardTitle>
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <CardTitle>Đánh giá theo tiêu chí</CardTitle>
+            <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+              Rubric score
+            </p>
+          </div>
+          <div className="text-right">
+            <div className="text-2xl font-semibold leading-none text-action-blue">
+              {totalScore.toFixed(1)}
+            </div>
+            <p className="mt-1 text-xs text-muted">/10</p>
+          </div>
+        </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        {/* Criteria Rows */}
+      <CardContent className="space-y-5">
+        <div className="h-2 overflow-hidden rounded-full bg-soft-stone">
+          <div
+            className="h-full rounded-full bg-action-blue transition-all"
+            style={{ width: `${totalPercent}%` }}
+          />
+        </div>
+
         {criteria.map((criterion) => (
           <div
             key={criterion.name}
-            className="flex items-center justify-between pb-3 border-b border-slate-200 last:border-b-0"
+            className="border-b border-hairline pb-3 last:border-b-0 last:pb-0"
           >
-            <span className="text-sm font-medium text-slate-700">
-              {criterion.name}
-            </span>
-            <span className="text-sm font-semibold text-blue-600">
-              {criterion.score}/{criterion.maxScore}
-            </span>
+            <div className="mb-2 flex items-center justify-between gap-4">
+              <span className="text-sm font-medium text-ink">{criterion.name}</span>
+              <span className="font-mono text-xs font-medium text-action-blue">
+                {criterion.score}/{criterion.maxScore}
+              </span>
+            </div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-soft-stone">
+              <div
+                className="h-full rounded-full bg-action-blue transition-all"
+                style={{
+                  width: `${Math.min((criterion.score / criterion.maxScore) * 100, 100)}%`,
+                }}
+              />
+            </div>
           </div>
         ))}
 
-        {/* Total Score */}
-        <div className="pt-2 flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg">
-          <span className="font-semibold text-slate-900">Tổng điểm</span>
-          <span className="text-lg font-bold text-blue-600">
-            {review.totalScore?.toFixed(1)}
-          </span>
-        </div>
-
-        {/* Comments */}
         {review.comments && (
-          <div className="pt-3">
-            <p className="text-xs font-medium text-slate-600 mb-1">Nhận xét:</p>
-            <p className="text-sm text-slate-700">{review.comments}</p>
+          <div className="rounded-lg bg-soft-stone p-4">
+            <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+              Nhận xét
+            </p>
+            <p className="text-sm leading-6 text-ink">{review.comments}</p>
           </div>
         )}
       </CardContent>
