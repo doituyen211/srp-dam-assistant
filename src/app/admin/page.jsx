@@ -130,14 +130,16 @@ function AdminPageContent() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      <Card className="border-slate-900 bg-slate-950 text-white">
+    <div className="space-y-6">
+      <Card className="border-primary bg-primary text-white">
         <CardContent className="p-6 md:p-8">
-          <p className="text-sm font-medium text-slate-300">Admin console</p>
-          <h1 className="mt-3 text-2xl font-semibold leading-tight md:text-4xl">
+          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-white/45">
+            Admin console
+          </p>
+          <h1 className="mt-3 text-2xl font-medium leading-tight tracking-[-0.02em] md:text-4xl">
             Quản trị hệ thống demo SRP DAM
           </h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 md:text-base">
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/65 md:text-base">
             Theo dõi vai trò người dùng, trạng thái hệ thống mock và các log
             phục vụ demo quản trị frontend-only.
           </p>
@@ -158,13 +160,13 @@ function AdminPageContent() {
         {userOverview.map((item) => (
           <Card key={item.role}>
             <CardContent className="p-5">
-              <p className="text-sm font-medium text-slate-500">
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-muted">
                 {item.label}
               </p>
-              <p className="mt-3 text-3xl font-semibold text-slate-950">
+              <p className="mt-3 text-3xl font-medium leading-none text-ink">
                 {item.count}
               </p>
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-3 text-sm text-body-muted">
                 Tài khoản mock đang cấu hình
               </p>
             </CardContent>
@@ -181,14 +183,14 @@ function AdminPageContent() {
             {systemStatuses.map((item) => (
               <div
                 key={item.label}
-                className="rounded-lg border border-slate-200 p-4"
+                className="rounded-lg border border-hairline bg-canvas p-4"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="font-semibold text-slate-950">
+                    <p className="font-medium text-ink">
                       {item.label}
                     </p>
-                    <p className="mt-1 text-sm leading-5 text-slate-500">
+                    <p className="mt-1 text-sm leading-5 text-body-muted">
                       {item.description}
                     </p>
                   </div>
@@ -204,37 +206,37 @@ function AdminPageContent() {
             <CardTitle>AI request logs mock</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto rounded-lg border border-slate-200">
-              <table className="w-full min-w-[640px] text-sm">
-                <thead className="border-b border-slate-200 bg-slate-50">
+            <div className="overflow-x-auto rounded-[10px] border border-hairline bg-canvas">
+              <table className="w-full min-w-[640px] border-collapse text-sm">
+                <thead className="bg-soft-stone">
                   <tr>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">
+                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
                       Action
                     </th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">
+                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
                       Target
                     </th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">
+                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
                       Provider
                     </th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">
+                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">
+                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
                       Latency
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-hairline">
                   {aiRequestLogs.map((log) => (
-                    <tr key={log.id}>
-                      <td className="px-4 py-3 font-medium text-slate-950">
+                    <tr key={log.id} className="transition-colors hover:bg-[#fafafa]">
+                      <td className="px-4 py-3 font-medium text-ink">
                         {log.action}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-body-muted">
                         {log.target}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-body-muted">
                         {log.provider}
                       </td>
                       <td className="px-4 py-3">
@@ -244,7 +246,7 @@ function AdminPageContent() {
                           {log.status}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-body-muted">
                         {log.latency}
                       </td>
                     </tr>
@@ -268,37 +270,37 @@ function AdminPageContent() {
               description="Các thao tác như đăng nhập, cập nhật đề tài hoặc recommend giảng viên sẽ được ghi nhận trong session demo."
             />
           ) : (
-            <div className="overflow-x-auto rounded-lg border border-slate-200">
-              <table className="w-full min-w-[760px] text-sm">
-                <thead className="border-b border-slate-200 bg-slate-50">
+            <div className="overflow-x-auto rounded-[10px] border border-hairline bg-canvas">
+              <table className="w-full min-w-[760px] border-collapse text-sm">
+                <thead className="bg-soft-stone">
                   <tr>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">
+                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
                       Time
                     </th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">
+                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
                       User
                     </th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">
+                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
                       Action
                     </th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">
+                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">
+                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
                       Details
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-hairline">
                   {auditLogs.map((log) => (
-                    <tr key={log.id} className="align-top">
-                      <td className="px-4 py-3 text-slate-600">
+                    <tr key={log.id} className="align-top transition-colors hover:bg-[#fafafa]">
+                      <td className="px-4 py-3 text-body-muted">
                         {formatDateTime(log.timestamp)}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-body-muted">
                         {log.userName || log.userId || "System"}
                       </td>
-                      <td className="px-4 py-3 font-medium text-slate-950">
+                      <td className="px-4 py-3 font-medium text-ink">
                         {log.action}
                       </td>
                       <td className="px-4 py-3">
@@ -308,7 +310,7 @@ function AdminPageContent() {
                           {log.status}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-body-muted">
                         {log.details || "Không có chi tiết"}
                       </td>
                     </tr>

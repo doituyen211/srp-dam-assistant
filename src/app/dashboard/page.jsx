@@ -205,30 +205,34 @@ function DashboardContent() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      <Card className="overflow-hidden border-slate-900 bg-slate-950 text-white">
+    <div className="space-y-6">
+      <Card className="overflow-hidden border-primary bg-primary text-white">
         <CardContent className="grid gap-6 p-6 md:grid-cols-[1.5fr_1fr] md:p-8">
           <div className="space-y-4">
             <Badge className="bg-white/10 text-white">
               {roleLabels[user?.role] || "Người dùng"}
             </Badge>
             <div>
-              <h1 className="text-2xl font-semibold leading-tight md:text-4xl">
+              <h1 className="text-2xl font-medium leading-tight tracking-[-0.02em] md:text-4xl">
                 Chào mừng, {user?.name || "bạn"}
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 md:text-base">
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/65 md:text-base">
                 Dashboard tóm tắt tình hình đề tài, việc cần xử lý và các bước
                 tiếp theo theo vai trò của bạn.
               </p>
             </div>
           </div>
           <div className="rounded-lg border border-white/10 bg-white/5 p-4">
-            <p className="text-sm text-slate-300">Khoa/đơn vị</p>
-            <p className="mt-1 text-lg font-semibold">
+            <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-white/45">
+              Khoa/đơn vị
+            </p>
+            <p className="mt-2 text-lg font-medium">
               {user?.department || "Chưa cập nhật"}
             </p>
-            <p className="mt-4 text-sm text-slate-300">Email</p>
-            <p className="mt-1 break-words text-sm font-medium">
+            <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.12em] text-white/45">
+              Email
+            </p>
+            <p className="mt-2 break-words text-sm font-medium text-white/85">
               {user?.email || "Chưa cập nhật"}
             </p>
           </div>
@@ -239,13 +243,13 @@ function DashboardContent() {
         {statCards.map((item) => (
           <Card key={item.label}>
             <CardContent className="p-5">
-              <p className="text-sm font-medium text-slate-500">
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-muted">
                 {item.label}
               </p>
-              <p className="mt-3 text-3xl font-semibold text-slate-950">
+              <p className="mt-3 text-3xl font-medium leading-none text-ink">
                 {item.value}
               </p>
-              <p className="mt-2 text-sm leading-5 text-slate-500">
+              <p className="mt-3 text-sm leading-5 text-body-muted">
                 {item.helper}
               </p>
             </CardContent>
@@ -258,13 +262,13 @@ function DashboardContent() {
           <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>Recent proposals</CardTitle>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-body-muted">
                 Các đề tài cập nhật gần đây nhất.
               </p>
             </div>
             <Link
               href="/proposals"
-              className="inline-flex items-center justify-center rounded-lg bg-slate-200 px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+              className="inline-flex items-center justify-center rounded-lg border border-hairline px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-soft-stone focus:outline-none focus:ring-2 focus:ring-focus-blue/30 focus:ring-offset-2"
             >
               Xem tất cả
             </Link>
@@ -278,27 +282,27 @@ function DashboardContent() {
                 className="py-10"
               />
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-hairline">
                 {visibleProposals.map((proposal) => (
                   <div
                     key={proposal.id}
                     className="grid gap-3 px-6 py-4 md:grid-cols-[1fr_auto] md:items-center"
                   >
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-950">
+                      <p className="truncate text-sm font-medium text-ink">
                         {proposal.title || "Đề tài chưa có tiêu đề"}
                       </p>
-                      <p className="mt-1 text-sm text-slate-500">
+                      <p className="mt-1 text-sm text-body-muted">
                         {proposal.field || "Chưa phân loại"} ·{" "}
                         {proposal.studentName || "Chưa có sinh viên"}
                       </p>
-                      <p className="mt-1 text-xs text-slate-400">
+                      <p className="mt-1 text-xs text-muted">
                         Cập nhật {formatDate(proposal.updatedAt)}
                       </p>
                     </div>
                     <div className="flex items-center gap-3 md:justify-end">
                       <ProposalStatusBadge status={proposal.status} />
-                      <span className="text-sm font-medium text-slate-500">
+                      <span className="font-mono text-[11px] font-medium text-action-blue">
                         AI {proposal.aiScore ?? "N/A"}
                       </span>
                     </div>
@@ -310,19 +314,19 @@ function DashboardContent() {
         </Card>
 
         <div className="space-y-6">
-          <Card className="bg-emerald-950 text-white">
+          <Card className="border-deep-green bg-deep-green text-white">
             <CardHeader className="border-white/10">
               <CardTitle className="text-white">AI assistant summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm leading-6 text-emerald-50">
+              <p className="text-sm leading-6 text-white/75">
                 {getRoleSummary(user?.role, stats || {}, proposals)}
               </p>
               <div className="rounded-lg bg-white/10 p-4">
-                <p className="text-xs uppercase text-emerald-100">
+                <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-white/50">
                   Điểm AI trung bình
                 </p>
-                <p className="mt-2 text-3xl font-semibold">
+                <p className="mt-2 text-3xl font-medium">
                   {stats?.averageAIScore || "N/A"}
                 </p>
               </div>
@@ -337,20 +341,20 @@ function DashboardContent() {
               {quickActions.map((action) => (
                 <div
                   key={action.href}
-                  className="rounded-lg border border-slate-200 p-4"
+                  className="rounded-lg border border-hairline bg-canvas p-4"
                 >
-                  <p className="font-semibold text-slate-950">
+                  <p className="font-medium text-ink">
                     {action.title}
                   </p>
-                  <p className="mt-1 text-sm leading-5 text-slate-500">
+                  <p className="mt-1 text-sm leading-5 text-body-muted">
                     {action.description}
                   </p>
                   <Link
                     href={action.href}
                     className={`mt-3 inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 sm:w-auto ${
                       action.primary
-                        ? "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500"
-                        : "bg-slate-200 text-slate-900 hover:bg-slate-300 focus:ring-slate-400"
+                        ? "bg-primary text-white hover:bg-[#2d2d35] focus:ring-focus-blue/30"
+                        : "border border-hairline text-ink hover:bg-soft-stone focus:ring-focus-blue/30"
                     }`}
                   >
                     {action.label}

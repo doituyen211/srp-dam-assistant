@@ -33,7 +33,7 @@ const formatDate = (value) => {
 function RubricPreview({ review }) {
   if (!review) {
     return (
-      <div className="text-sm text-slate-500">
+      <div className="text-sm text-muted">
         Chưa có rubric
       </div>
     );
@@ -43,17 +43,17 @@ function RubricPreview({ review }) {
 
   return (
     <div className="min-w-40 space-y-2">
-      <div className="text-sm font-semibold text-blue-600">
+      <div className="font-mono text-sm font-medium text-action-blue">
         {review.totalScore?.toFixed(1) || "N/A"}/10
       </div>
       <div className="space-y-1">
         {topCriteria.map((criterion) => (
           <div
             key={criterion.name}
-            className="flex items-center justify-between gap-3 text-xs text-slate-500"
+            className="flex items-center justify-between gap-3 text-xs text-muted"
           >
             <span className="truncate">{criterion.name}</span>
-            <span className="font-medium text-slate-700">
+            <span className="font-medium text-ink">
               {criterion.score}/{criterion.maxScore}
             </span>
           </div>
@@ -71,28 +71,28 @@ function ReviewRows({
   onRecommendApprove,
 }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200">
-      <table className="w-full min-w-[920px] text-sm">
-        <thead className="border-b border-slate-200 bg-slate-50">
+    <div className="overflow-x-auto rounded-[10px] border border-hairline bg-canvas">
+      <table className="w-full min-w-[920px] border-collapse text-sm">
+        <thead className="bg-soft-stone">
           <tr>
-            <th className="px-4 py-3 text-left font-semibold text-slate-700">
+            <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
               Đề tài
             </th>
-            <th className="px-4 py-3 text-left font-semibold text-slate-700">
+            <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
               Sinh viên
             </th>
-            <th className="px-4 py-3 text-left font-semibold text-slate-700">
+            <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
               Rubric preview
             </th>
-            <th className="px-4 py-3 text-left font-semibold text-slate-700">
+            <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
               Status
             </th>
-            <th className="px-4 py-3 text-right font-semibold text-slate-700">
+            <th className="px-4 py-3 text-right font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
               Actions
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody className="divide-y divide-hairline">
           {proposals.map((proposal) => {
             const pendingNeedsRevision =
               pendingAction === `${proposal.id}:revision`;
@@ -100,17 +100,17 @@ function ReviewRows({
             const isPending = pendingNeedsRevision || pendingApprove;
 
             return (
-              <tr key={proposal.id} className="align-top hover:bg-slate-50">
+              <tr key={proposal.id} className="align-top transition-colors hover:bg-[#fafafa]">
                 <td className="px-4 py-4">
-                  <p className="max-w-md font-semibold text-slate-950">
+                  <p className="max-w-md font-medium text-ink">
                     {proposal.title || "Đề tài chưa có tiêu đề"}
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-body-muted">
                     {proposal.field || "Chưa phân loại"} · Cập nhật{" "}
                     {formatDate(proposal.updatedAt)}
                   </p>
                 </td>
-                <td className="px-4 py-4 text-slate-700">
+                <td className="px-4 py-4 text-body-muted">
                   {proposal.studentName || "Chưa cập nhật"}
                 </td>
                 <td className="px-4 py-4">
@@ -123,7 +123,7 @@ function ReviewRows({
                   <div className="flex flex-wrap justify-end gap-2">
                     <Link
                       href={`/proposals/${proposal.id}`}
-                      className="inline-flex items-center justify-center rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2"
+                      className="inline-flex items-center justify-center rounded-lg border border-hairline px-3 py-2 text-xs font-medium text-ink transition-colors hover:bg-soft-stone focus:outline-none focus:ring-2 focus:ring-focus-blue/30 focus:ring-offset-2"
                     >
                       View detail
                     </Link>
@@ -254,16 +254,16 @@ function ReviewPageContent() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      <Card className="border-slate-900 bg-slate-950 text-white">
+    <div className="space-y-6">
+      <Card className="border-primary bg-primary text-white">
         <CardContent className="p-6 md:p-8">
-          <p className="text-sm font-medium text-slate-300">
+          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-white/45">
             Reviewer dashboard
           </p>
-          <h1 className="mt-3 text-2xl font-semibold leading-tight md:text-4xl">
+          <h1 className="mt-3 text-2xl font-medium leading-tight tracking-[-0.02em] md:text-4xl">
             Quyết định cuối cùng nằm ở reviewer
           </h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 md:text-base">
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/65 md:text-base">
             Dùng rubric, phản hồi AI và nội dung chi tiết để đưa ra khuyến nghị:
             yêu cầu chỉnh sửa hoặc phê duyệt đề tài cho vòng tiếp theo.
           </p>
@@ -286,7 +286,7 @@ function ReviewPageContent() {
         <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>Danh sách đề tài cần review</CardTitle>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-body-muted">
               {reviewQueue.length} đề tài đang ở trạng thái reviewer cần theo
               dõi.
             </p>

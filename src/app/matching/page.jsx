@@ -166,16 +166,16 @@ function MatchingPageContent() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      <Card className="border-slate-900 bg-slate-950 text-white">
+    <div className="space-y-6">
+      <Card className="border-primary bg-primary text-white">
         <CardContent className="p-6 md:p-8">
-          <p className="text-sm font-medium text-slate-300">
+          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-white/45">
             Lecturer matching
           </p>
-          <h1 className="mt-3 text-2xl font-semibold leading-tight md:text-4xl">
+          <h1 className="mt-3 text-2xl font-medium leading-tight tracking-[-0.02em] md:text-4xl">
             Gợi ý giảng viên hướng dẫn phù hợp
           </h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 md:text-base">
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/65 md:text-base">
             Chọn một đề tài để xem danh sách giảng viên được gợi ý theo chuyên
             môn, tải hướng dẫn hiện tại và mức độ phù hợp.
           </p>
@@ -203,7 +203,7 @@ function MatchingPageContent() {
         <CardHeader>
           <CardTitle>Chọn đề tài</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+        <CardContent className="grid gap-4 p-5 lg:grid-cols-[1fr_auto] lg:items-end">
           <Select
             label="Proposal"
             value={selectedProposalId}
@@ -213,7 +213,7 @@ function MatchingPageContent() {
           {selectedProposalId && (
             <Link
               href={`/proposals/${selectedProposalId}`}
-              className="inline-flex items-center justify-center rounded-lg bg-slate-200 px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+              className="inline-flex items-center justify-center rounded-lg border border-hairline px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-soft-stone focus:outline-none focus:ring-2 focus:ring-focus-blue/30 focus:ring-offset-2"
             >
               View proposal detail
             </Link>
@@ -224,27 +224,27 @@ function MatchingPageContent() {
       {selectedProposal && (
         <Card>
           <CardContent className="grid gap-4 p-5 md:grid-cols-3">
-            <div>
-              <p className="text-xs font-medium uppercase text-slate-500">
+            <div className="rounded-lg bg-soft-stone p-4">
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-muted">
                 Đề tài
               </p>
-              <p className="mt-1 text-sm font-semibold text-slate-950">
+              <p className="mt-2 text-sm font-medium text-ink">
                 {selectedProposal.title}
               </p>
             </div>
-            <div>
-              <p className="text-xs font-medium uppercase text-slate-500">
+            <div className="rounded-lg bg-soft-stone p-4">
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-muted">
                 Lĩnh vực
               </p>
-              <p className="mt-1 text-sm font-semibold text-slate-950">
+              <p className="mt-2 text-sm font-medium text-ink">
                 {selectedProposal.field || "Chưa cập nhật"}
               </p>
             </div>
-            <div>
-              <p className="text-xs font-medium uppercase text-slate-500">
+            <div className="rounded-lg bg-soft-stone p-4">
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-muted">
                 Sinh viên
               </p>
-              <p className="mt-1 text-sm font-semibold text-slate-950">
+              <p className="mt-2 text-sm font-medium text-ink">
                 {selectedProposal.studentName || "Chưa cập nhật"}
               </p>
             </div>

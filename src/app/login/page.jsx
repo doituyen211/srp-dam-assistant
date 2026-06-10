@@ -73,33 +73,45 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center px-4 py-12">
-      {/* Header */}
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-slate-900">SRP DAM</h1>
-        <p className="text-slate-600 mt-2">AI Trợ Lý Soạn & Quản Lý Đề Tài</p>
-      </div>
+    <div className="flex min-h-screen items-center justify-center bg-soft-stone px-5 py-10">
+      <div className="w-full max-w-[440px]">
+        <div className="mb-6 text-center">
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center rounded bg-primary px-3 py-2 font-mono text-[11px] uppercase tracking-[0.12em] text-white"
+          >
+            SRP D&M
+          </Link>
+          <h1 className="mt-5 text-2xl font-medium tracking-[-0.02em] text-ink">
+            Đăng nhập hệ thống
+          </h1>
+          <p className="mt-2 text-sm leading-6 text-body-muted">
+            AI Trợ Lý Soạn & Quản Lý Đề Tài Nghiên Cứu Sinh Viên
+          </p>
+        </div>
 
-      {/* Login Card */}
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Đăng nhập</CardTitle>
+        <Card className="rounded-2xl border-hairline bg-canvas">
+          <CardHeader>
+            <div>
+              <CardTitle>Đăng nhập</CardTitle>
+              <p className="mt-1 text-sm text-body-muted">
+                Dùng tài khoản demo hoặc nhập thông tin thủ công.
+              </p>
+            </div>
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* Error Alert */}
           {(error || localError) && (
             <Alert type="error">{error || localError}</Alert>
           )}
 
-          {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               label="Email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Nhập email của bạn"
+              placeholder="email@example.com"
               required
               disabled={loading}
             />
@@ -109,7 +121,7 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Nhập mật khẩu"
+              placeholder="demo123"
               required
               disabled={loading}
             />
@@ -119,26 +131,26 @@ export default function LoginPage() {
               variant="primary"
               loading={loading}
               disabled={loading}
-              className="w-full"
+              className="w-full justify-center"
             >
               Đăng nhập
             </Button>
           </form>
 
-          {/* Divider */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200"></div>
+              <div className="w-full border-t border-hairline" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-2 bg-white text-slate-500">hoặc</span>
+              <span className="bg-canvas px-3 font-mono uppercase tracking-[0.08em] text-muted">
+                Demo accounts
+              </span>
             </div>
           </div>
 
-          {/* Demo Accounts */}
-          <div className="space-y-3">
-            <p className="text-sm font-medium text-slate-700 text-center">
-              Tài khoản demo (click để điền nhanh)
+          <div className="rounded-lg bg-[#f8f8f5] p-4">
+            <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+              Mật khẩu: demo123
             </p>
             <div className="space-y-2">
               {DEMO_ACCOUNTS.map((account) => (
@@ -149,14 +161,14 @@ export default function LoginPage() {
                     fillDemoAccount(account.email, account.password)
                   }
                   disabled={loading}
-                  className="w-full p-3 border border-slate-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-lg border border-transparent bg-canvas p-3 text-left transition-all hover:border-hairline hover:bg-soft-stone disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-900 truncate">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-ink">
                         {account.email}
                       </p>
-                      <p className="text-xs text-slate-600">
+                      <p className="mt-0.5 text-xs text-body-muted">
                         {account.password}
                       </p>
                     </div>
@@ -169,24 +181,23 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Help Text */}
-          <div className="bg-blue-50 px-4 py-3 rounded-lg border border-blue-100">
-            <p className="text-xs text-blue-800">
-              💡 <strong>Tip:</strong> Nhấn vào tài khoản demo để điền thông tin
-              nhanh, hoặc nhập thủ công để kiểm tra (mật khẩu: demo123).
+          <div className="rounded-lg border border-card-border bg-canvas px-4 py-3">
+            <p className="text-xs leading-5 text-body-muted">
+              Nhấn vào một tài khoản demo để điền nhanh. Nếu thông tin sai, hệ
+              thống sẽ hiển thị: “Email hoặc mật khẩu chưa đúng.”
             </p>
           </div>
         </CardContent>
-      </Card>
+        </Card>
 
-      {/* Back Link */}
-      <div className="mt-6 text-center">
-        <Link
-          href="/"
-          className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-        >
-          ← Quay lại trang chủ
-        </Link>
+        <div className="mt-6 text-center">
+          <Link
+            href="/"
+            className="text-sm font-medium text-body-muted transition-colors hover:text-ink"
+          >
+            Quay lại trang chủ
+          </Link>
+        </div>
       </div>
     </div>
   );
