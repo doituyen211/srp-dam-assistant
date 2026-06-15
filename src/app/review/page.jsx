@@ -1,28 +1,23 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
-import { ProposalStatusBadge } from "@/components/proposal/ProposalStatusBadge";
+import { AIFeedbackPanel, RubricScoreCard } from "@/components/ai";
+import { ReviewTable } from "@/components/review/ReviewTable";
+import { ReviewQueueFilters } from "@/components/review/ReviewQueueFilters";
+import { ProposalSummaryPanel } from "@/components/review/ProposalSummaryPanel";
+import { ReviewDecisionPanel } from "@/components/review/ReviewDecisionPanel";
 import { Alert } from "@/components/ui/Alert";
-import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LoadingState } from "@/components/ui/LoadingState";
+import { HumanInLoopBanner } from "@/components/ui/HumanInLoopBanner";
 import { api } from "@/lib/api";
 import { PROPOSAL_STATUSES, USER_ROLES } from "@/lib/constants";
 
-const reviewableStatuses = [
-  PROPOSAL_STATUSES.SUBMITTED,
-  PROPOSAL_STATUSES.UNDER_REVIEW,
-  PROPOSAL_STATUSES.NEEDS_REVISION,
-  PROPOSAL_STATUSES.APPROVED,
-];
-
 const formatDate = (value) => {
-  if (!value) return "Chưa cập nhật";
-
+  if (!value) return "N/A";
   return new Intl.DateTimeFormat("vi-VN", {
     day: "2-digit",
     month: "2-digit",
@@ -30,298 +25,395 @@ const formatDate = (value) => {
   }).format(new Date(value));
 };
 
-function RubricPreview({ review }) {
-  if (!review) {
-    return (
-      <div className="text-sm text-muted">
-        Chưa có rubric
-      </div>
-    );
-  }
-
-  const topCriteria = (review.criteria || []).slice(0, 2);
-
-  return (
-    <div className="min-w-40 space-y-2">
-      <div className="font-mono text-sm font-medium text-action-blue">
-        {review.totalScore?.toFixed(1) || "N/A"}/10
-      </div>
-      <div className="space-y-1">
-        {topCriteria.map((criterion) => (
-          <div
-            key={criterion.name}
-            className="flex items-center justify-between gap-3 text-xs text-muted"
-          >
-            <span className="truncate">{criterion.name}</span>
-            <span className="font-medium text-ink">
-              {criterion.score}/{criterion.maxScore}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ReviewRows({
-  proposals,
-  reviewsByProposal,
-  pendingAction,
-  onNeedsRevision,
-  onRecommendApprove,
-}) {
-  return (
-    <div className="overflow-x-auto rounded-[10px] border border-hairline bg-canvas">
-      <table className="w-full min-w-[920px] border-collapse text-sm">
-        <thead className="bg-soft-stone">
-          <tr>
-            <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
-              Đề tài
-            </th>
-            <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
-              Sinh viên
-            </th>
-            <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
-              Rubric preview
-            </th>
-            <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
-              Status
-            </th>
-            <th className="px-4 py-3 text-right font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-hairline">
-          {proposals.map((proposal) => {
-            const pendingNeedsRevision =
-              pendingAction === `${proposal.id}:revision`;
-            const pendingApprove = pendingAction === `${proposal.id}:approve`;
-            const isPending = pendingNeedsRevision || pendingApprove;
-
-            return (
-              <tr key={proposal.id} className="align-top transition-colors hover:bg-[#fafafa]">
-                <td className="px-4 py-4">
-                  <p className="max-w-md font-medium text-ink">
-                    {proposal.title || "Đề tài chưa có tiêu đề"}
-                  </p>
-                  <p className="mt-1 text-xs text-body-muted">
-                    {proposal.field || "Chưa phân loại"} · Cập nhật{" "}
-                    {formatDate(proposal.updatedAt)}
-                  </p>
-                </td>
-                <td className="px-4 py-4 text-body-muted">
-                  {proposal.studentName || "Chưa cập nhật"}
-                </td>
-                <td className="px-4 py-4">
-                  <RubricPreview review={reviewsByProposal[proposal.id]} />
-                </td>
-                <td className="px-4 py-4">
-                  <ProposalStatusBadge status={proposal.status} />
-                </td>
-                <td className="px-4 py-4">
-                  <div className="flex flex-wrap justify-end gap-2">
-                    <Link
-                      href={`/proposals/${proposal.id}`}
-                      className="inline-flex items-center justify-center rounded-lg border border-hairline px-3 py-2 text-xs font-medium text-ink transition-colors hover:bg-soft-stone focus:outline-none focus:ring-2 focus:ring-focus-blue/30 focus:ring-offset-2"
-                    >
-                      View detail
-                    </Link>
-                    <Button
-                      variant="secondary"
-                      className="px-3 py-2 text-xs"
-                      loading={pendingNeedsRevision}
-                      disabled={isPending}
-                      onClick={() => onNeedsRevision(proposal.id)}
-                    >
-                      Mark needs revision
-                    </Button>
-                    <Button
-                      className="px-3 py-2 text-xs"
-                      loading={pendingApprove}
-                      disabled={isPending}
-                      onClick={() => onRecommendApprove(proposal.id)}
-                    >
-                      Recommend approve
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
 function ReviewPageContent() {
-  const [proposals, setProposals] = useState([]);
+  const [allProposals, setAllProposals] = useState([]);
   const [reviewsByProposal, setReviewsByProposal] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [pendingAction, setPendingAction] = useState("");
 
+  // Filters
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [fieldFilter, setFieldFilter] = useState("all");
+  const [urgencyFilter, setUrgencyFilter] = useState("all");
+  const [riskFilter, setRiskFilter] = useState("all");
+
+  // Selected proposal for inline detail
+  const [selectedId, setSelectedId] = useState(null);
+  const [selectedFeedback, setSelectedFeedback] = useState(null);
+  const [selectedReview, setSelectedReview] = useState(null);
+
+
+  // Decision
+  const [decisionLoading, setDecisionLoading] = useState(false);
+  const [actionPending, setActionPending] = useState("");
+
+  // Load proposals
   useEffect(() => {
     let mounted = true;
-
-    const loadReviewData = async () => {
+    const load = async () => {
       setLoading(true);
       setError("");
-      setMessage("");
-
       try {
-        const proposalData = await api.getProposals();
-        const proposalsList = Array.isArray(proposalData) ? proposalData : [];
+        const data = await api.getProposals();
+        if (!mounted) return;
+        const list = Array.isArray(data) ? data : [];
+        setAllProposals(list);
 
         const reviewResults = await Promise.allSettled(
-          proposalsList.map((proposal) => api.getRubricReview(proposal.id)),
+          list.map((p) => api.getRubricReview(p.id)),
         );
-
-        if (!mounted) return;
-
         const nextReviews = {};
-        reviewResults.forEach((result, index) => {
-          if (result.status === "fulfilled" && result.value) {
-            nextReviews[proposalsList[index].id] = result.value;
+        reviewResults.forEach((r, i) => {
+          if (r.status === "fulfilled" && r.value) {
+            nextReviews[list[i].id] = r.value;
           }
         });
-
-        setProposals(proposalsList);
         setReviewsByProposal(nextReviews);
-
-        if (reviewResults.some((result) => result.status === "rejected")) {
-          setError(
-            "Một phần rubric chưa tải được. Bạn vẫn có thể thao tác với danh sách đề tài.",
-          );
+        if (reviewResults.some((r) => r.status === "rejected")) {
+          setError("Some rubric data could not be loaded.");
         }
       } catch {
         if (!mounted) return;
-        setError("Không thể tải dữ liệu review. Vui lòng thử lại sau.");
-        setProposals([]);
-        setReviewsByProposal({});
+        setError("Unable to load review data.");
       } finally {
-        if (mounted) {
-          setLoading(false);
-        }
+        if (mounted) setLoading(false);
       }
     };
-
-    loadReviewData();
-
+    load();
     return () => {
       mounted = false;
     };
   }, []);
 
-  const reviewQueue = useMemo(() => {
-    return proposals
-      .filter((proposal) => reviewableStatuses.includes(proposal.status))
-      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-  }, [proposals]);
+  // Load detail when a proposal is selected
+  useEffect(() => {
+    if (!selectedId) return;
+    let mounted = true;
+    const load = async () => {
+      try {
+        const [fbResult, rvResult] = await Promise.allSettled([
+          api.getAIFeedback(selectedId),
+          api.getRubricReview(selectedId),
+        ]);
+        if (!mounted) return;
+        setSelectedFeedback(fbResult.status === "fulfilled" ? fbResult.value : null);
+        setSelectedReview(rvResult.status === "fulfilled" ? rvResult.value : null);
+      } catch {
+        if (!mounted) return;
+        setSelectedFeedback(null);
+        setSelectedReview(null);
+      }
+    };
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [selectedId]);
 
+  // Filtered review queue
+  const reviewQueue = useMemo(() => {
+    const reviewable = [
+      PROPOSAL_STATUSES.SUBMITTED,
+      PROPOSAL_STATUSES.UNDER_REVIEW,
+      PROPOSAL_STATUSES.NEEDS_REVISION,
+      PROPOSAL_STATUSES.APPROVED,
+    ];
+    const keyword = search.trim().toLowerCase();
+    return allProposals
+      .filter((p) => reviewable.includes(p.status))
+      .filter((p) => {
+        if (statusFilter !== "all" && p.status !== statusFilter) return false;
+        if (fieldFilter !== "all" && (p.researchField || p.field) !== fieldFilter) return false;
+        if (urgencyFilter === "urgent" && p.deadline) {
+          const days = (new Date(p.deadline) - new Date()) / (1000 * 60 * 60 * 24);
+          if (days > 7) return false;
+        }
+        if (urgencyFilter === "soon" && p.deadline) {
+          const days = (new Date(p.deadline) - new Date()) / (1000 * 60 * 60 * 24);
+          if (days < 7 || days > 30) return false;
+        }
+        if (urgencyFilter === "normal" && p.deadline) {
+          const days = (new Date(p.deadline) - new Date()) / (1000 * 60 * 60 * 24);
+          if (days <= 30) return false;
+        }
+        if (riskFilter !== "all") {
+          const flags = p.riskFlags || [];
+          const score = p.readinessScore || p.aiScore || 10;
+          const risk = flags.length > 1 || score < 5 ? "high" : flags.length === 1 || score < 7 ? "medium" : "low";
+          if (risk !== riskFilter) return false;
+        }
+        if (keyword) {
+          const haystack = [p.title, p.studentName, p.researchField, p.field, ...(p.keywords || [])]
+            .filter(Boolean).join(" ").toLowerCase();
+          if (!haystack.includes(keyword)) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  }, [allProposals, search, statusFilter, fieldFilter, urgencyFilter, riskFilter]);
+
+  // KPI calculations
+  const kpi = useMemo(() => {
+    const pending = reviewQueue.filter(
+      (p) => p.status === PROPOSAL_STATUSES.SUBMITTED || p.status === PROPOSAL_STATUSES.UNDER_REVIEW,
+    ).length;
+    const revisions = reviewQueue.filter(
+      (p) => p.status === PROPOSAL_STATUSES.NEEDS_REVISION,
+    ).length;
+    const approved = reviewQueue.filter(
+      (p) => p.status === PROPOSAL_STATUSES.APPROVED,
+    ).length;
+    const totalAssigned = allProposals.length;
+    const avgWait =
+      totalAssigned > 0
+        ? Math.round(
+            allProposals.reduce((sum, p) => {
+              const date = p.submittedAt || p.createdAt;
+              return date ? sum + (new Date() - new Date(date)) / (1000 * 60 * 60 * 24) : sum;
+            }, 0) / allProposals.length,
+          )
+        : 0;
+    return { pending, revisions, approved, totalAssigned, avgWait };
+  }, [reviewQueue, allProposals]);
+
+  // Update proposal status
   const handleStatusUpdate = async (proposalId, nextStatus, actionType) => {
-    setPendingAction(`${proposalId}:${actionType}`);
+    setActionPending(`${proposalId}:${actionType}`);
     setError("");
     setMessage("");
-
     try {
-      const updatedProposal = await api.updateProposal(proposalId, {
+      const updated = await api.updateProposal(proposalId, {
         status: nextStatus,
       });
-
-      setProposals((current) =>
-        current.map((proposal) =>
-          proposal.id === proposalId ? updatedProposal : proposal,
-        ),
+      setAllProposals((prev) =>
+        prev.map((p) => (p.id === proposalId ? updated : p)),
       );
-
-      setMessage(
-        nextStatus === PROPOSAL_STATUSES.APPROVED
-          ? "Đã ghi nhận khuyến nghị phê duyệt cho đề tài."
-          : "Đã chuyển đề tài sang trạng thái cần chỉnh sửa.",
-      );
+      const labels = {
+        approved: "Approval recorded.",
+        needs_revision: "Marked as needs revision.",
+        rejected: "Proposal rejected.",
+      };
+      setMessage(labels[nextStatus] || "Status updated.");
+      setSelectedId(null);
     } catch {
-      setError("Chưa thể cập nhật trạng thái đề tài. Vui lòng thử lại.");
+      setError("Unable to update proposal status.");
     } finally {
-      setPendingAction("");
+      setActionPending("");
     }
   };
 
+  const handleDecision = async (decision, comment) => {
+    if (!selectedId) return;
+    setDecisionLoading(true);
+    setError("");
+    setMessage("");
+    try {
+      const updated = await api.updateProposal(selectedId, {
+        status: decision,
+        reviewerComment: comment,
+      });
+      setAllProposals((prev) =>
+        prev.map((p) => (p.id === selectedId ? updated : p)),
+      );
+      const labels = {
+        approved: "Approval recommended. The student will be notified.",
+        needs_revision: "Revision requested. Comments forwarded to student.",
+        rejected: "Proposal rejected. The student will be notified.",
+      };
+      setMessage(labels[decision] || "Decision recorded.");
+      setSelectedId(null);
+    } catch {
+      setError("Unable to record decision.");
+    } finally {
+      setDecisionLoading(false);
+    }
+  };
+
+  const selectedProposal = allProposals.find((p) => p.id === selectedId);
+
   if (loading) {
-    return <LoadingState message="Đang tải reviewer dashboard..." />;
+    return <LoadingState variant="review" />;
   }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <Card className="border-primary bg-primary text-white">
         <CardContent className="p-6 md:p-8">
-          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-white/45">
-            Reviewer dashboard
-          </p>
-          <h1 className="mt-3 text-2xl font-medium leading-tight tracking-[-0.02em] md:text-4xl">
-            Quyết định cuối cùng nằm ở reviewer
-          </h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/65 md:text-base">
-            Dùng rubric, phản hồi AI và nội dung chi tiết để đưa ra khuyến nghị:
-            yêu cầu chỉnh sửa hoặc phê duyệt đề tài cho vòng tiếp theo.
-          </p>
+          <div className="space-y-3">
+            <div className="inline-flex rounded border border-white/15 bg-white/[0.06] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-white/60">
+              Reviewer Panel
+            </div>
+            <h1 className="text-2xl font-semibold leading-tight md:text-3xl">
+              Proposal Review Queue
+            </h1>
+            <p className="max-w-3xl text-sm leading-6 text-white/65">
+              Reviewers are the accountable decision makers. Use AI pre-reviews
+              as reference only — your judgment determines the outcome.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
+      {/* Advisory banner */}
+      <HumanInLoopBanner />
+
       {message && (
-        <Alert type="success" title="Cập nhật thành công" closable>
+        <Alert type="success" title="Decision Recorded" closable>
           {message}
         </Alert>
       )}
+      {error && <Alert type="error">{error}</Alert>}
 
-      {error && (
-        <Alert type="error" title="Có lỗi xảy ra">
-          {error}
-        </Alert>
-      )}
+      {/* KPI cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <Card>
+          <CardContent className="p-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">
+              Assigned
+            </p>
+            <p className="mt-1 text-2xl font-semibold text-ink">{kpi.totalAssigned}</p>
+          </CardContent>
+        </Card>
+        <Card accent="info">
+          <CardContent className="p-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">
+              Pending Review
+            </p>
+            <p className="mt-1 text-2xl font-semibold text-info">{kpi.pending}</p>
+          </CardContent>
+        </Card>
+        <Card accent="warning">
+          <CardContent className="p-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">
+              Revisions
+            </p>
+            <p className="mt-1 text-2xl font-semibold text-warning">{kpi.revisions}</p>
+          </CardContent>
+        </Card>
+        <Card accent="success">
+          <CardContent className="p-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">
+              Approved
+            </p>
+            <p className="mt-1 text-2xl font-semibold text-success">{kpi.approved}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">
+              Avg Wait
+            </p>
+            <p className="mt-1 text-2xl font-semibold text-ink">{kpi.avgWait}d</p>
+          </CardContent>
+        </Card>
+      </div>
 
+      {/* Filters */}
       <Card>
-        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <CardHeader>
+          <CardTitle>Filters</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ReviewQueueFilters
+            search={search}
+            onSearchChange={setSearch}
+            statusFilter={statusFilter}
+            onStatusChange={setStatusFilter}
+            fieldFilter={fieldFilter}
+            onFieldChange={setFieldFilter}
+            urgencyFilter={urgencyFilter}
+            onUrgencyChange={setUrgencyFilter}
+            riskFilter={riskFilter}
+            onRiskChange={setRiskFilter}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Queue table */}
+      <Card>
+        <CardHeader className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle>Danh sách đề tài cần review</CardTitle>
+            <CardTitle>Review Queue</CardTitle>
             <p className="mt-1 text-sm text-body-muted">
-              {reviewQueue.length} đề tài đang ở trạng thái reviewer cần theo
-              dõi.
+              {reviewQueue.length} proposal{reviewQueue.length !== 1 ? "s" : ""}{" "}
+              match{reviewQueue.length !== 1 ? "" : "es"} current filters.
+              Click a row to review in detail.
             </p>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {reviewQueue.length === 0 ? (
-            <EmptyState
-              icon="✅"
-              title="Không có đề tài cần review"
-              description="Khi sinh viên gửi đề tài hoặc có đề tài cần chỉnh sửa, danh sách sẽ xuất hiện tại đây."
-            />
+            <div className="p-6">
+              <EmptyState
+                title="No proposals match current filters"
+                description="Try adjusting your search or filter criteria."
+              />
+            </div>
           ) : (
-            <ReviewRows
+            <ReviewTable
               proposals={reviewQueue}
-              reviewsByProposal={reviewsByProposal}
-              pendingAction={pendingAction}
-              onNeedsRevision={(proposalId) =>
-                handleStatusUpdate(
-                  proposalId,
-                  PROPOSAL_STATUSES.NEEDS_REVISION,
-                  "revision",
-                )
+              reviews={reviewsByProposal}
+              selectedId={selectedId}
+              onSelectProposal={setSelectedId}
+              onNeedsRevision={(id) =>
+                handleStatusUpdate(id, PROPOSAL_STATUSES.NEEDS_REVISION, "revision")
               }
-              onRecommendApprove={(proposalId) =>
-                handleStatusUpdate(
-                  proposalId,
-                  PROPOSAL_STATUSES.APPROVED,
-                  "approve",
-                )
+              onRecommendApprove={(id) =>
+                handleStatusUpdate(id, PROPOSAL_STATUSES.APPROVED, "approve")
+              }
+              onReject={(id) =>
+                handleStatusUpdate(id, PROPOSAL_STATUSES.REJECTED, "reject")
               }
             />
           )}
         </CardContent>
       </Card>
+
+      {/* Inline review detail */}
+      {selectedProposal && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader className="flex items-center justify-between">
+              <CardTitle>Review Detail</CardTitle>
+              <button
+                type="button"
+                onClick={() => setSelectedId(null)}
+                className="text-sm text-body-muted transition-colors hover:text-ink"
+              >
+                Close review
+              </button>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Proposal summary */}
+              <ProposalSummaryPanel proposal={selectedProposal} />
+
+              <div className="grid gap-6 lg:grid-cols-2">
+                  {/* Left: AI Pre-review + Rubric */}
+                  <div className="space-y-6">
+                    <AIFeedbackPanel
+                      feedback={selectedFeedback}
+                      loading={false}
+                      isEmpty={!selectedFeedback}
+                    />
+                    {selectedReview && <RubricScoreCard review={selectedReview} />}
+                  </div>
+
+                  {/* Right: Decision panel */}
+                  <div className="space-y-6">
+                    <ReviewDecisionPanel
+                      proposal={selectedProposal}
+                      onDecision={handleDecision}
+                      loading={decisionLoading}
+                    />
+                  </div>
+                </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

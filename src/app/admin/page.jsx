@@ -1,78 +1,25 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { AppShell } from "@/components/layout/AppShell";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { Alert } from "@/components/ui/Alert";
-import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LoadingState } from "@/components/ui/LoadingState";
+import { Badge } from "@/components/ui/Badge";
+import { AdminKpiCard } from "@/components/admin/AdminKpiCard";
+import { WorkflowPipeline } from "@/components/admin/WorkflowPipeline";
+import { BottleneckTable } from "@/components/admin/BottleneckTable";
+import { PendingDecisionQueue } from "@/components/admin/PendingDecisionQueue";
+import { LecturerCapacityTable } from "@/components/admin/LecturerCapacityTable";
 import { api } from "@/lib/api";
 import { USER_ROLES } from "@/lib/constants";
-import { mockUsers } from "@/lib/mockData";
-
-const roleLabels = {
-  [USER_ROLES.STUDENT]: "Student",
-  [USER_ROLES.REVIEWER]: "Reviewer",
-  [USER_ROLES.ADMIN]: "Admin",
-  [USER_ROLES.LECTURER]: "Lecturer",
-};
-
-const aiRequestLogs = [
-  {
-    id: "ai-log-001",
-    action: "AI_FEEDBACK",
-    target: "prop-001",
-    provider: "mock",
-    status: "success",
-    latency: "800ms",
-    timestamp: "2026-06-10T08:15:00Z",
-  },
-  {
-    id: "ai-log-002",
-    action: "LECTURER_MATCHING",
-    target: "prop-002",
-    provider: "mock",
-    status: "success",
-    latency: "420ms",
-    timestamp: "2026-06-10T08:22:00Z",
-  },
-  {
-    id: "ai-log-003",
-    action: "RUBRIC_PREVIEW",
-    target: "prop-003",
-    provider: "mock",
-    status: "skipped",
-    latency: "0ms",
-    timestamp: "2026-06-10T08:31:00Z",
-  },
-];
-
-const systemStatuses = [
-  {
-    label: "Mock API enabled",
-    value: "Enabled",
-    intent: "success",
-    description: "Tất cả dữ liệu đang chạy bằng mock frontend memory.",
-  },
-  {
-    label: "Frontend only",
-    value: "Active",
-    intent: "info",
-    description: "Không có backend service hoặc database thật trong phase demo.",
-  },
-  {
-    label: "AI provider disabled/mock",
-    value: "Mocked",
-    intent: "warning",
-    description: "Không gọi OpenAI/Claude hay provider AI thật.",
-  },
-];
+import { mockUsers, mockLecturers } from "@/lib/mockData";
 
 const formatDateTime = (value) => {
-  if (!value) return "Chưa cập nhật";
-
+  if (!value) return "";
   return new Intl.DateTimeFormat("vi-VN", {
     day: "2-digit",
     month: "2-digit",
@@ -83,235 +30,350 @@ const formatDateTime = (value) => {
 };
 
 function AdminPageContent() {
+  const [overview, setOverview] = useState(null);
+  const [proposals, setProposals] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     let mounted = true;
-
-    const loadAuditLogs = async () => {
+    const load = async () => {
       setLoading(true);
       setError("");
-
       try {
-        const logs = await api.getAuditLogs();
+        const [ov, propData, logs] = await Promise.allSettled([
+          api.getAdminOverview(),
+          api.getProposals(),
+          api.getAuditLogs(),
+        ]);
         if (!mounted) return;
-
-        setAuditLogs(Array.isArray(logs) ? logs : []);
+        if (ov.status === "fulfilled") setOverview(ov.value);
+        if (propData.status === "fulfilled")
+          setProposals(Array.isArray(propData.value) ? propData.value : []);
+        if (logs.status === "fulfilled")
+          setAuditLogs(Array.isArray(logs.value) ? logs.value : []);
       } catch {
         if (!mounted) return;
-        setError("Không thể tải audit logs. Vui lòng thử lại sau.");
-        setAuditLogs([]);
+        setError("Unable to load admin data.");
       } finally {
-        if (mounted) {
-          setLoading(false);
-        }
+        if (mounted) setLoading(false);
       }
     };
-
-    loadAuditLogs();
-
+    load();
     return () => {
       mounted = false;
     };
   }, []);
 
-  const userOverview = useMemo(() => {
-    return Object.values(USER_ROLES).map((role) => ({
-      role,
-      label: roleLabels[role],
-      count: mockUsers.filter((user) => user.role === role).length,
-    }));
-  }, []);
+  const kpiProps = useMemo(() => {
+    if (!overview) return {};
+    const stageCounts = overview.proposalsByStage || {};
+    return {
+      totalProposals: overview.totalProposals || 0,
+      pendingReview:
+        (stageCounts.submitted || 0) + (stageCounts.under_review || 0),
+      needsRevision: stageCounts.needs_revision || 0,
+      pendingSupervisor: stageCounts.approved || 0,
+      overdueMilestones: overview.overdueMilestones || 0,
+      lecturerCapacityRisk: overview.lecturerCapacity?.filter(
+        (l) => l.currentLoad >= l.maxLoad,
+      ).length || 0,
+    };
+  }, [overview]);
+
+  const userOverview = useMemo(
+    () =>
+      Object.values(USER_ROLES).map((role) => ({
+        role,
+        label:
+          { student: "Students", reviewer: "Reviewers", admin: "Admins", lecturer: "Lecturers" }[
+            role
+          ] || role,
+        count: mockUsers.filter((u) => u.role === role).length,
+      })),
+    [],
+  );
 
   if (loading) {
-    return <LoadingState message="Đang tải trang quản trị..." />;
+    return <LoadingState variant="dashboard" />;
   }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <Card className="border-primary bg-primary text-white">
         <CardContent className="p-6 md:p-8">
-          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-white/45">
-            Admin console
-          </p>
-          <h1 className="mt-3 text-2xl font-medium leading-tight tracking-[-0.02em] md:text-4xl">
-            Quản trị hệ thống demo SRP DAM
-          </h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/65 md:text-base">
-            Theo dõi vai trò người dùng, trạng thái hệ thống mock và các log
-            phục vụ demo quản trị frontend-only.
-          </p>
+          <div className="space-y-3">
+            <div className="inline-flex rounded border border-white/15 bg-white/[0.06] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-white/60">
+              Research Office — Operations Dashboard
+            </div>
+            <h1 className="text-2xl font-semibold leading-tight md:text-3xl">
+              Research Proposal Operations
+            </h1>
+            <p className="max-w-3xl text-sm leading-6 text-white/65">
+              Monitor the full academic workflow pipeline — from draft
+              submission through completion. AI provides operational insights;
+              all assignments and decisions require human authorization.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
-      <Alert type="warning" title="Cảnh báo vận hành">
-        AI chỉ hỗ trợ, mọi quyết định cần người duyệt.
-      </Alert>
+      {error && <Alert type="error">{error}</Alert>}
 
-      {error && (
-        <Alert type="error" title="Không tải được dữ liệu">
-          {error}
-        </Alert>
-      )}
+      {/* KPI cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <AdminKpiCard
+          label="Total Proposals"
+          value={kpiProps.totalProposals}
+          subtitle="All time"
+        />
+        <AdminKpiCard
+          label="Pending Review"
+          value={kpiProps.pendingReview}
+          subtitle="Awaiting reviewer"
+          accent="info"
+        />
+        <AdminKpiCard
+          label="Need Revision"
+          value={kpiProps.needsRevision}
+          subtitle="Waiting on student"
+          accent="warning"
+        />
+        <AdminKpiCard
+          label="Pending Supervisor"
+          value={kpiProps.pendingSupervisor}
+          subtitle="Approved, unassigned"
+          accent="info"
+        />
+        <AdminKpiCard
+          label="Overdue Milestones"
+          value={kpiProps.overdueMilestones}
+          subtitle="Past deadline"
+          accent="danger"
+        />
+        <AdminKpiCard
+          label="Lecturer Risk"
+          value={kpiProps.lecturerCapacityRisk}
+          subtitle="At full capacity"
+          accent="danger"
+        />
+      </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {/* User overview */}
+      <div className="grid gap-4 sm:grid-cols-4">
         {userOverview.map((item) => (
           <Card key={item.role}>
-            <CardContent className="p-5">
-              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-muted">
+            <CardContent className="p-4">
+              <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">
                 {item.label}
               </p>
-              <p className="mt-3 text-3xl font-medium leading-none text-ink">
+              <p className="mt-1.5 text-2xl font-semibold text-ink">
                 {item.count}
-              </p>
-              <p className="mt-3 text-sm text-body-muted">
-                Tài khoản mock đang cấu hình
               </p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+      {/* Workflow Pipeline + Bottlenecks */}
+      <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
         <Card>
           <CardHeader>
-            <CardTitle>System status</CardTitle>
+            <CardTitle>Workflow Pipeline</CardTitle>
+            <p className="mt-1 text-sm text-body-muted">
+              Proposal count by academic workflow stage
+            </p>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {systemStatuses.map((item) => (
-              <div
-                key={item.label}
-                className="rounded-lg border border-hairline bg-canvas p-4"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="font-medium text-ink">
-                      {item.label}
-                    </p>
-                    <p className="mt-1 text-sm leading-5 text-body-muted">
-                      {item.description}
-                    </p>
-                  </div>
-                  <Badge intent={item.intent}>{item.value}</Badge>
-                </div>
-              </div>
-            ))}
+          <CardContent>
+            <WorkflowPipeline counts={overview?.proposalsByStage || {}} />
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>AI request logs mock</CardTitle>
+            <CardTitle>Bottlenecks &amp; Risks</CardTitle>
+            <p className="mt-1 text-sm text-body-muted">
+              Stages requiring administrative attention
+            </p>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto rounded-[10px] border border-hairline bg-canvas">
-              <table className="w-full min-w-[640px] border-collapse text-sm">
-                <thead className="bg-soft-stone">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
-                      Action
-                    </th>
-                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
-                      Target
-                    </th>
-                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
-                      Provider
-                    </th>
-                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
-                      Status
-                    </th>
-                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
-                      Latency
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-hairline">
-                  {aiRequestLogs.map((log) => (
-                    <tr key={log.id} className="transition-colors hover:bg-[#fafafa]">
-                      <td className="px-4 py-3 font-medium text-ink">
-                        {log.action}
-                      </td>
-                      <td className="px-4 py-3 text-body-muted">
-                        {log.target}
-                      </td>
-                      <td className="px-4 py-3 text-body-muted">
-                        {log.provider}
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge
-                          intent={log.status === "success" ? "success" : "muted"}
-                        >
-                          {log.status}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3 text-body-muted">
-                        {log.latency}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <BottleneckTable bottlenecks={overview?.bottlenecks || []} />
           </CardContent>
         </Card>
       </div>
 
+      {/* Pending decisions + Lecturer capacity */}
+      <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+        <Card>
+          <CardHeader>
+            <CardTitle>Pending Decisions</CardTitle>
+            <p className="mt-1 text-sm text-body-muted">
+              Proposals requiring admin or reviewer action
+            </p>
+          </CardHeader>
+          <CardContent>
+            <PendingDecisionQueue proposals={proposals} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Lecturer Capacity</CardTitle>
+            <p className="mt-1 text-sm text-body-muted">
+              Supervision load and availability
+            </p>
+          </CardHeader>
+          <CardContent>
+            <LecturerCapacityTable
+              lecturers={overview?.lecturerCapacity || mockLecturers}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Configuration entry points */}
       <Card>
         <CardHeader>
-          <CardTitle>Audit logs mock</CardTitle>
+          <CardTitle>Academic Configuration</CardTitle>
+          <p className="mt-1 text-sm text-body-muted">
+            Manage templates, rubrics, and workflow settings
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-4">
+            <Link
+              href="#"
+              className="block rounded border border-hairline bg-canvas p-4 transition-colors hover:bg-subdued"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded bg-info-bg text-info">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <p className="mt-3 text-sm font-medium text-ink">
+                Proposal Templates
+              </p>
+              <p className="mt-1 text-xs text-body-muted">
+                Manage section templates and guidance
+              </p>
+            </Link>
+
+            <Link
+              href="#"
+              className="block rounded border border-hairline bg-canvas p-4 transition-colors hover:bg-subdued"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded bg-success-bg text-success">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+              </div>
+              <p className="mt-3 text-sm font-medium text-ink">
+                Review Rubrics
+              </p>
+              <p className="mt-1 text-xs text-body-muted">
+              Configure assessment criteria and scoring
+              </p>
+            </Link>
+
+            <Link
+              href="#"
+              className="block rounded border border-hairline bg-canvas p-4 transition-colors hover:bg-subdued"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded bg-warning-bg text-warning">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+              </div>
+              <p className="mt-3 text-sm font-medium text-ink">
+                Workflow Stages
+              </p>
+              <p className="mt-1 text-xs text-body-muted">
+                Define stage transitions and approvals
+              </p>
+            </Link>
+
+            <Link
+              href="#"
+              className="block rounded border border-hairline bg-canvas p-4 transition-colors hover:bg-subdued"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded bg-purple/10 text-purple">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <p className="mt-3 text-sm font-medium text-ink">
+                Matching Criteria
+              </p>
+              <p className="mt-1 text-xs text-body-muted">
+                Configure supervisor matching weights
+              </p>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Audit Log */}
+      <Card>
+        <CardHeader>
+          <CardTitle>System Audit Log</CardTitle>
+          <p className="mt-1 text-sm text-body-muted">
+            Recent events recorded in the system
+          </p>
         </CardHeader>
         <CardContent>
           {auditLogs.length === 0 ? (
             <EmptyState
-              icon="📋"
-              title="Chưa có audit log"
-              description="Các thao tác như đăng nhập, cập nhật đề tài hoặc recommend giảng viên sẽ được ghi nhận trong session demo."
+              title="No audit events yet"
+              description="Events will appear as users interact with the system."
             />
           ) : (
-            <div className="overflow-x-auto rounded-[10px] border border-hairline bg-canvas">
-              <table className="w-full min-w-[760px] border-collapse text-sm">
-                <thead className="bg-soft-stone">
+            <div className="overflow-x-auto rounded border border-hairline bg-canvas">
+              <table className="w-full min-w-[640px] border-collapse text-sm">
+                <thead className="bg-subdued">
                   <tr>
-                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
+                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-muted">
                       Time
                     </th>
-                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
+                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-muted">
                       User
                     </th>
-                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
+                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-muted">
                       Action
                     </th>
-                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
+                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-muted">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-body-muted">
+                    <th className="px-4 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-muted">
                       Details
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-hairline">
                   {auditLogs.map((log) => (
-                    <tr key={log.id} className="align-top transition-colors hover:bg-[#fafafa]">
-                      <td className="px-4 py-3 text-body-muted">
+                    <tr key={log.id} className="hover:bg-subdued/50">
+                      <td className="px-4 py-3 font-mono text-xs text-body-muted">
                         {formatDateTime(log.timestamp)}
                       </td>
                       <td className="px-4 py-3 text-body-muted">
-                        {log.userName || log.userId || "System"}
+                        {log.userName || log.userId}
                       </td>
                       <td className="px-4 py-3 font-medium text-ink">
                         {log.action}
                       </td>
                       <td className="px-4 py-3">
                         <Badge
-                          intent={log.status === "success" ? "success" : "danger"}
+                          intent={
+                            log.status === "success" ? "success" : "warning"
+                          }
                         >
                           {log.status}
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-body-muted">
-                        {log.details || "Không có chi tiết"}
+                        {log.details}
                       </td>
                     </tr>
                   ))}

@@ -6,20 +6,26 @@ import { AppShell } from "@/components/layout/AppShell";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { ProposalCard } from "@/components/proposal/ProposalCard";
 import { Alert } from "@/components/ui/Alert";
-import { Card, CardContent } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Input } from "@/components/ui/Input";
 import { LoadingState } from "@/components/ui/LoadingState";
 import { Select } from "@/components/ui/Select";
 import { useAuth } from "@/hooks/useAuth";
 import { api } from "@/lib/api";
-import { PROPOSAL_STATUSES, STATUS_LABELS, USER_ROLES } from "@/lib/constants";
+import {
+  PROPOSAL_STATUSES,
+  STATUS_LABELS,
+  USER_ROLES,
+  ACADEMIC_ROLE_LABELS,
+} from "@/lib/constants";
 
 const statusOptions = [
-  { value: "all", label: "Tất cả trạng thái" },
-  ...Object.values(PROPOSAL_STATUSES).map((status) => ({
-    value: status,
-    label: STATUS_LABELS[status] || status,
+  { value: "all", label: "All Statuses" },
+  ...Object.entries(STATUS_LABELS).map(([value, label]) => ({
+    value,
+    label,
   })),
 ];
 
@@ -33,55 +39,57 @@ function ProposalsContent() {
 
   useEffect(() => {
     let mounted = true;
-
-    const loadProposals = async () => {
+    const load = async () => {
       setLoading(true);
       setError("");
-
       try {
         const data = await api.getProposals();
         if (!mounted) return;
         setProposals(Array.isArray(data) ? data : []);
       } catch {
         if (!mounted) return;
-        setError("Không thể tải danh sách đề tài. Vui lòng thử lại sau.");
+        setError("Unable to load proposals. Please try again.");
         setProposals([]);
       } finally {
-        if (mounted) {
-          setLoading(false);
-        }
+        if (mounted) setLoading(false);
       }
     };
-
-    loadProposals();
-
+    load();
     return () => {
       mounted = false;
     };
   }, []);
 
   const roleScopedProposals = useMemo(() => {
-    if (user?.role !== USER_ROLES.STUDENT) return proposals;
-
-    return proposals.filter((proposal) => proposal.studentId === user.id);
+    if (user?.role === USER_ROLES.STUDENT) {
+      return proposals.filter((proposal) => proposal.studentId === user.id);
+    }
+    if (user?.role === USER_ROLES.LECTURER) {
+      return proposals.filter(
+        (proposal) =>
+          proposal.assignedLecturer === user.id ||
+          proposal.status === PROPOSAL_STATUSES.APPROVED,
+      );
+    }
+    return proposals;
   }, [proposals, user]);
 
   const filteredProposals = useMemo(() => {
     const keyword = search.trim().toLowerCase();
-
     return roleScopedProposals
       .filter((proposal) => {
-        const matchesStatus = status === "all" || proposal.status === status;
+        const matchesStatus =
+          status === "all" || proposal.status === status;
         const haystack = [
           proposal.title,
-          proposal.field,
+          proposal.researchField || proposal.field,
           proposal.studentName,
-          proposal.problem,
+          proposal.abstract || proposal.problem,
+          ...(proposal.keywords || []),
         ]
           .filter(Boolean)
           .join(" ")
           .toLowerCase();
-
         return matchesStatus && (!keyword || haystack.includes(keyword));
       })
       .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
@@ -90,87 +98,91 @@ function ProposalsContent() {
   const hasFilters = search.trim() || status !== "all";
   const isStudent = user?.role === USER_ROLES.STUDENT;
 
+  const needsRevisionCount = roleScopedProposals.filter(
+    (p) => p.status === PROPOSAL_STATUSES.NEEDS_REVISION,
+  ).length;
+  const underReviewCount = roleScopedProposals.filter(
+    (p) => p.status === PROPOSAL_STATUSES.UNDER_REVIEW,
+  ).length;
+
   if (loading) {
-    return <LoadingState message="Đang tải danh sách đề tài..." />;
+    return <LoadingState variant="default" />;
   }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
-            Proposal workspace
+            {ACADEMIC_ROLE_LABELS[user?.role] || "User"} Workspace
           </p>
-          <h1 className="mt-2 text-2xl font-medium tracking-[-0.02em] text-ink md:text-3xl">
-            Đề tài nghiên cứu
+          <h1 className="mt-2 text-2xl font-semibold tracking-[-0.02em] text-ink md:text-3xl">
+            Research Proposals
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-body-muted">
-            Tìm kiếm, lọc trạng thái và mở nhanh từng đề xuất để theo dõi quá
-            trình xử lý.
+            {roleScopedProposals.length === 0
+              ? "No proposals yet. Create your first research proposal to get started."
+              : `${roleScopedProposals.length} proposal${roleScopedProposals.length > 1 ? "s" : ""}${needsRevisionCount > 0 ? ` · ${needsRevisionCount} need${needsRevisionCount > 1 ? "" : "s"} revision` : ""}${underReviewCount > 0 ? ` · ${underReviewCount} under review` : ""}`}
           </p>
         </div>
 
         {isStudent && (
-          <Link
-            href="/proposals/new"
-            className="inline-flex items-center justify-center rounded-pill bg-primary px-5 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-px hover:bg-[#2d2d35] focus:outline-none focus:ring-2 focus:ring-focus-blue/30 focus:ring-offset-2"
-          >
-            Tạo đề xuất mới
+          <Link href="/proposals/new">
+            <Button variant="primary">+ New Proposal</Button>
           </Link>
         )}
       </div>
 
       {error && (
-        <Alert type="error" title="Không tải được dữ liệu">
+        <Alert type="error" title="Unable to load data">
           {error}
         </Alert>
       )}
 
+      {/* Filters */}
       <Card>
         <CardContent className="grid gap-4 p-5 md:grid-cols-[1fr_260px]">
           <Input
-            label="Tìm kiếm"
+            label="Search"
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Tìm theo tiêu đề, lĩnh vực, sinh viên..."
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by title, field, keywords..."
           />
           <Select
-            label="Trạng thái"
+            label="Status"
             value={status}
-            onChange={(event) => setStatus(event.target.value || "all")}
+            onChange={(e) => setStatus(e.target.value || "all")}
             options={statusOptions}
           />
         </CardContent>
       </Card>
 
+      {/* Grid */}
       {filteredProposals.length === 0 ? (
         <Card>
           <EmptyState
-            icon="📄"
             title={
               hasFilters
-                ? "Không tìm thấy đề tài phù hợp"
-                : "Chưa có đề tài nào"
+                ? "No matching proposals found"
+                : "No proposals yet"
             }
             description={
               hasFilters
-                ? "Thử đổi từ khóa tìm kiếm hoặc chọn trạng thái khác."
-                : "Khi có đề xuất mới, danh sách sẽ hiển thị tại đây."
+                ? "Try adjusting your search terms or filters."
+                : "Your research journey begins here. Create a well-structured proposal to get AI-assisted feedback and reviewer evaluation."
             }
             action={
               isStudent && !hasFilters ? (
-                <Link
-                  href="/proposals/new"
-                  className="inline-flex items-center justify-center rounded-pill bg-primary px-5 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-px hover:bg-[#2d2d35] focus:outline-none focus:ring-2 focus:ring-focus-blue/30 focus:ring-offset-2"
-                >
-                  Tạo đề xuất mới
+                <Link href="/proposals/new">
+                  <Button variant="primary">Create Your First Proposal</Button>
                 </Link>
               ) : null
             }
           />
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {filteredProposals.map((proposal) => (
             <ProposalCard key={proposal.id} proposal={proposal} />
           ))}

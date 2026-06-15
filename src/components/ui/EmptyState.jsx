@@ -1,25 +1,36 @@
 "use client";
 
 /**
- * EmptyState component
- * @param {Object} props
- * @param {string} props.title - Empty state title
- * @param {string} props.description - Empty state description
- * @param {ReactNode} props.action - Action element (Button, etc.)
- * @param {string} props.icon - Emoji or icon
+ * EmptyState — consistent empty state with optional action
+ * @param {string}  props.title       - Empty state title
+ * @param {string}  props.description - Empty state description
+ * @param {ReactNode} props.action    - Action element (Button, Link)
+ * @param {string}  props.icon        - SVG icon or emoji
+ * @param {string}  props.variant     - 'default' | 'info' | 'warning'
  */
 export function EmptyState({
-  title = "Không có dữ liệu",
+  title = "No data",
   description,
   action,
   icon,
+  variant = "default",
   className = "",
 }) {
+  const iconStyles = {
+    default: "border-hairline bg-subdued text-muted",
+    info: "border-info/20 bg-info-bg text-info",
+    warning: "border-warning/20 bg-warning-bg text-warning",
+  };
+
   return (
     <div
-      className={`flex flex-col items-center justify-center gap-4 py-14 text-center ${className}`}
+      className={`flex flex-col items-center justify-center gap-5 py-14 text-center ${className}`}
     >
-      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-soft-stone text-xl text-muted ring-1 ring-hairline">
+      <div
+        className={`flex h-12 w-12 items-center justify-center rounded border ${
+          iconStyles[variant] || iconStyles.default
+        }`}
+      >
         {icon || (
           <svg
             aria-hidden="true"
@@ -35,14 +46,12 @@ export function EmptyState({
         )}
       </div>
       <div className="max-w-md">
-        <h3 className="mb-1 text-lg font-medium tracking-[-0.01em] text-ink">
-          {title}
-        </h3>
+        <h3 className="mb-1.5 text-base font-semibold text-ink">{title}</h3>
         {description && (
           <p className="text-sm leading-6 text-body-muted">{description}</p>
         )}
       </div>
-      {action && <div className="mt-2">{action}</div>}
+      {action && <div className="mt-1">{action}</div>}
     </div>
   );
 }

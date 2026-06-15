@@ -5,198 +5,160 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
+import { Card, CardContent } from "@/components/ui/Card";
 import { Alert } from "@/components/ui/Alert";
 import { Badge } from "@/components/ui/Badge";
 
-const DEMO_ACCOUNTS = [
+const ROLES = [
   {
+    id: "student",
+    label: "Student",
     email: "student@demo.com",
     password: "demo123",
-    role: "Sinh viên",
+    badge: "Sinh viên",
+    color: "bg-info-bg text-info border-info/20",
+    description: "Draft proposals, receive AI pre-review, submit for evaluation, track milestone progress.",
   },
   {
+    id: "reviewer",
+    label: "Reviewer",
     email: "reviewer@demo.com",
     password: "demo123",
-    role: "Đánh giá viên",
+    badge: "Đánh giá viên",
+    color: "bg-warning-bg text-warning border-warning/20",
+    description: "Triage proposals, score using rubric criteria, request revisions, recommend approval.",
   },
   {
+    id: "admin",
+    label: "Admin",
     email: "admin@demo.com",
     password: "demo123",
-    role: "Admin",
+    badge: "Quản trị",
+    color: "bg-danger/10 text-danger border-danger/20",
+    description: "Monitor workflow pipeline, manage supervisor matching, view audit logs, configure system.",
   },
   {
+    id: "lecturer",
+    label: "Lecturer",
     email: "lecturer@demo.com",
     password: "demo123",
-    role: "Giảng viên",
+    badge: "Giảng viên",
+    color: "bg-success-bg text-success border-success/20",
+    description: "Review assigned proposals, view matching suggestions, track supervision load.",
   },
 ];
 
 export default function LoginPage() {
   const router = useRouter();
   const { user, login, loading, error } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [localError, setLocalError] = useState(null);
+  const [selectedRole, setSelectedRole] = useState(null);
 
-  // Redirect if already logged in
   useEffect(() => {
-    if (user) {
-      router.push("/dashboard");
-    }
+    if (user) router.push("/dashboard");
   }, [user, router]);
 
-  // Fill demo account credentials
-  const fillDemoAccount = (demoEmail, demoPassword) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
+  const handleRoleLogin = async (role) => {
+    setSelectedRole(role.id);
     setLocalError(null);
-  };
-
-  // Handle login
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLocalError(null);
-
-    if (!email.trim() || !password.trim()) {
-      setLocalError("Vui lòng nhập email và mật khẩu");
-      return;
-    }
-
     try {
-      await login(email, password);
+      await login(role.email, role.password);
       router.push("/dashboard");
     } catch (err) {
-      setLocalError(err.message || "Đăng nhập thất bại. Vui lòng thử lại.");
+      setLocalError(err.message || "Login failed.");
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-soft-stone px-5 py-10">
-      <div className="w-full max-w-[440px]">
-        <div className="mb-6 text-center">
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center rounded bg-primary px-3 py-2 font-mono text-[11px] uppercase tracking-[0.12em] text-white"
-          >
-            SRP D&M
-          </Link>
-          <h1 className="mt-5 text-2xl font-medium tracking-[-0.02em] text-ink">
-            Đăng nhập hệ thống
-          </h1>
-          <p className="mt-2 text-sm leading-6 text-body-muted">
-            AI Trợ Lý Soạn & Quản Lý Đề Tài Nghiên Cứu Sinh Viên
-          </p>
-        </div>
+    <div className="flex min-h-screen flex-col bg-app-bg">
+      {/* Simple header */}
+      <div className="border-b border-hairline bg-canvas px-5 py-3">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm font-medium text-body-muted transition-colors hover:text-ink"
+        >
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5m7-7l-7 7 7 7" />
+          </svg>
+          Back to home
+        </Link>
+      </div>
 
-        <Card className="rounded-2xl border-hairline bg-canvas">
-          <CardHeader>
-            <div>
-              <CardTitle>Đăng nhập</CardTitle>
-              <p className="mt-1 text-sm text-body-muted">
-                Dùng tài khoản demo hoặc nhập thông tin thủ công.
-              </p>
+      <div className="flex flex-1 items-center justify-center px-5 py-10">
+        <div className="w-full max-w-3xl">
+          {/* Header */}
+          <div className="mb-8 text-center">
+            <div className="mb-4 inline-flex rounded border border-primary/20 bg-primary/5 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-primary">
+              Competition Demo
             </div>
-        </CardHeader>
+            <h1 className="text-2xl font-semibold text-ink">
+              Select a role to explore
+            </h1>
+            <p className="mt-2 text-sm text-body-muted">
+              Each account provides a different view of the platform. No password
+              needed — just click a role to log in instantly.
+            </p>
+          </div>
 
-        <CardContent className="space-y-6">
           {(error || localError) && (
-            <Alert type="error">{error || localError}</Alert>
+            <div className="mb-6 max-w-md mx-auto">
+              <Alert type="error">{error || localError}</Alert>
+            </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@example.com"
-              required
-              disabled={loading}
-            />
-
-            <Input
-              label="Mật khẩu"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="demo123"
-              required
-              disabled={loading}
-            />
-
-            <Button
-              type="submit"
-              variant="primary"
-              loading={loading}
-              disabled={loading}
-              className="w-full justify-center"
-            >
-              Đăng nhập
-            </Button>
-          </form>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-hairline" />
-            </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="bg-canvas px-3 font-mono uppercase tracking-[0.08em] text-muted">
-                Demo accounts
-              </span>
-            </div>
-          </div>
-
-          <div className="rounded-lg bg-[#f8f8f5] p-4">
-            <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
-              Mật khẩu: demo123
-            </p>
-            <div className="space-y-2">
-              {DEMO_ACCOUNTS.map((account) => (
-                <button
-                  key={account.email}
-                  type="button"
-                  onClick={() =>
-                    fillDemoAccount(account.email, account.password)
-                  }
-                  disabled={loading}
-                  className="w-full rounded-lg border border-transparent bg-canvas p-3 text-left transition-all hover:border-hairline hover:bg-soft-stone disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-ink">
-                        {account.email}
-                      </p>
-                      <p className="mt-0.5 text-xs text-body-muted">
-                        {account.password}
-                      </p>
+          {/* Role cards */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            {ROLES.map((role) => (
+              <button
+                key={role.id}
+                type="button"
+                onClick={() => handleRoleLogin(role)}
+                disabled={loading}
+                className="w-full text-left transition-all duration-150 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 disabled:opacity-50 disabled:hover:translate-y-0"
+              >
+                <Card className="h-full border-hairline transition-colors hover:border-primary/30">
+                  <CardContent className="flex flex-col gap-4 p-5">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-base font-semibold text-ink">
+                        {role.label}
+                      </h2>
+                      <Badge className={`border ${role.color}`}>
+                        {role.badge}
+                      </Badge>
                     </div>
-                    <Badge intent="info" className="flex-shrink-0">
-                      {account.role}
-                    </Badge>
-                  </div>
-                </button>
-              ))}
-            </div>
+                    <p className="text-xs leading-6 text-body-muted">
+                      {role.description}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-muted">
+                      <span className="rounded bg-subdued px-2 py-0.5 font-mono">
+                        {role.email}
+                      </span>
+                      <span className="opacity-50">·</span>
+                      <span className="font-mono">{role.password}</span>
+                    </div>
+                    <div className="mt-auto">
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-primary">
+                        {loading && selectedRole === role.id
+                          ? "Logging in..."
+                          : "Enter as " + role.label}
+                        <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M9 5l7 7-7 7" />
+                        </svg>
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </button>
+            ))}
           </div>
 
-          <div className="rounded-lg border border-card-border bg-canvas px-4 py-3">
-            <p className="text-xs leading-5 text-body-muted">
-              Nhấn vào một tài khoản demo để điền nhanh. Nếu thông tin sai, hệ
-              thống sẽ hiển thị: “Email hoặc mật khẩu chưa đúng.”
+          {/* Footer */}
+          <div className="mt-8 text-center">
+            <p className="text-xs text-muted">
+              Demo credentials are pre-configured. All data is mock data stored
+              in your browser session.
             </p>
           </div>
-        </CardContent>
-        </Card>
-
-        <div className="mt-6 text-center">
-          <Link
-            href="/"
-            className="text-sm font-medium text-body-muted transition-colors hover:text-ink"
-          >
-            Quay lại trang chủ
-          </Link>
         </div>
       </div>
     </div>

@@ -1,38 +1,33 @@
 "use client";
 
 /**
- * Textarea component
+ * Textarea component — designed for long-form proposal writing
  * @param {Object} props
  * @param {string} props.label - Label text
  * @param {string} props.error - Error message
  * @param {string} props.helperText - Helper text
  */
-export function Textarea({
-  label,
-  error,
-  helperText,
-  className = "",
-  ...props
-}) {
+export function Textarea({ label, error, helperText, className = "", ...props }) {
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
-        <label className="text-[13px] font-medium text-ink">
+        <label className="text-sm font-medium text-ink" htmlFor={props.name}>
           {label}
-          {props.required && <span className="ml-1 text-error">*</span>}
+          {props.required && <span className="ml-1 text-danger">*</span>}
         </label>
       )}
       <textarea
-        className={`min-h-[100px] resize-y rounded-lg border bg-canvas px-3.5 py-2.5 text-[15px] text-ink outline-none transition-[border-color,box-shadow] placeholder:text-muted disabled:cursor-not-allowed disabled:bg-soft-stone disabled:text-muted ${
+        id={props.name}
+        className={`min-h-[120px] w-full resize-y rounded border bg-canvas px-4 py-2.5 text-base text-ink outline-none transition-all placeholder:text-muted disabled:cursor-not-allowed disabled:bg-subdued disabled:text-muted ${
           error
-            ? "border-[#f8b4b4] focus:border-error focus:ring-4 focus:ring-[#b30000]/10"
-            : "border-hairline focus:border-action-blue focus:ring-4 focus:ring-action-blue/10"
+            ? "border-danger/50 focus:border-danger focus:ring-4 focus:ring-danger/10"
+            : "border-hairline focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
         } ${className}`}
         {...props}
       />
-      {error && <span className="text-xs text-error">{error}</span>}
+      {error && <span className="text-xs text-danger">{error}</span>}
       {helperText && !error && (
-        <span className="text-xs text-muted">{helperText}</span>
+        <span className="text-xs text-body-muted">{helperText}</span>
       )}
     </div>
   );
