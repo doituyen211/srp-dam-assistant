@@ -1,73 +1,136 @@
 @import "tailwindcss";
 @config "../../tailwind.config.js";
 
+/* ───────── Academic Design System ───────── */
+/* Inspired by DESIGN.md principles:
+   - Serif body, sans-serif UI (inverse of modern convention)
+   - Structured page-frame container
+   - Calm, credible color palette
+   - Flat fills with sharp borders, no playful shadows
+   - Human-in-the-loop visible in every AI surface
+*/
+
 :root {
-  --color-primary: #17171c;
-  --color-ink: #212121;
-  --color-deep-green: #003c33;
-  --color-dark-navy: #071829;
-  --color-canvas: #ffffff;
-  --color-app-bg: #f5f5f0;
-  --color-soft-stone: #eeece7;
-  --color-pale-green: #edfce9;
-  --color-pale-blue: #f1f5ff;
-  --color-hairline: #d9d9dd;
-  --color-border-light: #e5e7eb;
-  --color-card-border: #f2f2f2;
-  --color-muted: #93939f;
-  --color-slate: #75758a;
-  --color-body-muted: #616161;
-  --color-action-blue: #1863dc;
-  --color-focus-blue: #4c6ee6;
-  --color-coral: #ff7759;
-  --color-error: #b30000;
-  --color-warning: #e65100;
-  --color-success: #1b5e20;
+  /* Brand — navy academic */
+  --color-primary: #1e3a5f;
+  --color-primary-light: #2d4a7a;
+  --color-primary-dark: #142b4a;
   --color-on-primary: #ffffff;
-  --color-on-dark: #ffffff;
+
+  /* Text */
+  --color-ink: #1a1d21;
+  --color-body-muted: #515a63;
+  --color-muted: #8a929b;
+  --color-inverse: #ffffff;
+
+  /* Surfaces */
+  --color-canvas: #ffffff;
+  --color-app-bg: #f4f5f7;
+  --color-subdued: #eef0f2;
+  --color-hairline: #d4d8dd;
+  --color-border-light: #c5cbd1;
+  --color-card-border: #edeeef;
+
+  /* Semantics */
+  --color-success: #0d7a3e;
+  --color-success-bg: #e8f5ed;
+  --color-warning: #b45309;
+  --color-warning-bg: #fef7e8;
+  --color-danger: #bc1c1e;
+  --color-danger-bg: #fdeeef;
+  --color-info: #2563eb;
+  --color-info-bg: #eef3fc;
+  --color-unset: #7d8590;
+
+  /* Accent helpers */
+  --color-emerald: #0d7a3e;
+  --color-teal: #0d5e6b;
+  --color-indigo: #4338ca;
+  --color-purple: #7c3aed;
+  --color-sky: #0369a1;
+
+  /* ─── Backward-compatibility aliases (maps old → new values) ─── */
+  --color-deep-green: var(--color-success);
+  --color-dark-navy: var(--color-primary-dark);
+  --color-soft-stone: var(--color-subdued);
+  --color-pale-green: var(--color-success-bg);
+  --color-pale-blue: var(--color-info-bg);
+  --color-card-border: var(--color-hairline);
+  --color-border-light: var(--color-hairline);
+  --color-action-blue: var(--color-info);
+  --color-focus-blue: var(--color-primary);
+  --color-coral: var(--color-warning);
+  --color-error: var(--color-danger);
+  --color-slate: var(--color-unset);
+  --color-on-dark: var(--color-inverse);
 }
 
 @theme inline {
   --color-primary: var(--color-primary);
+  --color-primary-light: var(--color-primary-light);
+  --color-primary-dark: var(--color-primary-dark);
   --color-ink: var(--color-ink);
-  --color-deep-green: var(--color-deep-green);
-  --color-dark-navy: var(--color-dark-navy);
+  --color-body-muted: var(--color-body-muted);
+  --color-muted: var(--color-muted);
+  --color-inverse: var(--color-inverse);
   --color-canvas: var(--color-canvas);
   --color-app-bg: var(--color-app-bg);
-  --color-soft-stone: var(--color-soft-stone);
-  --color-pale-green: var(--color-pale-green);
-  --color-pale-blue: var(--color-pale-blue);
+  --color-subdued: var(--color-subdued);
   --color-hairline: var(--color-hairline);
   --color-border-light: var(--color-border-light);
   --color-card-border: var(--color-card-border);
-  --color-muted: var(--color-muted);
-  --color-slate: var(--color-slate);
-  --color-body-muted: var(--color-body-muted);
+  --color-success: var(--color-success);
+  --color-success-bg: var(--color-success-bg);
+  --color-warning: var(--color-warning);
+  --color-warning-bg: var(--color-warning-bg);
+  --color-danger: var(--color-danger);
+  --color-danger-bg: var(--color-danger-bg);
+  --color-info: var(--color-info);
+  --color-info-bg: var(--color-info-bg);
+  --color-unset: var(--color-unset);
+  --color-emerald: var(--color-emerald);
+  --color-teal: var(--color-teal);
+  --color-indigo: var(--color-indigo);
+  --color-purple: var(--color-purple);
+  --color-sky: var(--color-sky);
+  --color-on-primary: var(--color-on-primary);
+
+  /* ─── Backward-compatibility aliases in @theme ─── */
+  --color-deep-green: var(--color-deep-green);
+  --color-dark-navy: var(--color-dark-navy);
+  --color-soft-stone: var(--color-soft-stone);
+  --color-pale-green: var(--color-pale-green);
+  --color-pale-blue: var(--color-pale-blue);
+  --color-card-border: var(--color-card-border);
+  --color-border-light: var(--color-border-light);
   --color-action-blue: var(--color-action-blue);
   --color-focus-blue: var(--color-focus-blue);
   --color-coral: var(--color-coral);
   --color-error: var(--color-error);
-  --color-warning: var(--color-warning);
-  --color-success: var(--color-success);
-  --color-on-primary: var(--color-on-primary);
+  --color-slate: var(--color-slate);
   --color-on-dark: var(--color-on-dark);
 
   --font-display: var(--font-display, "Space Grotesk"), ui-sans-serif, system-ui;
   --font-sans: var(--font-sans, Inter), ui-sans-serif, system-ui;
+  --font-serif: var(--font-serif, Georgia), "Times New Roman", Times, serif;
   --font-mono: var(--font-mono, "IBM Plex Mono"), ui-monospace, monospace;
+
+  /* Reusable shadow for card elevation */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 @layer base {
   html {
     font-size: 16px;
+    scroll-behavior: smooth;
   }
 
-  body,
-  body.bg-white {
+  body {
     background-color: var(--color-app-bg);
     color: var(--color-ink);
     font-family: var(--font-sans, Inter), ui-sans-serif, system-ui;
-    line-height: 1.5;
+    line-height: 1.6;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -79,12 +142,113 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-focus-blue);
+    outline: 2px solid var(--color-primary);
     outline-offset: 2px;
+    border-radius: 2px;
   }
 
   ::selection {
-    background-color: var(--color-deep-green);
-    color: var(--color-on-dark);
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+}
+
+/* ───────── Academic utility classes ───────── */
+
+/* Page container with subtle border frame (inspired by DESIGN.md page-frame) */
+.academic-page-frame {
+  border: 1px solid var(--color-hairline);
+  background: var(--color-canvas);
+  box-shadow: var(--shadow-card);
+}
+
+/* Section header pattern: eyebrow label + title + optional description */
+.academic-section-header {
+  margin-bottom: 1.25rem;
+}
+.academic-section-header__eyebrow {
+  display: block;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 0.375rem;
+}
+.academic-section-header__title {
+  font-family: var(--font-display, ui-sans-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  line-height: 1.25;
+}
+.academic-section-header__description {
+  font-size: 0.875rem;
+  color: var(--color-body-muted);
+  margin-top: 0.25rem;
+  line-height: 1.5;
+}
+
+/* Metadata row: label + value pairs */
+.academic-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+}
+.academic-metadata__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+.academic-metadata__label {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.academic-metadata__value {
+  font-size: 0.875rem;
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+/* Human-in-the-loop marker */
+.human-in-loop-marker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  color: var(--color-body-muted);
+  background: var(--color-subdued);
+  border: 1px solid var(--color-hairline);
+  border-radius: 4px;
+}
+.human-in-loop-marker::before {
+  content: "";
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  flex-shrink: 0;
+}
+
+/* Proposal body text — serif for readability during long-form writing */
+.academic-body-text {
+  font-family: var(--font-serif, Georgia), "Times New Roman", Times, serif;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--color-ink);
+}
+
+/* Responsive text utilities */
+@media (max-width: 640px) {
+  .academic-body-text {
+    font-size: 0.875rem;
   }
 }

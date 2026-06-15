@@ -8,3 +8,4 @@ export { Select } from "./Select";
 export { Alert } from "./Alert";
 export { LoadingState } from "./LoadingState";
 export { EmptyState } from "./EmptyState";
+export { HumanInLoopBanner } from "./HumanInLoopBanner";

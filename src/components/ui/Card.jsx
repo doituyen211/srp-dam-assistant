@@ -1,12 +1,22 @@
 "use client";
 
 /**
- * Card - Container component
+ * Card - Container component with academic styling
+ * @param {string} props.accent - optional status color for left border (success, warning, danger, info)
  */
-export function Card({ className = "", children, ...props }) {
+export function Card({ className = "", accent, children, ...props }) {
+  const accentBorder = accent
+    ? {
+        success: "border-l-success",
+        warning: "border-l-warning",
+        danger: "border-l-danger",
+        info: "border-l-info",
+      }[accent] || ""
+    : "";
+
   return (
     <div
-      className={`rounded-card border border-hairline bg-canvas shadow-[0_1px_0_rgb(0_0_0/0.02)] ${className}`}
+      className={`rounded-card border border-hairline bg-canvas shadow-card ${accentBorder} ${className}`}
       {...props}
     >
       {children}
@@ -20,7 +30,7 @@ export function Card({ className = "", children, ...props }) {
 export function CardHeader({ className = "", children, ...props }) {
   return (
     <div
-      className={`border-b border-hairline px-6 py-4 ${className}`}
+      className={`border-b border-card-border px-5 py-4 sm:px-6 ${className}`}
       {...props}
     >
       {children}
@@ -34,7 +44,7 @@ export function CardHeader({ className = "", children, ...props }) {
 export function CardTitle({ className = "", children, ...props }) {
   return (
     <h3
-      className={`text-lg font-medium tracking-[-0.01em] text-ink ${className}`}
+      className={`text-base font-semibold tracking-[-0.01em] text-ink ${className}`}
       {...props}
     >
       {children}
@@ -47,7 +57,7 @@ export function CardTitle({ className = "", children, ...props }) {
  */
 export function CardContent({ className = "", children, ...props }) {
   return (
-    <div className={`px-6 py-5 ${className}`} {...props}>
+    <div className={`px-5 py-5 sm:px-6 ${className}`} {...props}>
       {children}
     </div>
   );

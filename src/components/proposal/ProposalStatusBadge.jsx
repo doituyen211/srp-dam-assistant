@@ -1,29 +1,44 @@
 "use client";
 
 import { Badge } from "@/components/ui/Badge";
-import { STATUS_LABELS, STATUS_COLORS } from "@/lib/constants";
+import { STATUS_LABELS, WORKFLOW_STAGES } from "@/lib/constants";
 
 /**
- * ProposalStatusBadge - Display proposal status with color
+ * ProposalStatusBadge - Display proposal status with color and workflow context
  */
-export function ProposalStatusBadge({ status }) {
+export function ProposalStatusBadge({ status, showWorkflow = false }) {
   const label = STATUS_LABELS[status] || status;
-  const color = STATUS_COLORS[status] || "default";
 
-  const colorMap = {
-    slate: "default",
-    blue: "info",
-    amber: "warning",
-    orange: "warning",
-    green: "success",
-    red: "danger",
+  const getStageInfo = () => {
+    const stage = WORKFLOW_STAGES.find((s) => s.status === status);
+    if (!stage) return null;
+
+    return {
+      order: stage.order,
+      nextStage: WORKFLOW_STAGES.find((s) => s.order === stage.order + 1),
+    };
   };
 
-  const intent = colorMap[color] || "default";
+  const stageInfo = showWorkflow ? getStageInfo() : null;
 
   return (
-    <Badge intent={intent} className="whitespace-nowrap">
-      {label}
-    </Badge>
+    <div className="flex items-center gap-2">
+      <Badge status={status} className="whitespace-nowrap">
+        {label}
+      </Badge>
+
+      {showWorkflow && stageInfo && (
+        <div className="flex items-center gap-1 text-xs text-muted">
+          <span>•</span>
+          <span>Stage {stageInfo.order}</span>
+          {stageInfo.nextStage && (
+            <>
+              <span>→</span>
+              <span>{stageInfo.nextStage.label}</span>
+            </>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

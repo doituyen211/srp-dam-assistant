@@ -17,17 +17,17 @@ export function Button({
   ...props
 }) {
   const baseStyles =
-    "inline-flex items-center justify-center gap-2 rounded-pill px-5 py-2.5 text-sm font-medium leading-[1.4] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-focus-blue/30 focus:ring-offset-2 focus:ring-offset-app-bg disabled:pointer-events-none disabled:opacity-55";
+    "inline-flex items-center justify-center gap-2 rounded px-4 py-2.5 text-sm font-medium leading-[1.3] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-app-bg disabled:pointer-events-none disabled:opacity-50";
 
   const variants = {
     primary:
-      "bg-primary text-on-primary hover:-translate-y-px hover:bg-[#2d2d35] disabled:hover:translate-y-0 disabled:hover:bg-primary",
+      "bg-primary text-white hover:bg-primary-light active:bg-primary-dark",
     secondary:
-      "rounded-lg border border-hairline bg-transparent text-ink hover:bg-soft-stone disabled:hover:bg-transparent",
+      "border border-hairline bg-canvas text-ink hover:bg-subdued active:bg-hairline",
     ghost:
-      "rounded-lg bg-transparent px-3 text-body-muted hover:bg-soft-stone hover:text-ink disabled:hover:bg-transparent disabled:hover:text-body-muted",
+      "bg-transparent text-body-muted hover:text-ink hover:bg-subdued active:bg-hairline",
     danger:
-      "rounded-lg border border-[#f8b4b4] bg-[#fff0f0] text-error hover:bg-[#ffe0e0] disabled:hover:bg-[#fff0f0]",
+      "bg-danger-bg text-danger border border-danger/20 hover:bg-danger hover:text-white active:bg-danger",
   };
 
   const variantClass = variants[variant] || variants.primary;

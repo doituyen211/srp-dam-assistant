@@ -6,167 +6,238 @@ import { Card, CardContent } from "@/components/ui/Card";
 
 const features = [
   {
-    title: "AI hỗ trợ hoàn thiện đề xuất",
+    title: "Proposal Drafting Workspace",
     description:
-      "Phân tích vấn đề, mục tiêu, phương pháp và tính khả thi để sinh viên chỉnh sửa đề cương có cấu trúc hơn.",
+      "Structured 11-section editor with academic guidance, character targets, and inline health checks for each section.",
     icon: (
       <path d="M7.75 8.25h8.5M7.75 12h8.5M7.75 15.75h5M5.25 3.75h13.5v16.5H5.25z" />
     ),
   },
   {
-    title: "Gợi ý giảng viên hướng dẫn",
+    title: "AI Pre-review",
     description:
-      "Đề xuất giảng viên phù hợp theo lĩnh vực nghiên cứu, chuyên môn và tải hướng dẫn hiện tại.",
+      "Automated advisory analysis of proposal completeness, strengths, and areas for improvement. AI suggests — humans decide.",
     icon: (
-      <path d="M12 4.75 4.75 8.5 12 12.25l7.25-3.75L12 4.75Zm-4.75 6v4.5c1.35 1.35 2.95 2 4.75 2s3.4-.65 4.75-2v-4.5" />
+      <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
     ),
   },
   {
-    title: "Theo dõi tiến độ & hỗ trợ hội đồng",
+    title: "Rubric-based Human Review",
     description:
-      "Tập trung trạng thái, phản hồi, rubric và dữ liệu review để quá trình xét duyệt minh bạch hơn.",
+      "Reviewers evaluate proposals against 8 academic criteria with transparent scoring, AI observations, and reviewer comments.",
     icon: (
-      <path d="M5 18.75h14M7.25 15.25v-4.5M12 15.25v-8.5M16.75 15.25v-6" />
+      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
     ),
+  },
+  {
+    title: "Explainable Supervisor Matching",
+    description:
+      "Multi-factor matching (topic, expertise, capacity, prior supervision) with transparent score breakdowns and admin approval.",
+    icon: (
+      <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+    ),
+  },
+  {
+    title: "Academic Workflow Tracking",
+    description:
+      "10-stage pipeline from draft through completion with clear stage ownership, transition rules, and milestone tracking.",
+    icon: <path d="M12 6v6l4 2M12 3a9 9 0 100 18 9 9 0 000-18z" />,
+  },
+  {
+    title: "Admin Operations Dashboard",
+    description:
+      "Real-time view of proposal pipeline, bottlenecks, reviewer workload, lecturer capacity, and system audit log.",
+    icon: <path d="M4 6h16M4 10h16M4 14h16M4 18h16" />,
   },
 ];
 
-function FeatureIcon({ children }) {
-  return (
-    <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-lg bg-deep-green text-white">
-      <svg
-        aria-hidden="true"
-        className="h-5 w-5"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {children}
-      </svg>
-    </div>
-  );
-}
+const roles = [
+  {
+    title: "For Students",
+    items: [
+      "Write structured proposals with section guidance",
+      "Receive AI pre-review before submission",
+      "Track proposal status through the workflow",
+      "View reviewer feedback and rubric scores",
+    ],
+  },
+  {
+    title: "For Reviewers",
+    items: [
+      "Triage proposals with AI risk indicators",
+      "Evaluate using 8-criterion rubric",
+      "Make accountable decisions with required comments",
+      "Track review queue and deadlines",
+    ],
+  },
+  {
+    title: "For Administrators",
+    items: [
+      "Monitor full workflow pipeline health",
+      "Detect bottlenecks and capacity risks",
+      "Manage supervisor assignments",
+      "Access complete system audit log",
+    ],
+  },
+  {
+    title: "For Lecturers",
+    items: [
+      "View assigned and suggested proposals",
+      "See explainable match scores with breakdown",
+      "Track supervision load and milestones",
+      "Indicate interest in potential matches",
+    ],
+  },
+];
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-canvas text-ink">
-      <nav className="sticky top-0 z-40 border-b border-hairline bg-canvas">
+      {/* Nav */}
+      <nav className="sticky top-0 z-40 border-b border-hairline bg-canvas/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 md:px-8">
           <div>
-            <h1 className="text-[15px] font-semibold tracking-[0.04em]">
-              SRP D&M Assistant
+            <h1 className="text-sm font-semibold tracking-[0.04em]">
+              SRP D&amp;M Assistant
             </h1>
             <p className="hidden font-mono text-[10px] uppercase tracking-[0.12em] text-muted sm:block">
-              Student Research Platform
+              Student Research Proposal Platform
             </p>
           </div>
           <Link href="/login">
-            <Button variant="primary" className="px-5 py-2 text-sm">
-              Đăng nhập
-            </Button>
+            <Button variant="primary">Try Demo</Button>
           </Link>
         </div>
       </nav>
 
       <main>
-        <section className="px-5 pb-16 pt-14 md:px-8 md:pb-20 md:pt-20">
-          <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-            <div className="max-w-3xl">
-              <div className="mb-6 inline-flex rounded-full bg-deep-green px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-white">
-                AI-assisted research management
+        {/* Hero */}
+        <section className="px-5 pb-20 pt-16 md:px-8 md:pb-28 md:pt-24">
+          <div className="mx-auto max-w-6xl">
+            <div className="mx-auto max-w-3xl text-center">
+              <div className="mb-6 inline-flex rounded border border-primary/20 bg-primary/5 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-primary">
+                AI-assisted academic workflow platform
               </div>
-              <h2 className="max-w-4xl text-5xl font-medium leading-[1.05] tracking-[-0.03em] text-ink md:text-6xl">
-                AI Trợ Lý Soạn & Quản Lý Đề Tài Nghiên Cứu
+              <h2 className="text-4xl font-semibold leading-[1.1] tracking-[-0.02em] text-ink md:text-5xl">
+                From draft to completion — <br />
+                <span className="text-primary">
+                  a structured research proposal workflow
+                </span>
               </h2>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-body-muted">
-                Nền tảng hỗ trợ sinh viên xây dựng đề xuất nghiên cứu chặt chẽ,
-                kết nối giảng viên phù hợp và giúp hội đồng theo dõi tiến độ xét
-                duyệt trong một không gian làm việc chuyên nghiệp.
+              <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-body-muted">
+                SRP D&amp;M Assistant helps students write stronger proposals,
+                reviewers evaluate faster with rubric support, administrators
+                monitor pipeline health, and lecturers find suitable matches.
               </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Link href="/login">
-                  <Button variant="primary" className="w-full px-7 py-3 sm:w-auto">
-                    Bắt đầu ngay
+                  <Button
+                    variant="primary"
+                    className="w-full px-8 py-3 sm:w-auto"
+                  >
+                    Try the Demo
                   </Button>
                 </Link>
                 <Link href="/login">
-                  <Button variant="secondary" className="w-full px-7 py-3 sm:w-auto">
-                    Xem demo
+                  <Button
+                    variant="secondary"
+                    className="w-full px-8 py-3 sm:w-auto"
+                  >
+                    Explore as a Role
                   </Button>
                 </Link>
               </div>
             </div>
 
-            <div className="rounded-[22px] bg-soft-stone p-4">
-              <div className="rounded-xl bg-primary p-5 text-white shadow-card">
-                <div className="mb-5 font-mono text-[11px] uppercase tracking-[0.12em] text-white/45">
-                  Proposal intelligence
-                </div>
-                <div className="space-y-3">
-                  {["Problem clarity", "Method feasibility", "Lecturer match"].map(
-                    (label, index) => (
-                      <div
-                        key={label}
-                        className="rounded-lg border border-white/10 bg-white/[0.06] p-4"
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-white/80">{label}</span>
-                          <span className="font-mono text-xs text-white">
-                            {[86, 78, 92][index]}%
-                          </span>
-                        </div>
-                        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
-                          <div
-                            className="h-full rounded-full bg-[#4ade80]"
-                            style={{ width: `${[86, 78, 92][index]}%` }}
-                          />
-                        </div>
-                      </div>
-                    ),
-                  )}
-                </div>
+            {/* Role cards */}
+            <div className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {roles.map((role) => (
+                <Card key={role.title} className="border-hairline">
+                  <CardContent className="p-5">
+                    <h3 className="mb-3 text-sm font-semibold text-ink">
+                      {role.title}
+                    </h3>
+                    <ul className="space-y-2">
+                      {role.items.map((item) => (
+                        <li
+                          key={item}
+                          className="flex items-start gap-2 text-xs leading-5 text-body-muted"
+                        >
+                          <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Problem section */}
+        <section className="border-y border-hairline bg-app-bg px-5 py-16 md:px-8">
+          <div className="mx-auto max-w-6xl">
+            <div className="grid gap-8 md:grid-cols-[0.9fr_1.1fr]">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
+                  The Challenge
+                </p>
+                <h3 className="mt-3 text-2xl font-semibold leading-tight text-ink">
+                  Research proposals need structure, not just templates.
+                </h3>
+              </div>
+              <div className="space-y-4 text-sm leading-7 text-body-muted">
+                <p>
+                  Students struggle to frame clear research problems, align
+                  methodology with objectives, and present feasible plans.
+                  Reviewers lack structured criteria and spend excessive time on
+                  poorly formatted proposals.
+                </p>
+                <p>
+                  SRP D&amp;M Assistant integrates drafting, AI-assisted
+                  pre-review, rubric-based human evaluation, explainable
+                  supervisor matching, and workflow tracking into a single
+                  academic platform.
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="border-y border-hairline bg-app-bg px-5 py-14 md:px-8">
-          <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[0.8fr_1.2fr]">
-            <h3 className="text-2xl font-medium tracking-[-0.02em] text-ink">
-              Vấn đề nghiên cứu cần một quy trình rõ ràng hơn.
-            </h3>
-            <div className="space-y-4 text-base leading-7 text-body-muted">
-              <p>
-                Sinh viên thường gặp khó khăn khi định hình vấn đề, mục tiêu và
-                phương pháp nghiên cứu. Những thiếu sót nhỏ trong đề cương có thể
-                làm quá trình xét duyệt kéo dài.
-              </p>
-              <p>
-                SRP D&M Assistant gom việc soạn thảo, phản hồi AI, matching giảng
-                viên và review hội đồng vào một luồng làm việc nhất quán.
-              </p>
-            </div>
-          </div>
-        </section>
-
+        {/* Features */}
         <section className="px-5 py-20 md:px-8">
           <div className="mx-auto max-w-6xl">
-            <h3 className="mb-10 text-center text-3xl font-medium tracking-[-0.02em] text-ink">
-              Tính năng chính
-            </h3>
-
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="mb-12 text-center">
+              <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
+                Platform capabilities
+              </p>
+              <h3 className="mt-3 text-2xl font-semibold text-ink">
+                Everything you need to manage research proposals
+              </h3>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {features.map((feature) => (
-                <Card key={feature.title} className="bg-soft-stone">
+                <Card key={feature.title} className="bg-app-bg">
                   <CardContent className="p-6">
-                    <FeatureIcon>{feature.icon}</FeatureIcon>
-                    <h4 className="text-base font-medium text-ink">
+                    <div className="mb-4 flex h-10 w-10 items-center justify-center rounded border border-hairline bg-canvas text-primary">
+                      <svg
+                        aria-hidden="true"
+                        className="h-5 w-5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        {feature.icon}
+                      </svg>
+                    </div>
+                    <h4 className="text-sm font-semibold text-ink">
                       {feature.title}
                     </h4>
-                    <p className="mt-3 text-sm leading-6 text-body-muted">
+                    <p className="mt-2 text-xs leading-6 text-body-muted">
                       {feature.description}
                     </p>
                   </CardContent>
@@ -176,25 +247,131 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-deep-green px-5 py-16 text-white md:px-8">
+        {/* Trust section */}
+        <section className="border-y border-hairline bg-app-bg px-5 py-16 md:px-8">
+          <div className="mx-auto max-w-6xl">
+            <div className="mb-10 text-center">
+              <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
+                Design principles
+              </p>
+              <h3 className="mt-3 text-2xl font-semibold text-ink">
+                Built for academic integrity
+              </h3>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <Card>
+                <CardContent className="p-5 text-center">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-info-bg text-info">
+                    <svg
+                      className="h-6 w-6"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-sm font-semibold text-ink">
+                    AI Advisory Only
+                  </h4>
+                  <p className="mt-1.5 text-xs leading-5 text-body-muted">
+                    AI provides suggestions and analysis. It never approves,
+                    rejects, or assigns.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-5 text-center">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-success-bg text-success">
+                    <svg
+                      className="h-6 w-6"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-sm font-semibold text-ink">
+                    Human Final Decision
+                  </h4>
+                  <p className="mt-1.5 text-xs leading-5 text-body-muted">
+                    Every decision requires a named human reviewer with a
+                    recorded comment.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-5 text-center">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-warning-bg text-warning">
+                    <svg
+                      className="h-6 w-6"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                  </div>
+                  <h4 className="text-sm font-semibold text-ink">
+                    Transparent Rubric
+                  </h4>
+                  <p className="mt-1.5 text-xs leading-5 text-body-muted">
+                    All criteria scores and reviewer comments visible to
+                    students and administrators.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-5 text-center">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-purple/10 text-purple">
+                    <svg
+                      className="h-6 w-6"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                  </div>
+                  <h4 className="text-sm font-semibold text-ink">
+                    Audit-friendly Workflow
+                  </h4>
+                  <p className="mt-1.5 text-xs leading-5 text-body-muted">
+                    Every status change and decision is recorded with timestamp
+                    and user identity.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="bg-primary px-5 py-16 text-white md:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/50">
-              Academic workflow
+            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/50">
+              Competition Demo
             </p>
-            <h3 className="mt-4 text-3xl font-medium tracking-[-0.02em] md:text-4xl">
-              Sẵn sàng nâng cao chất lượng đề tài của bạn?
+            <h3 className="mt-4 text-3xl font-semibold leading-tight md:text-4xl">
+              Ready to see it in action?
             </h3>
-            <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-white/70">
-              Đăng nhập để trải nghiệm luồng demo cho sinh viên, reviewer,
-              giảng viên và quản trị viên.
+            <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-white/70">
+              Try the full demo with four role accounts. No installation, no
+              sign-up — just click and explore.
             </p>
             <div className="mt-8">
               <Link href="/login">
-                <Button
-                  variant="primary"
-                  className="bg-white px-8 py-3 text-primary hover:bg-soft-stone"
-                >
-                  Đi tới đăng nhập
+                <Button className="bg-white px-8 py-3 !text-primary hover:bg-white/90">
+                  Launch Demo
                 </Button>
               </Link>
             </div>
@@ -202,8 +379,14 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-hairline bg-primary px-6 py-8 text-center text-sm text-white/55">
-        <p>© 2026 SRP D&M Assistant. All rights reserved.</p>
+      <footer className="border-t border-hairline bg-primary px-6 py-8 text-center text-sm text-white/50">
+        <p>
+          © 2026 SRP D&amp;M Assistant. Academic research proposal platform.
+        </p>
+        <p className="mt-1 text-xs text-white/30">
+          AI-assisted workflow · Human-in-the-loop · Built for university
+          research offices
+        </p>
       </footer>
     </div>
   );
