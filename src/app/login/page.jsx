@@ -11,23 +11,19 @@ import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 
 const DEMO_CREDENTIALS = [
-  { role: "Student",     email: "student@example.edu",    password: "password123" },
-  { role: "Reviewer",    email: "reviewer@example.edu",   password: "password123" },
-  { role: "Admin",       email: "admin@example.edu",      password: "password123" },
-  { role: "Lecturer",    email: "lecturer@example.edu",   password: "password123" },
+  { role: "Student",  email: "student@example.edu",  password: "password123" },
+  { role: "Reviewer", email: "reviewer@example.edu", password: "password123" },
+  { role: "Admin",    email: "admin@example.edu",    password: "password123" },
+  { role: "Lecturer", email: "lecturer@example.edu", password: "password123" },
 ];
 
 function getRedirectPath(role) {
   switch (role) {
-    case "reviewer":
-      return "/review";
-    case "admin":
-      return "/admin";
-    case "lecturer":
-      return "/dashboard";
+    case "reviewer": return "/review";
+    case "admin":    return "/admin";
+    case "lecturer": return "/dashboard";
     case "student":
-    default:
-      return "/dashboard";
+    default:         return "/dashboard";
   }
 }
 
@@ -37,56 +33,50 @@ export default function LoginPage() {
   const [localError, setLocalError] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showDemo, setShowDemo] = useState(false);
 
-  // Redirect if already authenticated
   useEffect(() => {
-    if (user) {
-      router.push(getRedirectPath(user.role));
-    }
+    if (user) router.push(getRedirectPath(user.role));
   }, [user, router]);
 
-  // ── Email / password login ──
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     setLocalError(null);
-
     if (!email.trim() || !password.trim()) {
       setLocalError("Please enter your email and password.");
       return;
     }
-
     try {
       const userData = await login(email.trim(), password);
-      if (userData) {
-        router.push(getRedirectPath(userData.role));
-      }
+      if (userData) router.push(getRedirectPath(userData.role));
     } catch (err) {
-      const message =
+      const msg =
         err.message?.includes("401") || err.message?.includes("Invalid")
           ? "Invalid email or password."
           : err.message?.includes("fetch") || err.message?.includes("Failed to fetch")
             ? "Unable to connect to the server. Please check your connection and try again."
             : err.message || "Login failed. Please try again.";
-      setLocalError(message);
+      setLocalError(msg);
     }
   };
 
-  // ── Demo role login ──
   const handleDemoLogin = async (demoEmail, demoPassword) => {
     setLocalError(null);
     try {
       const userData = await login(demoEmail, demoPassword);
-      if (userData) {
-        router.push(getRedirectPath(userData.role));
-      }
+      if (userData) router.push(getRedirectPath(userData.role));
     } catch (err) {
-      if (err.message?.includes("fetch") || err.message?.includes("Failed to fetch")) {
-        setLocalError("Demo backend is not available. Please ensure the API server is running.");
-      } else {
-        setLocalError("Demo login failed. The credentials may have changed on the server.");
-      }
+      setLocalError(
+        err.message?.includes("fetch") || err.message?.includes("Failed to fetch")
+          ? "Demo backend is not available. Please ensure the API server is running."
+          : "Demo login failed. The credentials may have changed on the server."
+      );
     }
+  };
+
+  const fillDemo = (demoEmail, demoPassword) => {
+    setEmail(demoEmail);
+    setPassword(demoPassword);
+    setLocalError(null);
   };
 
   return (
@@ -105,26 +95,22 @@ export default function LoginPage() {
       </div>
 
       <div className="flex flex-1 items-center justify-center px-5 py-10">
-        <div className="w-full max-w-lg">
-          <div className="mb-8 text-center">
-            <h1 className="text-2xl font-semibold text-ink">Sign in</h1>
-            <p className="mt-2 text-sm text-body-muted">
-              Sign in with your institutional account.
-            </p>
-          </div>
-
-          {(error || localError) && (
-            <div className="mb-6">
-              <Alert type="error">{error || localError}</Alert>
-            </div>
-          )}
-
-          {/* ── Primary email login form ── */}
+        <div className="w-full max-w-md">
+          {/* ── Primary login card ── */}
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle>Sign in with email</CardTitle>
+              <CardTitle>Sign in to Research Office</CardTitle>
+              <p className="mt-1 text-sm text-body-muted">
+                Access your academic research workflow workspace.
+              </p>
             </CardHeader>
             <CardContent>
+              {(error || localError) && (
+                <div className="mb-5">
+                  <Alert type="error">{error || localError}</Alert>
+                </div>
+              )}
+
               <form onSubmit={handleEmailLogin} className="space-y-5">
                 <Input
                   label="Email"
@@ -146,6 +132,11 @@ export default function LoginPage() {
                   disabled={loading}
                   autoComplete="current-password"
                 />
+
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted italic">Forgot password? Coming soon</span>
+                </div>
+
                 <Button
                   type="submit"
                   variant="primary"
@@ -168,68 +159,54 @@ export default function LoginPage() {
             </CardContent>
           </Card>
 
-          {/* ── Demo login ── */}
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setShowDemo(!showDemo)}
-              className="inline-flex items-center gap-1 text-xs text-muted hover:text-body-muted transition-colors"
-            >
-              {showDemo ? "Hide" : "Show"} demo login credentials
-              <svg
-                className={`h-3 w-3 transition-transform ${showDemo ? "rotate-180" : ""}`}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </button>
-          </div>
-
-          {showDemo && (
-            <Card className="mt-4 border-dashed border-hairline">
-              <CardContent className="p-5">
-                <div className="mb-3">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">
-                    Demo role login — development only
-                  </p>
-                  <p className="mt-1 text-xs text-body-muted">
-                    These accounts are pre-configured for development and
-                    evaluation purposes. Not available in production.
-                  </p>
+          {/* ── Demo accounts ── */}
+          <Card className="border-dashed border-hairline">
+            <CardHeader>
+              <CardTitle>Demo accounts</CardTitle>
+              <p className="mt-1 text-xs text-body-muted">
+                Pre-configured for local development and evaluation only.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {DEMO_CREDENTIALS.map((cred) => (
+                <div
+                  key={cred.role}
+                  className="flex items-center gap-3 rounded border border-hairline bg-canvas px-4 py-3"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-ink">{cred.role}</p>
+                    <p className="font-mono text-xs text-muted">
+                      {cred.email}
+                    </p>
+                  </div>
+                  <Badge intent="muted" className="flex-shrink-0 font-mono">
+                    {cred.password}
+                  </Badge>
+                  <button
+                    type="button"
+                    onClick={() => fillDemo(cred.email, cred.password)}
+                    disabled={loading}
+                    className="flex-shrink-0 rounded border border-hairline bg-subdued px-3 py-1.5 text-xs font-medium text-body-muted transition-colors hover:bg-hairline hover:text-ink disabled:opacity-50"
+                  >
+                    Fill
+                  </button>
                 </div>
+              ))}
+              <div className="pt-2">
+                <Button
+                  variant="secondary"
+                  className="w-full text-xs"
+                  loading={false}
+                  disabled={loading || !email || !password}
+                  onClick={() => handleDemoLogin(email, password)}
+                >
+                  Sign in with filled credentials
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
-                <div className="space-y-2">
-                  {DEMO_CREDENTIALS.map((cred) => (
-                    <button
-                      key={cred.role}
-                      type="button"
-                      onClick={() => handleDemoLogin(cred.email, cred.password)}
-                      disabled={loading}
-                      className="flex w-full items-center justify-between gap-3 rounded border border-hairline bg-canvas px-4 py-3 text-left transition-colors hover:bg-subdued disabled:opacity-50"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-ink">
-                          {cred.role}
-                        </p>
-                        <p className="mt-0.5 font-mono text-xs text-muted">
-                          {cred.email}
-                        </p>
-                      </div>
-                      <Badge intent="muted" className="flex-shrink-0 font-mono">
-                        {cred.password}
-                      </Badge>
-                    </button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Footer */}
-          <div className="mt-8 text-center">
+          <div className="mt-6 text-center">
             <p className="text-xs text-muted">
               By signing in, you agree to the platform terms of use.
             </p>

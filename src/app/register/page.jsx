@@ -53,8 +53,6 @@ export default function RegisterPage() {
       return;
     }
 
-    // Default role is student — public registration cannot create
-    // admin, reviewer, or lecturer accounts.
     const payload = {
       name: form.name.trim(),
       email: form.email.trim().toLowerCase(),
@@ -69,7 +67,6 @@ export default function RegisterPage() {
       if (user) {
         router.push("/dashboard");
       } else {
-        // Backend accepted registration but did not return a user session.
         router.push("/login");
       }
     } catch (err) {
@@ -96,10 +93,10 @@ export default function RegisterPage() {
         <div className="w-full max-w-lg">
           <div className="mb-8 text-center">
             <h1 className="text-2xl font-semibold text-ink">
-              Create your student account
+              Create student research account
             </h1>
             <p className="mt-2 text-sm text-body-muted">
-              Student accounts can be created with a verified institutional email.
+              Use your institutional email to start drafting and tracking your research proposal.
             </p>
           </div>
 
@@ -126,7 +123,7 @@ export default function RegisterPage() {
                 />
 
                 <Input
-                  label="Email"
+                  label="Institutional email"
                   type="email"
                   name="email"
                   value={form.email}
@@ -135,6 +132,22 @@ export default function RegisterPage() {
                   required
                   disabled={loading}
                   helperText="Use your institutional email address."
+                />
+
+                <Select
+                  label="Faculty"
+                  name="faculty"
+                  value={form.faculty}
+                  onChange={handleChange}
+                  options={facultyOptions}
+                />
+
+                <Select
+                  label="Department"
+                  name="department"
+                  value={form.department}
+                  onChange={handleChange}
+                  options={departmentOptions}
                 />
 
                 <Input
@@ -159,22 +172,6 @@ export default function RegisterPage() {
                   disabled={loading}
                 />
 
-                <Select
-                  label="Faculty"
-                  name="faculty"
-                  value={form.faculty}
-                  onChange={handleChange}
-                  options={facultyOptions}
-                />
-
-                <Select
-                  label="Department"
-                  name="department"
-                  value={form.department}
-                  onChange={handleChange}
-                  options={departmentOptions}
-                />
-
                 <Button
                   type="submit"
                   variant="primary"
@@ -188,9 +185,11 @@ export default function RegisterPage() {
 
               <div className="mt-6 space-y-4">
                 <div className="rounded border border-info/20 bg-info-bg px-3 py-2.5 text-xs leading-5 text-info">
-                  <strong>Role notice:</strong> You are registering as a{" "}
-                  <strong>student</strong>. Reviewer, lecturer, and admin
-                  accounts are created by institutional administrators.
+                  Student self-registration is available for eligible institutional domains.
+                </div>
+                <div className="rounded border border-hairline bg-subdued px-3 py-2.5 text-xs leading-5 text-body-muted">
+                  <strong>Staff accounts:</strong> Reviewer, lecturer, and admin accounts are
+                  created by institutional administrators.
                 </div>
 
                 <div className="text-center">
