@@ -29,7 +29,7 @@ export function ProtectedRoute({ children, allowedRoles = null }) {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-app-bg">
-        <LoadingState message="Đang kiểm tra xác thực..." />
+        <LoadingState message="Verifying your session..." />
       </div>
     );
   }

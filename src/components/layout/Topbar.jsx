@@ -28,9 +28,8 @@ export function Topbar({ onMenuToggle, isMenuOpen = false }) {
   const handleLogout = async () => {
     try {
       await logout();
+    } finally {
       router.push("/login");
-    } catch (err) {
-      console.error("Logout error:", err);
     }
   };
 

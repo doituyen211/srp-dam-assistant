@@ -1,68 +1,133 @@
-// Session management - client-side only
-const SESSION_KEY = "srp_session";
+// ───────── Auth API — httpOnly cookie JWT ─────────
+// All requests use credentials: "include" so the browser sends httpOnly cookies.
+// No tokens are stored in LocalStorage or JavaScript memory.
+import { apiFetch, ApiError } from "./httpClient";
 
-/**
- * Check if running in browser
- */
-const isBrowser = () => typeof window !== "undefined";
+// ─── Safe localStorage (UI preferences only, never tokens) ───
+const LAST_EMAIL_KEY = "srp_last_email";
 
-/**
- * Save user session to localStorage
- * @param {Object} user user object
- */
-export const saveSession = (user) => {
-  if (!isBrowser()) return;
+export function getLastEmail() {
+  if (typeof window === "undefined") return "";
   try {
-    localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-  } catch (e) {
-    console.error("Failed to save session:", e);
+    return localStorage.getItem(LAST_EMAIL_KEY) || "";
+  } catch {
+    return "";
   }
-};
+}
+
+function saveLastEmail(email) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(LAST_EMAIL_KEY, email);
+  } catch {
+    // Storage full or unavailable — silently ignore
+  }
+}
+
+// ─── Auth API functions ───
 
 /**
- * Get user session from localStorage
- * @returns {Object|null} user object or null
+ * Register a new user account.
+ * Backend sets httpOnly access + refresh cookies on success.
  */
-export const getSession = () => {
-  if (!isBrowser()) return null;
+export async function register(payload) {
   try {
-    const session = localStorage.getItem(SESSION_KEY);
-    return session ? JSON.parse(session) : null;
-  } catch (e) {
-    console.error("Failed to get session:", e);
+    const res = await apiFetch("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    const user = data.user || data;
+    saveLastEmail(user.email || payload.email);
+    return user;
+  } catch (err) {
+    if (err instanceof ApiError) {
+      throw new Error(err.detail?.detail || err.detail?.message || err.message);
+    }
+    throw err;
+  }
+}
+
+/**
+ * Login with email and password.
+ * Backend sets httpOnly access + refresh cookies on success.
+ */
+export async function login(email, password) {
+  try {
+    const res = await apiFetch("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    const user = data.user || data;
+    saveLastEmail(user.email || email);
+    return user;
+  } catch (err) {
+    if (err instanceof ApiError) {
+      throw new Error(err.detail?.detail || err.detail?.message || err.message);
+    }
+    throw err;
+  }
+}
+
+/**
+ * Get current user from session cookie.
+ * Returns user object or null (no session / expired).
+ */
+export async function getMe() {
+  try {
+    const res = await apiFetch("/auth/me");
+    const data = await res.json();
+    return data.user || data || null;
+  } catch {
     return null;
   }
-};
+}
 
 /**
- * Clear user session from localStorage
+ * Explicitly refresh the session.
+ * httpClient already does this automatically on 401,
+ * but this is useful for manual refresh (e.g. before critical operations).
  */
-export const clearSession = () => {
-  if (!isBrowser()) return;
+export async function refreshSession() {
   try {
-    localStorage.removeItem(SESSION_KEY);
-  } catch (e) {
-    console.error("Failed to clear session:", e);
+    const res = await apiFetch("/auth/refresh", { method: "POST" });
+    return res.ok;
+  } catch {
+    return false;
   }
-};
+}
 
 /**
- * Check if user is authenticated
- * @returns {boolean}
+ * Logout — clears httpOnly cookies on the backend.
+ * Always succeeds from the frontend perspective.
  */
-export const isAuthenticated = () => {
-  return getSession() !== null;
-};
+export async function logout() {
+  try {
+    await apiFetch("/auth/logout", { method: "POST" });
+  } catch {
+    // Swallow — clear local state regardless of network outcome
+  }
+}
 
 /**
- * Check if user has required role(s)
- * @param {Object} user user object
- * @param {string|Array} allowedRoles single role or array of roles
+ * Dev-only: login with a predefined demo role.
+ * Uses the same real POST /auth/login endpoint.
+ */
+export async function loginDemoRole(role) {
+  return login(role.email, role.password);
+}
+
+// ─── Role check ───
+
+/**
+ * Check if user has one of the allowed roles.
+ * @param {Object|null}  user
+ * @param {string|string[]} allowedRoles
  * @returns {boolean}
  */
 export const hasRole = (user, allowedRoles) => {
   if (!user) return false;
-
   const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
   return roles.includes(user.role);
 };
