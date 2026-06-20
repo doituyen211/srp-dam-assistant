@@ -24,6 +24,46 @@ function saveLastEmail(email) {
   }
 }
 
+// ─── User response normalizer ───
+
+/**
+ * Normalize a user response from the backend.
+ * Supports both { user: {...} } and flat { id, email, ... } shapes.
+ * Does NOT expose tokens, passwords, or internal fields.
+ *
+ * @param {*} data - Raw response body from /auth/login, /auth/register, or /auth/me
+ * @returns {Object|null} Safe user profile or null
+ */
+export function normalizeUserResponse(data) {
+  if (!data) return null;
+  const raw = data.user || data;
+  if (!raw || !raw.id) return null;
+
+  // Return only safe fields
+  return {
+    id: raw.id,
+    tenant_id: raw.tenant_id || null,
+    email: raw.email,
+    name: raw.name,
+    role: raw.role,
+    faculty: raw.faculty || null,
+    department: raw.department || null,
+    title: raw.title || null,
+    is_active: raw.is_active ?? true,
+    is_verified: raw.is_verified ?? false,
+    memberships: raw.memberships || [],
+  };
+}
+
+// ─── Demo credentials map ───
+
+const DEMO_CREDENTIALS = {
+  student:  { email: "student@example.edu",  password: "password123" },
+  reviewer: { email: "reviewer@example.edu", password: "password123" },
+  admin:    { email: "admin@example.edu",    password: "password123" },
+  lecturer: { email: "lecturer@example.edu", password: "password123" },
+};
+
 // ─── Auth API functions ───
 
 /**
@@ -37,12 +77,15 @@ export async function register(payload) {
       body: JSON.stringify(payload),
     });
     const data = await res.json();
-    const user = data.user || data;
-    saveLastEmail(user.email || payload.email);
+    const user = normalizeUserResponse(data);
+    if (user) saveLastEmail(user.email || payload.email);
     return user;
   } catch (err) {
     if (err instanceof ApiError) {
-      throw new Error(err.detail?.detail || err.detail?.message || err.message);
+      const msg = err.data?.detail || err.data?.message || err.message;
+      const wrapped = new Error(msg);
+      wrapped.status = err.status;
+      throw wrapped;
     }
     throw err;
   }
@@ -59,12 +102,15 @@ export async function login(email, password) {
       body: JSON.stringify({ email, password }),
     });
     const data = await res.json();
-    const user = data.user || data;
-    saveLastEmail(user.email || email);
+    const user = normalizeUserResponse(data);
+    if (user) saveLastEmail(user.email || email);
     return user;
   } catch (err) {
     if (err instanceof ApiError) {
-      throw new Error(err.detail?.detail || err.detail?.message || err.message);
+      const msg = err.data?.detail || err.data?.message || err.message;
+      const wrapped = new Error(msg);
+      wrapped.status = err.status;
+      throw wrapped;
     }
     throw err;
   }
@@ -78,7 +124,7 @@ export async function getMe() {
   try {
     const res = await apiFetch("/auth/me");
     const data = await res.json();
-    return data.user || data || null;
+    return normalizeUserResponse(data);
   } catch {
     return null;
   }
@@ -112,10 +158,37 @@ export async function logout() {
 
 /**
  * Dev-only: login with a predefined demo role.
- * Uses the same real POST /auth/login endpoint.
+ * Maps role name to demo credentials.
+ *
+ * @param {string} role - "student" | "reviewer" | "admin" | "lecturer"
  */
 export async function loginDemoRole(role) {
-  return login(role.email, role.password);
+  const creds = DEMO_CREDENTIALS[role];
+  if (!creds) throw new Error(`Unknown demo role: ${role}`);
+  return login(creds.email, creds.password);
+}
+
+/**
+ * Accept an invite using a token.
+ * Creates membership + sets httpOnly cookies.
+ */
+export async function acceptInvite(token) {
+  try {
+    const res = await apiFetch("/auth/accept-invite", {
+      method: "POST",
+      body: JSON.stringify({ token }),
+    });
+    const data = await res.json();
+    return normalizeUserResponse(data);
+  } catch (err) {
+    if (err instanceof ApiError) {
+      const msg = err.data?.detail || err.data?.message || err.message;
+      const wrapped = new Error(msg);
+      wrapped.status = err.status;
+      throw wrapped;
+    }
+    throw err;
+  }
 }
 
 // ─── Role check ───

@@ -1,43 +1,39 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
 import {
   login as authLogin,
+  loginDemoRole as authLoginDemoRole,
   register as authRegister,
   getMe,
+  refreshSession,
   logout as authLogout,
   hasRole as checkRole,
 } from "@/lib/auth";
 
-/**
- * useAuth — Authentication hook backed by httpOnly cookie JWT.
- *
- * On mount:
- *   Calls GET /auth/me to restore session from httpOnly cookie.
- *   If the cookie is valid, user is set.
- *   If 401 / expired, user stays null.
- *   loading stops in both cases.
- *
- * Session persists across browser refreshes because the cookie
- * is sent automatically with credentials: "include".
- *
- * No JWT tokens are stored in LocalStorage or JavaScript.
- */
-export const useAuth = () => {
+// 1. Tạo Context
+const AuthContext = createContext();
+
+// 2. Tạo Provider bọc toàn bộ ứng dụng
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ── Session restore on mount ──
+  // ── Session restore on mount (Chỉ chạy 1 lần duy nhất) ──
   useEffect(() => {
     let mounted = true;
 
     const restore = async () => {
       try {
         const currentUser = await getMe();
-        if (mounted) {
-          setUser(currentUser);
-        }
+        if (mounted) setUser(currentUser);
       } catch {
         if (mounted) setUser(null);
       } finally {
@@ -52,7 +48,6 @@ export const useAuth = () => {
     };
   }, []);
 
-  // ── Login ──
   const login = useCallback(async (email, password) => {
     setLoading(true);
     setError(null);
@@ -69,7 +64,22 @@ export const useAuth = () => {
     }
   }, []);
 
-  // ── Register ──
+  const loginDemo = useCallback(async (roleName) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const userData = await authLoginDemoRole(roleName);
+      setUser(userData);
+      return userData;
+    } catch (err) {
+      const message = err.message || "Demo login failed";
+      setError(message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const register = useCallback(async (payload) => {
     setLoading(true);
     setError(null);
@@ -86,13 +96,11 @@ export const useAuth = () => {
     }
   }, []);
 
-  // ── Logout ──
   const logout = useCallback(async () => {
     setLoading(true);
     try {
       await authLogout();
     } catch {
-      // Swallow — clear local state
     } finally {
       setUser(null);
       setError(null);
@@ -100,7 +108,6 @@ export const useAuth = () => {
     }
   }, []);
 
-  // ── Manual user re-fetch ──
   const refetchUser = useCallback(async () => {
     try {
       const currentUser = await getMe();
@@ -112,22 +119,50 @@ export const useAuth = () => {
     }
   }, []);
 
-  // ── Helpers ──
-  const isAuthenticated = useCallback(() => user !== null, [user]);
-  const hasRole = useCallback(
-    (roles) => checkRole(user, roles),
-    [user],
-  );
+  const refresh = useCallback(async () => {
+    try {
+      return await refreshSession();
+    } catch {
+      return false;
+    }
+  }, []);
 
-  return {
+  const isAuthenticated = useCallback(() => user !== null, [user]);
+  const hasRole = useCallback((roles) => checkRole(user, roles), [user]);
+  const isSuperAdmin = user?.role === "super_admin";
+  const isAdmin = user?.role === "admin" || user?.role === "super_admin";
+  const isStudent = user?.role === "student";
+  const isReviewer = user?.role === "reviewer";
+  const isLecturer = user?.role === "lecturer";
+
+  // Đẩy tất cả state và hàm xuống Context
+  const value = {
     user,
     loading,
     error,
     isAuthenticated,
     login,
+    loginDemo,
     register,
     logout,
     refetchUser,
+    refresh,
     hasRole,
+    isSuperAdmin,
+    isAdmin,
+    isStudent,
+    isReviewer,
+    isLecturer,
   };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+// 3. Export hook để các Component con sử dụng
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 };

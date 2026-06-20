@@ -41,12 +41,11 @@ export function LecturerCapacityTable({ lecturers = [] }) {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-hairline">
+        {/* <tbody className="divide-y divide-hairline">
           {lecturers.map((lec) => {
             const loadPct = Math.round((lec.currentLoad / lec.maxLoad) * 100);
             const isFull = loadPct >= 100;
             const isNear = loadPct >= 75;
-
             return (
               <tr key={lec.id} className="hover:bg-subdued/50">
                 <td className="px-4 py-3">
@@ -55,15 +54,17 @@ export function LecturerCapacityTable({ lecturers = [] }) {
                     <p className="text-xs text-body-muted">{lec.title}</p>
                   )}
                 </td>
-                <td className="px-4 py-3 text-body-muted">
-                  {lec.department}
-                </td>
+                <td className="px-4 py-3 text-body-muted">{lec.department}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     <div className="h-1.5 w-20 overflow-hidden rounded-full bg-subdued">
                       <div
                         className={`h-full rounded-full ${
-                          isFull ? "bg-danger" : isNear ? "bg-warning" : "bg-success"
+                          isFull
+                            ? "bg-danger"
+                            : isNear
+                              ? "bg-warning"
+                              : "bg-success"
                         }`}
                         style={{ width: `${Math.min(loadPct, 100)}%` }}
                       />
@@ -75,9 +76,74 @@ export function LecturerCapacityTable({ lecturers = [] }) {
                 </td>
                 <td className="px-4 py-3">
                   <Badge
-                    intent={
-                      isFull ? "danger" : isNear ? "warning" : "success"
-                    }
+                    intent={isFull ? "danger" : isNear ? "warning" : "success"}
+                  >
+                    {isFull ? "Full" : isNear ? "Near limit" : "Available"}
+                  </Badge>
+                </td>
+                <td className="px-4 py-3">
+                  <Badge
+                    intent={isFull ? "danger" : isNear ? "warning" : "success"}
+                  >
+                    {isFull ? "High" : isNear ? "Medium" : "Low"}
+                  </Badge>
+                </td>
+                <td className="px-4 py-3">
+                  <span className="text-xs text-body-muted">
+                    {isFull
+                      ? "Redistribute load"
+                      : isNear
+                        ? "Monitor assignments"
+                        : "Available for assignment"}
+                  </span>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody> */}
+        <tbody className="divide-y divide-hairline">
+          {lecturers.map((lec, index) => {
+            const loadPct = Math.round((lec.currentLoad / lec.maxLoad) * 100);
+            const isFull = loadPct >= 100;
+            const isNear = loadPct >= 75;
+
+            // 1. Tạo fallback key: Nếu lec.id không tồn tại, dùng index
+            const uniqueKey = lec.id || `lecturer-index-${index}`;
+
+            // 2. (Tùy chọn) Bật dòng này lên để check xem lec.id nào đang bị undefined
+            // console.log(`Row ${index}: ID là`, lec.id, "Data:", lec);
+
+            return (
+              <tr key={uniqueKey} className="hover:bg-subdued/50">
+                <td className="px-4 py-3">
+                  <p className="font-medium text-ink">{lec.name}</p>
+                  {lec.title && (
+                    <p className="text-xs text-body-muted">{lec.title}</p>
+                  )}
+                </td>
+                <td className="px-4 py-3 text-body-muted">{lec.department}</td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-1.5 w-20 overflow-hidden rounded-full bg-subdued">
+                      <div
+                        className={`h-full rounded-full ${
+                          isFull
+                            ? "bg-danger"
+                            : isNear
+                              ? "bg-warning"
+                              : "bg-success"
+                        }`}
+                        style={{ width: `${Math.min(loadPct, 100)}%` }}
+                      />
+                    </div>
+                    <span className="font-mono text-xs text-ink">
+                      {lec.currentLoad}/{lec.maxLoad}
+                    </span>
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <Badge
+                    intent={isFull ? "danger" : isNear ? "warning" : "success"}
                   >
                     {isFull ? "Full" : isNear ? "Near limit" : "Available"}
                   </Badge>

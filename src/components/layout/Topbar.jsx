@@ -1,8 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
+import { NotificationBell } from "@/components/ui/NotificationBell";
+import { api } from "@/lib/api";
 import {
   USER_ROLES,
   CURRENT_TERM,
@@ -12,6 +15,7 @@ import {
 } from "@/lib/constants";
 
 const ROLE_BADGE_COLORS = {
+  [USER_ROLES.SUPER_ADMIN]: "bg-purple/10 text-purple border-purple/20",
   [USER_ROLES.STUDENT]: "bg-info-bg text-info border-info/20",
   [USER_ROLES.REVIEWER]: "bg-warning-bg text-warning border-warning/20",
   [USER_ROLES.ADMIN]: "bg-danger/10 text-danger border-danger/20",
@@ -24,6 +28,25 @@ const ROLE_BADGE_COLORS = {
 export function Topbar({ onMenuToggle, isMenuOpen = false }) {
   const router = useRouter();
   const { user, logout, loading } = useAuth();
+  const [notifications, setNotifications] = useState([]);
+  const [notificationsFetched, setNotificationsFetched] = useState(false);
+
+  const ensureNotificationsLoaded = () => {
+    if (!notificationsFetched) {
+      api.getNotifications().then(setNotifications).catch(() => {});
+      setNotificationsFetched(true);
+    }
+  };
+
+  const handleDismiss = async (id) => {
+    await api.dismissNotification(id).catch(() => {});
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
+  const handleClearAll = async () => {
+    await api.dismissAllNotifications().catch(() => {});
+    setNotifications([]);
+  };
 
   const handleLogout = async () => {
     try {
@@ -101,6 +124,14 @@ export function Topbar({ onMenuToggle, isMenuOpen = false }) {
               {user.email}
             </p>
           </div>
+
+          {/* Notifications */}
+          <NotificationBell
+            notifications={notifications}
+            onDismiss={handleDismiss}
+            onClearAll={handleClearAll}
+            onOpen={ensureNotificationsLoaded}
+          />
 
           {/* User avatar */}
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">

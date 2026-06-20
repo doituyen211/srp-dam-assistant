@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/layout/AppShell";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { Alert } from "@/components/ui/Alert";
+import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LoadingState } from "@/components/ui/LoadingState";
@@ -16,7 +17,7 @@ import { PendingDecisionQueue } from "@/components/admin/PendingDecisionQueue";
 import { LecturerCapacityTable } from "@/components/admin/LecturerCapacityTable";
 import { api } from "@/lib/api";
 import { USER_ROLES } from "@/lib/constants";
-import { mockUsers, mockLecturers } from "@/lib/mockData";
+import { mockUsers } from "@/lib/mockData";
 
 const formatDateTime = (value) => {
   if (!value) return "";
@@ -227,7 +228,7 @@ function AdminPageContent() {
           </CardHeader>
           <CardContent>
             <LecturerCapacityTable
-              lecturers={overview?.lecturerCapacity || mockLecturers}
+              lecturers={overview?.lecturerCapacity || []}
             />
           </CardContent>
         </Card>
@@ -383,7 +384,102 @@ function AdminPageContent() {
           )}
         </CardContent>
       </Card>
+
+      {/* Invite Team Members */}
+      <InviteTeamSection />
     </div>
+  );
+}
+
+function InviteTeamSection() {
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("reviewer");
+  const [invites, setInvites] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const { listInvites } = require ? {} : { listInvites: async () => [] };
+    import("@/lib/tenant").then((mod) => mod.listInvites().then(setInvites).catch(() => {})).catch(() => {});
+  }, []);
+
+  const handleSend = async () => {
+    if (!email.trim()) { setError("Email is required."); return; }
+    setLoading(true); setError(""); setMessage("");
+    try {
+      const { createInvite } = await import("@/lib/tenant");
+      await createInvite(null, email.trim(), role);
+      setMessage(`Invite sent to ${email.trim()}.`);
+      setEmail("");
+      const { listInvites } = await import("@/lib/tenant");
+      listInvites().then(setInvites).catch(() => {});
+    } catch (err) {
+      setError(err.message || "Failed to send invite.");
+    } finally { setLoading(false); }
+  };
+
+  const handleCancel = async (inviteId) => {
+    try {
+      const { cancelInvite } = await import("@/lib/tenant");
+      await cancelInvite(inviteId);
+      setInvites((prev) => prev.filter((i) => i.id !== inviteId));
+    } catch (err) {
+      setError(err.message || "Failed to cancel.");
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader><CardTitle>Invite Team Members</CardTitle></CardHeader>
+      <CardContent className="space-y-5">
+        {message && <Alert type="success" closable>{message}</Alert>}
+        {error && <Alert type="error">{error}</Alert>}
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <div className="flex-1">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email@university.edu"
+              disabled={loading}
+              className="min-h-[44px] w-full rounded border border-hairline bg-canvas px-4 py-2.5 text-base text-ink outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+            />
+          </div>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            disabled={loading}
+            className="min-h-[44px] rounded border border-hairline bg-canvas px-4 text-sm text-ink"
+          >
+            <option value="reviewer">Reviewer</option>
+            <option value="lecturer">Lecturer</option>
+            <option value="admin">Admin</option>
+          </select>
+          <Button onClick={handleSend} loading={loading} disabled={loading} className="flex-shrink-0">Send Invite</Button>
+        </div>
+
+        <div>
+          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.08em] text-muted">Pending Invites</p>
+          {invites.length === 0 ? (
+            <p className="text-sm text-muted">No pending invites.</p>
+          ) : (
+            <div className="space-y-2">
+              {invites.map((inv) => (
+                <div key={inv.id} className="flex items-center justify-between rounded border border-hairline px-4 py-3">
+                  <div>
+                    <p className="text-sm text-ink">{inv.email}</p>
+                    <p className="text-xs text-body-muted">{inv.role} · Sent {inv.created_at ? new Date(inv.created_at).toLocaleDateString() : "recently"}</p>
+                  </div>
+                  <button onClick={() => handleCancel(inv.id)} className="text-xs text-danger hover:underline">Cancel</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

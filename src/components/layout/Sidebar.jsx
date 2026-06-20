@@ -67,6 +67,14 @@ const NAV_ITEMS = {
     { label: "Proposals", href: "/proposals", icon: "proposals" },
     { label: "Matching Suggestions", href: "/matching", icon: "matching" },
   ],
+  [USER_ROLES.SUPER_ADMIN]: [
+    { section: "System" },
+    { label: "Dashboard", href: "/super-admin/overview", icon: "dashboard" },
+    { label: "Tenants", href: "/super-admin/tenants", icon: "admin" },
+    { section: "Platform" },
+    { label: "Pricing", href: "/super-admin/subscriptions", icon: "settings" },
+    { label: "Settings", href: "/super-admin/settings", icon: "settings" },
+  ],
 };
 
 /**

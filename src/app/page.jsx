@@ -104,9 +104,12 @@ export default function Home() {
               Student Research Proposal Platform
             </p>
           </div>
-          <Link href="/login">
-            <Button variant="primary">Try Demo</Button>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/pricing" className="hidden text-sm font-medium text-body-muted transition-colors hover:text-ink sm:block">Pricing</Link>
+            <Link href="/login">
+              <Button variant="primary">Try Demo</Button>
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -380,12 +383,13 @@ export default function Home() {
       </main>
 
       <footer className="border-t border-hairline bg-primary px-6 py-8 text-center text-sm text-white/50">
-        <p>
-          © 2026 SRP D&amp;M Assistant. Academic research proposal platform.
-        </p>
+        <p>© 2026 SRP D&amp;M Assistant. Academic research proposal platform.</p>
+        <div className="mt-2 flex items-center justify-center gap-4 text-xs text-white/30">
+          <Link href="/pricing" className="hover:text-white/60">Pricing</Link>
+          <Link href="/login" className="hover:text-white/60">Sign in</Link>
+        </div>
         <p className="mt-1 text-xs text-white/30">
-          AI-assisted workflow · Human-in-the-loop · Built for university
-          research offices
+          AI-assisted workflow · Human-in-the-loop · Built for university research offices
         </p>
       </footer>
     </div>

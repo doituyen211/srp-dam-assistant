@@ -66,6 +66,14 @@ export const mockUsers = [
     studentId: "SV2021003",
     year: 3,
   },
+  {
+    id: "7",
+    email: "superadmin@srpplatform.com",
+    password: "password123",
+    name: "Platform Admin",
+    role: USER_ROLES.SUPER_ADMIN,
+    title: "Super Administrator",
+  },
 ];
 
 // ═══════════════════════════════════════════
@@ -102,35 +110,40 @@ function makeSections(opts) {
       label: "Tóm tắt / Synopsis",
       content: abstract,
       health: abstractHealth,
-      aiComment: abstractHealth === "strong"
-        ? "Tóm tắt rõ ràng, đủ thông tin."
-        : abstractHealth === "needs_evidence"
-          ? "Cần thêm chi tiết về phương pháp."
-          : "Tóm tắt quá ngắn, cần mở rộng.",
-      rubricHint: "Kiểm tra tính đầy đủ: vấn đề - phương pháp - kết quả kỳ vọng.",
+      aiComment:
+        abstractHealth === "strong"
+          ? "Tóm tắt rõ ràng, đủ thông tin."
+          : abstractHealth === "needs_evidence"
+            ? "Cần thêm chi tiết về phương pháp."
+            : "Tóm tắt quá ngắn, cần mở rộng.",
+      rubricHint:
+        "Kiểm tra tính đầy đủ: vấn đề - phương pháp - kết quả kỳ vọng.",
     },
     {
       id: "problem",
       label: "Vấn đề nghiên cứu",
       content: problem,
       health: problemHealth,
-      aiComment: problemHealth === "strong"
-        ? "Vấn đề được định nghĩa tốt, có bối cảnh và khoảng trống."
-        : problemHealth === "needs_evidence"
-          ? "Cần dẫn chứng cụ thể hơn về khoảng trống nghiên cứu."
-          : "Vấn đề chưa rõ ràng, cần tái cấu trúc.",
-      rubricHint: "Vấn đề có thực sự cần giải quyết? Có dẫn chứng từ thực tiễn?",
+      aiComment:
+        problemHealth === "strong"
+          ? "Vấn đề được định nghĩa tốt, có bối cảnh và khoảng trống."
+          : problemHealth === "needs_evidence"
+            ? "Cần dẫn chứng cụ thể hơn về khoảng trống nghiên cứu."
+            : "Vấn đề chưa rõ ràng, cần tái cấu trúc.",
+      rubricHint:
+        "Vấn đề có thực sự cần giải quyết? Có dẫn chứng từ thực tiễn?",
     },
     {
       id: "question",
       label: "Câu hỏi nghiên cứu",
       content: question,
       health: questionHealth,
-      aiComment: questionHealth === "strong"
-        ? "Câu hỏi nghiên cứu cụ thể, có thể đo lường."
-        : questionHealth === "needs_evidence"
-          ? "Câu hỏi nên được chia nhỏ thành các câu hỏi phụ."
-          : "Thiếu câu hỏi nghiên cứu rõ ràng.",
+      aiComment:
+        questionHealth === "strong"
+          ? "Câu hỏi nghiên cứu cụ thể, có thể đo lường."
+          : questionHealth === "needs_evidence"
+            ? "Câu hỏi nên được chia nhỏ thành các câu hỏi phụ."
+            : "Thiếu câu hỏi nghiên cứu rõ ràng.",
       rubricHint: "Câu hỏi có thể trả lời được bằng phương pháp đề xuất?",
     },
     {
@@ -138,11 +151,12 @@ function makeSections(opts) {
       label: "Mục tiêu",
       content: objectives,
       health: objectivesHealth,
-      aiComment: objectivesHealth === "strong"
-        ? "Mục tiêu cụ thể, đo lường được, khả thi."
-        : objectivesHealth === "needs_evidence"
-          ? "Nên bổ sung chỉ số đánh giá cho mỗi mục tiêu."
-          : "Mục tiêu còn chung chung.",
+      aiComment:
+        objectivesHealth === "strong"
+          ? "Mục tiêu cụ thể, đo lường được, khả thi."
+          : objectivesHealth === "needs_evidence"
+            ? "Nên bổ sung chỉ số đánh giá cho mỗi mục tiêu."
+            : "Mục tiêu còn chung chung.",
       rubricHint: "Mỗi mục tiêu có thể kiểm chứng được không?",
     },
     {
@@ -150,11 +164,12 @@ function makeSections(opts) {
       label: "Cơ sở lý thuyết",
       content: literature,
       health: literatureHealth,
-      aiComment: literatureHealth === "strong"
-        ? "Tài liệu tham khảo phong phú, có phân tích phản biện."
-        : literatureHealth === "needs_evidence"
-          ? "Nên bổ sung thêm các công trình gần đây (5 năm)."
-          : "Cần mở rộng tổng quan tài liệu.",
+      aiComment:
+        literatureHealth === "strong"
+          ? "Tài liệu tham khảo phong phú, có phân tích phản biện."
+          : literatureHealth === "needs_evidence"
+            ? "Nên bổ sung thêm các công trình gần đây (5 năm)."
+            : "Cần mở rộng tổng quan tài liệu.",
       rubricHint: "Có tài liệu cập nhật? Có chỉ ra khoảng trống?",
     },
     {
@@ -162,11 +177,12 @@ function makeSections(opts) {
       label: "Phương pháp nghiên cứu",
       content: methodology,
       health: methodologyHealth,
-      aiComment: methodologyHealth === "strong"
-        ? "Phương pháp phù hợp, có kế hoạch chi tiết."
-        : methodologyHealth === "needs_evidence"
-          ? "Cần mô tả cách thu thập và xử lý dữ liệu cụ thể hơn."
-          : "Phương pháp chưa được mô tả đầy đủ.",
+      aiComment:
+        methodologyHealth === "strong"
+          ? "Phương pháp phù hợp, có kế hoạch chi tiết."
+          : methodologyHealth === "needs_evidence"
+            ? "Cần mô tả cách thu thập và xử lý dữ liệu cụ thể hơn."
+            : "Phương pháp chưa được mô tả đầy đủ.",
       rubricHint: "Phương pháp có phù hợp với câu hỏi nghiên cứu?",
     },
     {
@@ -174,11 +190,12 @@ function makeSections(opts) {
       label: "Tính khả thi & tiến độ",
       content: feasibility,
       health: feasibilityHealth,
-      aiComment: feasibilityHealth === "strong"
-        ? "Kế hoạch khả thi, có phân bổ thời gian hợp lý."
-        : feasibilityHealth === "needs_evidence"
-          ? "Nên bổ sung timeline chi tiết theo tuần."
-          : "Tiến độ chưa thực tế.",
+      aiComment:
+        feasibilityHealth === "strong"
+          ? "Kế hoạch khả thi, có phân bổ thời gian hợp lý."
+          : feasibilityHealth === "needs_evidence"
+            ? "Nên bổ sung timeline chi tiết theo tuần."
+            : "Tiến độ chưa thực tế.",
       rubricHint: "Nguồn lực có đủ? Thời gian có hợp lý?",
     },
     {
@@ -186,11 +203,12 @@ function makeSections(opts) {
       label: "Đóng góp dự kiến",
       content: contribution,
       health: contributionHealth,
-      aiComment: contributionHealth === "strong"
-        ? "Đóng góp rõ ràng, có giá trị học thuật và thực tiễn."
-        : contributionHealth === "needs_evidence"
-          ? "Nên định lượng tác động dự kiến."
-          : "Đóng góp còn chung chung.",
+      aiComment:
+        contributionHealth === "strong"
+          ? "Đóng góp rõ ràng, có giá trị học thuật và thực tiễn."
+          : contributionHealth === "needs_evidence"
+            ? "Nên định lượng tác động dự kiến."
+            : "Đóng góp còn chung chung.",
       rubricHint: "Đóng góp có mới và có ý nghĩa không?",
     },
     {
@@ -198,11 +216,12 @@ function makeSections(opts) {
       label: "Đạo đức & Rủi ro",
       content: ethics,
       health: ethicsHealth,
-      aiComment: ethicsHealth === "strong"
-        ? "Đã xem xét đầy đủ các vấn đề đạo đức."
-        : ethicsHealth === "needs_evidence"
-          ? "Cần đề cập đến quyền riêng tư và bảo mật dữ liệu."
-          : "Thiếu phân tích về đạo đức nghiên cứu.",
+      aiComment:
+        ethicsHealth === "strong"
+          ? "Đã xem xét đầy đủ các vấn đề đạo đức."
+          : ethicsHealth === "needs_evidence"
+            ? "Cần đề cập đến quyền riêng tư và bảo mật dữ liệu."
+            : "Thiếu phân tích về đạo đức nghiên cứu.",
       rubricHint: "Nếu có dữ liệu cá nhân, đã xin phép chưa?",
     },
     {
@@ -210,11 +229,12 @@ function makeSections(opts) {
       label: "Tài liệu tham khảo",
       content: references,
       health: referencesHealth,
-      aiComment: referencesHealth === "strong"
-        ? "Danh mục phong phú, đúng chuẩn trích dẫn."
-        : referencesHealth === "needs_evidence"
-          ? "Nên bổ sung tài liệu tiếng Anh và bài báo Q1."
-          : "Danh mục còn thiếu, cần chuẩn hóa định dạng.",
+      aiComment:
+        referencesHealth === "strong"
+          ? "Danh mục phong phú, đúng chuẩn trích dẫn."
+          : referencesHealth === "needs_evidence"
+            ? "Nên bổ sung tài liệu tiếng Anh và bài báo Q1."
+            : "Danh mục còn thiếu, cần chuẩn hóa định dạng.",
       rubricHint: "Đủ số lượng? Đúng định dạng? Có tài liệu cập nhật?",
     },
   ];
@@ -226,8 +246,10 @@ function makeSections(opts) {
 export const mockProposals = [
   {
     id: "prop-001",
-    title: "Xây dựng hệ thống quản lý kho dữ liệu phân tán với công nghệ Blockchain",
-    abstract: "Đề xuất xây dựng hệ thống quản lý kho dữ liệu phân tán sử dụng blockchain Ethereum và IPFS nhằm giải quyết các vấn đề về bảo mật, độ tin cậy và hiệu suất của các hệ thống tập trung hiện tại. Hệ thống sử dụng smart contracts để đảm bảo tính toàn vẹn dữ liệu.",
+    title:
+      "Xây dựng hệ thống quản lý kho dữ liệu phân tán với công nghệ Blockchain",
+    abstract:
+      "Đề xuất xây dựng hệ thống quản lý kho dữ liệu phân tán sử dụng blockchain Ethereum và IPFS nhằm giải quyết các vấn đề về bảo mật, độ tin cậy và hiệu suất của các hệ thống tập trung hiện tại. Hệ thống sử dụng smart contracts để đảm bảo tính toàn vẹn dữ liệu.",
     studentName: "Nguyễn Văn A",
     studentId: "1",
     faculty: "Khoa Công nghệ Thông tin",
@@ -249,28 +271,44 @@ export const mockProposals = [
     riskFlags: ["scope_too_broad"],
     version: 3,
     sections: makeSections({
-      abstract: "Đề xuất xây dựng hệ thống quản lý kho dữ liệu phân tán sử dụng blockchain Ethereum và IPFS nhằm giải quyết các vấn đề về bảo mật, độ tin cậy và hiệu suất của các hệ thống tập trung hiện tại. Hệ thống sử dụng smart contracts để đảm bảo tính toàn vẹn dữ liệu và cung cấp cơ chế đồng thuận phi tập trung. Kết quả dự kiến là một prototype có thể xử lý 10.000 giao dịch/giây với độ trễ dưới 2 giây.",
-      problem: "Các hệ thống quản lý kho dữ liệu tập trung hiện nay đối mặt với ba thách thức lớn: (1) bảo mật — dữ liệu tập trung là mục tiêu tấn công hấp dẫn, (2) độ tin cậy — một điểm lỗi duy nhất có thể làm sụp đổ toàn bộ hệ thống, (3) hiệu suất — chi phí vận hành trung tâm dữ liệu lớn tăng theo cấp số nhân. Công nghệ blockchain với cơ chế đồng thuận phân tán hứa hẹn giải quyết đồng thời cả ba vấn đề.",
-      question: "1. Làm thế nào để thiết kế hệ thống lưu trữ phân tán đảm bảo tính nhất quán và hiệu suất? 2. Smart contracts có thể tự động hóa việc kiểm tra tính toàn vẹn dữ liệu như thế nào? 3. Hiệu suất của hệ thống đề xuất so với giải pháp tập trung truyền thống ra sao?",
-      objectives: "1. Thiết kế kiến trúc hệ thống kho dữ liệu phân tán dựa trên blockchain. 2. Xây dựng smart contract cho cơ chế đồng thuận và kiểm tra toàn vẹn. 3. Tích hợp IPFS cho lưu trữ phi tập trung. 4. Đánh giá hiệu suất thông qua benchmark với 10.000+ giao dịch.",
-      literature: "Các nghiên cứu gần đây (Nakamoto 2008, Wood 2014, Benet 2017) đã đặt nền móng cho blockchain và IPFS. Tuy nhiên, hầu hết các giải pháp hiện tại tập trung vào tài chính (DeFi) hơn là lưu trữ dữ liệu học thuật. Công trình của Chen et al. (2024) trên IEEE Access đề xuất một mô hình lai nhưng chưa giải quyết được bài toán hiệu suất ở quy mô lớn.",
-      methodology: "Nghiên cứu sử dụng phương pháp thiết kế và thực nghiệm (design science research). Giai đoạn 1: Phân tích yêu cầu và thiết kế kiến trúc. Giai đoạn 2: Phát triển smart contract bằng Solidity, triển khai trên Ethereum testnet. Giai đoạn 3: Tích hợp IPFS và xây dựng API. Giai đoạn 4: Đo lường hiệu suất (throughput, latency, cost) so với MongoDB và PostgreSQL.",
-      feasibility: "Khả thi cao. Công nghệ mã nguồn mở (Ethereum, IPFS) đã trưởng thành. Đội phát triển có kiến thức cơ bản về blockchain. Dự kiến hoàn thành trong 14 tuần với 3 milestone chính. Rủi ro chính là chi phí gas trên Ethereum mainnet — giải pháp là sử dụng testnet và L2 solutions.",
-      contribution: "1. Một kiến trúc tham chiếu cho hệ thống lưu trữ học thuật phân tán. 2. Bộ smart contracts mã nguồn mở cho quản lý dữ liệu phi tập trung. 3. Dữ liệu benchmark so sánh hiệu suất với giải pháp truyền thống. 4. Bài báo khoa học cho hội thảo chuyên ngành.",
-      ethics: "Dữ liệu sử dụng là dữ liệu tổng hợp (synthetic data), không chứa thông tin cá nhân. Hệ thống tuân thủ nguyên tắc bảo vệ dữ liệu (GDPR).",
-      references: "1. Nakamoto, S. (2008). Bitcoin: A Peer-to-Peer Electronic Cash System. 2. Wood, G. (2014). Ethereum: A Secure Decentralised Generalised Transaction Ledger. 3. Benet, J. (2017). IPFS - Content Addressed, Versioned, P2P File System. 4. Chen et al. (2024). Blockchain-based Distributed Storage. IEEE Access.",
+      abstract:
+        "Đề xuất xây dựng hệ thống quản lý kho dữ liệu phân tán sử dụng blockchain Ethereum và IPFS nhằm giải quyết các vấn đề về bảo mật, độ tin cậy và hiệu suất của các hệ thống tập trung hiện tại. Hệ thống sử dụng smart contracts để đảm bảo tính toàn vẹn dữ liệu và cung cấp cơ chế đồng thuận phi tập trung. Kết quả dự kiến là một prototype có thể xử lý 10.000 giao dịch/giây với độ trễ dưới 2 giây.",
+      problem:
+        "Các hệ thống quản lý kho dữ liệu tập trung hiện nay đối mặt với ba thách thức lớn: (1) bảo mật — dữ liệu tập trung là mục tiêu tấn công hấp dẫn, (2) độ tin cậy — một điểm lỗi duy nhất có thể làm sụp đổ toàn bộ hệ thống, (3) hiệu suất — chi phí vận hành trung tâm dữ liệu lớn tăng theo cấp số nhân. Công nghệ blockchain với cơ chế đồng thuận phân tán hứa hẹn giải quyết đồng thời cả ba vấn đề.",
+      question:
+        "1. Làm thế nào để thiết kế hệ thống lưu trữ phân tán đảm bảo tính nhất quán và hiệu suất? 2. Smart contracts có thể tự động hóa việc kiểm tra tính toàn vẹn dữ liệu như thế nào? 3. Hiệu suất của hệ thống đề xuất so với giải pháp tập trung truyền thống ra sao?",
+      objectives:
+        "1. Thiết kế kiến trúc hệ thống kho dữ liệu phân tán dựa trên blockchain. 2. Xây dựng smart contract cho cơ chế đồng thuận và kiểm tra toàn vẹn. 3. Tích hợp IPFS cho lưu trữ phi tập trung. 4. Đánh giá hiệu suất thông qua benchmark với 10.000+ giao dịch.",
+      literature:
+        "Các nghiên cứu gần đây (Nakamoto 2008, Wood 2014, Benet 2017) đã đặt nền móng cho blockchain và IPFS. Tuy nhiên, hầu hết các giải pháp hiện tại tập trung vào tài chính (DeFi) hơn là lưu trữ dữ liệu học thuật. Công trình của Chen et al. (2024) trên IEEE Access đề xuất một mô hình lai nhưng chưa giải quyết được bài toán hiệu suất ở quy mô lớn.",
+      methodology:
+        "Nghiên cứu sử dụng phương pháp thiết kế và thực nghiệm (design science research). Giai đoạn 1: Phân tích yêu cầu và thiết kế kiến trúc. Giai đoạn 2: Phát triển smart contract bằng Solidity, triển khai trên Ethereum testnet. Giai đoạn 3: Tích hợp IPFS và xây dựng API. Giai đoạn 4: Đo lường hiệu suất (throughput, latency, cost) so với MongoDB và PostgreSQL.",
+      feasibility:
+        "Khả thi cao. Công nghệ mã nguồn mở (Ethereum, IPFS) đã trưởng thành. Đội phát triển có kiến thức cơ bản về blockchain. Dự kiến hoàn thành trong 14 tuần với 3 milestone chính. Rủi ro chính là chi phí gas trên Ethereum mainnet — giải pháp là sử dụng testnet và L2 solutions.",
+      contribution:
+        "1. Một kiến trúc tham chiếu cho hệ thống lưu trữ học thuật phân tán. 2. Bộ smart contracts mã nguồn mở cho quản lý dữ liệu phi tập trung. 3. Dữ liệu benchmark so sánh hiệu suất với giải pháp truyền thống. 4. Bài báo khoa học cho hội thảo chuyên ngành.",
+      ethics:
+        "Dữ liệu sử dụng là dữ liệu tổng hợp (synthetic data), không chứa thông tin cá nhân. Hệ thống tuân thủ nguyên tắc bảo vệ dữ liệu (GDPR).",
+      references:
+        "1. Nakamoto, S. (2008). Bitcoin: A Peer-to-Peer Electronic Cash System. 2. Wood, G. (2014). Ethereum: A Secure Decentralised Generalised Transaction Ledger. 3. Benet, J. (2017). IPFS - Content Addressed, Versioned, P2P File System. 4. Chen et al. (2024). Blockchain-based Distributed Storage. IEEE Access.",
     }),
   },
   {
     id: "prop-002",
     title: "Ứng dụng machine learning để dự đoán khả năng bỏ học của sinh viên",
-    abstract: "Nghiên cứu xây dựng mô hình machine learning dự đoán rủi ro bỏ học của sinh viên đại học dựa trên dữ liệu học tập và hành vi. Sử dụng các thuật toán Random Forest, XGBoost và Neural Networks để phân tích dữ liệu từ hệ thống quản lý học tập.",
+    abstract:
+      "Nghiên cứu xây dựng mô hình machine learning dự đoán rủi ro bỏ học của sinh viên đại học dựa trên dữ liệu học tập và hành vi. Sử dụng các thuật toán Random Forest, XGBoost và Neural Networks để phân tích dữ liệu từ hệ thống quản lý học tập.",
     studentName: "Trần Thị E",
     studentId: "5",
     faculty: "Khoa Công nghệ Thông tin",
     department: "Khoa CNTT",
     researchField: "Khoa học máy tính",
-    keywords: ["Machine Learning", "Student Dropout", "Predictive Model", "Educational Data Mining"],
+    keywords: [
+      "Machine Learning",
+      "Student Dropout",
+      "Predictive Model",
+      "Educational Data Mining",
+    ],
     status: PROPOSAL_STATUSES.UNDER_REVIEW,
     currentStage: 3,
     readinessScore: 7.8,
@@ -286,30 +324,47 @@ export const mockProposals = [
     riskFlags: ["missing_data"],
     version: 2,
     sections: makeSections({
-      abstract: "Tỷ lệ bỏ học đại học tại Việt Nam dao động 10-15%, gây lãng phí nguồn lực xã hội. Nghiên cứu này đề xuất xây dựng mô hình ML dự đoán rủi ro bỏ học dựa trên dữ liệu LMS (Learning Management System), kết quả học tập và thông tin nhân khẩu học. Mục tiêu đạt độ chính xác trên 85%.",
-      problem: "Tỷ lệ bỏ học tại các trường đại học Việt Nam đang ở mức báo động (12% theo Bộ GD&ĐT 2025). Các phương pháp can thiệp hiện tại chỉ dựa trên cảm tính của cố vấn học tập, thiếu cơ sở dữ liệu định lượng. Cần một hệ thống cảnh báo sớm dựa trên dữ liệu.",
-      question: "1. Những yếu tố nào có khả năng dự đoán rủi ro bỏ học nhất? 2. Mô hình ML nào cho hiệu suất tốt nhất trên dữ liệu giáo dục? 3. Làm thế nào để triển khai hệ thống cảnh báo theo thời gian thực?",
-      objectives: "1. Xác định các feature quan trọng từ dữ liệu LMS. 2. Huấn luyện và so sánh 3 thuật toán (RF, XGBoost, DNN). 3. Xây dựng pipeline xử lý dữ liệu tự động. 4. Tích hợp cảnh báo real-time qua dashboard.",
-      literature: "Sinh viên bỏ học là chủ đề được nghiên cứu rộng rãi (Tinto 1975, Bean 1980). Các nghiên cứu gần đây sử dụng ML (Shahiri 2015, Amrieh 2016) cho thấy tiềm năng của dữ liệu LMS. Tuy nhiên, hầu hết tập trung vào dữ liệu phương Tây — chưa có mô hình phù hợp cho bối cảnh Việt Nam.",
-      methodology: "Sử dụng CRISP-DM framework. Thu thập dữ liệu từ Moodle LMS của trường (5 năm, ~10,000 sinh viên). Tiền xử lý: xử lý missing value, encoding, scaling. Huấn luyện: train/test split 80/20, cross-validation 5-fold. Đánh giá: accuracy, precision, recall, F1, AUC-ROC.",
-      feasibility: "Dữ liệu đã có sẵn từ phòng đào tạo. Công nghệ ML đã trưởng thành (scikit-learn, TensorFlow). Thời gian 14 tuần. Rủi ro: chất lượng dữ liệu không đồng đều — cần làm sạch dữ liệu kỹ lưỡng.",
-      contribution: "1. Bộ dữ liệu giáo dục mở cho cộng đồng nghiên cứu. 2. Mô hình dự đoán tối ưu cho bối cảnh Việt Nam. 3. Hệ thống dashboard cảnh báo sớm có thể triển khai thực tế. 4. Bài báo hội thảo quốc gia.",
-      ethics: "Dữ liệu sẽ được ẩn danh hóa. Nghiên cứu tuân thủ quy định bảo vệ dữ liệu của trường. Cần xin phép hội đồng đạo đức nghiên cứu.",
-      references: "1. Tinto, V. (1975). Dropout from Higher Education. Review of Educational Research. 2. Shahiri, A.M. (2015). A Review on Predicting Student's Performance. 3. Amrieh, E.A. (2016). Mining Educational Data to Predict Student's academic Performance.",
+      abstract:
+        "Tỷ lệ bỏ học đại học tại Việt Nam dao động 10-15%, gây lãng phí nguồn lực xã hội. Nghiên cứu này đề xuất xây dựng mô hình ML dự đoán rủi ro bỏ học dựa trên dữ liệu LMS (Learning Management System), kết quả học tập và thông tin nhân khẩu học. Mục tiêu đạt độ chính xác trên 85%.",
+      problem:
+        "Tỷ lệ bỏ học tại các trường đại học Việt Nam đang ở mức báo động (12% theo Bộ GD&ĐT 2025). Các phương pháp can thiệp hiện tại chỉ dựa trên cảm tính của cố vấn học tập, thiếu cơ sở dữ liệu định lượng. Cần một hệ thống cảnh báo sớm dựa trên dữ liệu.",
+      question:
+        "1. Những yếu tố nào có khả năng dự đoán rủi ro bỏ học nhất? 2. Mô hình ML nào cho hiệu suất tốt nhất trên dữ liệu giáo dục? 3. Làm thế nào để triển khai hệ thống cảnh báo theo thời gian thực?",
+      objectives:
+        "1. Xác định các feature quan trọng từ dữ liệu LMS. 2. Huấn luyện và so sánh 3 thuật toán (RF, XGBoost, DNN). 3. Xây dựng pipeline xử lý dữ liệu tự động. 4. Tích hợp cảnh báo real-time qua dashboard.",
+      literature:
+        "Sinh viên bỏ học là chủ đề được nghiên cứu rộng rãi (Tinto 1975, Bean 1980). Các nghiên cứu gần đây sử dụng ML (Shahiri 2015, Amrieh 2016) cho thấy tiềm năng của dữ liệu LMS. Tuy nhiên, hầu hết tập trung vào dữ liệu phương Tây — chưa có mô hình phù hợp cho bối cảnh Việt Nam.",
+      methodology:
+        "Sử dụng CRISP-DM framework. Thu thập dữ liệu từ Moodle LMS của trường (5 năm, ~10,000 sinh viên). Tiền xử lý: xử lý missing value, encoding, scaling. Huấn luyện: train/test split 80/20, cross-validation 5-fold. Đánh giá: accuracy, precision, recall, F1, AUC-ROC.",
+      feasibility:
+        "Dữ liệu đã có sẵn từ phòng đào tạo. Công nghệ ML đã trưởng thành (scikit-learn, TensorFlow). Thời gian 14 tuần. Rủi ro: chất lượng dữ liệu không đồng đều — cần làm sạch dữ liệu kỹ lưỡng.",
+      contribution:
+        "1. Bộ dữ liệu giáo dục mở cho cộng đồng nghiên cứu. 2. Mô hình dự đoán tối ưu cho bối cảnh Việt Nam. 3. Hệ thống dashboard cảnh báo sớm có thể triển khai thực tế. 4. Bài báo hội thảo quốc gia.",
+      ethics:
+        "Dữ liệu sẽ được ẩn danh hóa. Nghiên cứu tuân thủ quy định bảo vệ dữ liệu của trường. Cần xin phép hội đồng đạo đức nghiên cứu.",
+      references:
+        "1. Tinto, V. (1975). Dropout from Higher Education. Review of Educational Research. 2. Shahiri, A.M. (2015). A Review on Predicting Student's Performance. 3. Amrieh, E.A. (2016). Mining Educational Data to Predict Student's academic Performance.",
       literatureHealth: "needs_evidence",
       ethicsHealth: "needs_evidence",
     }),
   },
   {
     id: "prop-003",
-    title: "Phát triển chatbot hỗ trợ tư vấn học tập bằng xử lý ngôn ngữ tự nhiên",
-    abstract: "Phát triển chatbot thông minh sử dụng NLP và mô hình ngôn ngữ lớn để hỗ trợ sinh viên trong việc tra cứu thông tin học tập, lịch học, và giải đáp thắc mắc về chương trình đào tạo.",
+    title:
+      "Phát triển chatbot hỗ trợ tư vấn học tập bằng xử lý ngôn ngữ tự nhiên",
+    abstract:
+      "Phát triển chatbot thông minh sử dụng NLP và mô hình ngôn ngữ lớn để hỗ trợ sinh viên trong việc tra cứu thông tin học tập, lịch học, và giải đáp thắc mắc về chương trình đào tạo.",
     studentName: "Lê Minh F",
     studentId: "6",
     faculty: "Khoa Công nghệ Thông tin",
     department: "Khoa CNTT",
     researchField: "Trí tuệ nhân tạo",
-    keywords: ["Chatbot", "NLP", "Educational Technology", "Question Answering"],
+    keywords: [
+      "Chatbot",
+      "NLP",
+      "Educational Technology",
+      "Question Answering",
+    ],
     status: PROPOSAL_STATUSES.NEEDS_REVISION,
     currentStage: 5,
     readinessScore: 6.5,
@@ -325,16 +380,24 @@ export const mockProposals = [
     riskFlags: ["scope_too_broad", "weak_methodology"],
     version: 1,
     sections: makeSections({
-      abstract: "Chatbot giáo dục đang trở thành xu hướng, nhưng hầu hết là các chatbot tổng quát chưa được tối ưu cho môi trường đại học. Đề tài xây dựng chatbot chuyên biệt cho tư vấn học tập, sử dụng NLP và fine-tune mô hình ngôn ngữ lớn.",
-      problem: "Sinh viên thường gặp khó khăn trong việc tìm kiếm thông tin học tập chính xác. Phòng đào tạo quá tải với hàng trăm câu hỏi mỗi ngày. Chatbot hiện tại của trường chỉ trả lời được các câu hỏi đơn giản, thiếu khả năng hiểu ngữ cảnh.",
-      question: "1. Làm thế nào để xây dựng chatbot hiểu được ngữ cảnh học tập đại học? 2. Mô hình NLP nào phù hợp nhất cho tiếng Việt trong lĩnh vực giáo dục? 3. Chatbot có thể đạt độ chính xác bao nhiêu %?",
-      objectives: "Xây dựng chatbot thông minh có khả năng hiểu và trả lời các câu hỏi về học tập.",
-      literature: "Các nghiên cứu về chatbot giáo dục (Winkler 2018, Okonkwo 2021) cho thấy tiềm năng lớn trong việc giảm tải cho nhân viên. Tuy nhiên, các giải pháp hiện tại chủ yếu bằng tiếng Anh.",
-      methodology: "Sử dụng framework NLP như spaCy, BERT. Tích hợp API OpenAI.",
+      abstract:
+        "Chatbot giáo dục đang trở thành xu hướng, nhưng hầu hết là các chatbot tổng quát chưa được tối ưu cho môi trường đại học. Đề tài xây dựng chatbot chuyên biệt cho tư vấn học tập, sử dụng NLP và fine-tune mô hình ngôn ngữ lớn.",
+      problem:
+        "Sinh viên thường gặp khó khăn trong việc tìm kiếm thông tin học tập chính xác. Phòng đào tạo quá tải với hàng trăm câu hỏi mỗi ngày. Chatbot hiện tại của trường chỉ trả lời được các câu hỏi đơn giản, thiếu khả năng hiểu ngữ cảnh.",
+      question:
+        "1. Làm thế nào để xây dựng chatbot hiểu được ngữ cảnh học tập đại học? 2. Mô hình NLP nào phù hợp nhất cho tiếng Việt trong lĩnh vực giáo dục? 3. Chatbot có thể đạt độ chính xác bao nhiêu %?",
+      objectives:
+        "Xây dựng chatbot thông minh có khả năng hiểu và trả lời các câu hỏi về học tập.",
+      literature:
+        "Các nghiên cứu về chatbot giáo dục (Winkler 2018, Okonkwo 2021) cho thấy tiềm năng lớn trong việc giảm tải cho nhân viên. Tuy nhiên, các giải pháp hiện tại chủ yếu bằng tiếng Anh.",
+      methodology:
+        "Sử dụng framework NLP như spaCy, BERT. Tích hợp API OpenAI.",
       feasibility: "Khả thi, nhưng cần dataset chất lượng cao về Q&A học tập.",
-      contribution: "Chatbot hỗ trợ sinh viên 24/7, giảm tải cho phòng đào tạo.",
+      contribution:
+        "Chatbot hỗ trợ sinh viên 24/7, giảm tải cho phòng đào tạo.",
       ethics: "",
-      references: "1. Winkler, R. (2018). Chatbots in Education. 2. Okonkwo, C.W. (2021). Chatbot in Higher Education.",
+      references:
+        "1. Winkler, R. (2018). Chatbots in Education. 2. Okonkwo, C.W. (2021). Chatbot in Higher Education.",
       abstractHealth: "needs_evidence",
       problemHealth: "needs_evidence",
       questionHealth: "weak",
@@ -350,13 +413,19 @@ export const mockProposals = [
   {
     id: "prop-004",
     title: "Hệ thống mã hóa end-to-end cho ứng dụng chat an toàn",
-    abstract: "Phát triển ứng dụng chat với mã hóa end-to-end sử dụng Double Ratchet Algorithm và Signal Protocol, đảm bảo quyền riêng tư và bảo mật cho người dùng trong môi trường doanh nghiệp.",
+    abstract:
+      "Phát triển ứng dụng chat với mã hóa end-to-end sử dụng Double Ratchet Algorithm và Signal Protocol, đảm bảo quyền riêng tư và bảo mật cho người dùng trong môi trường doanh nghiệp.",
     studentName: "Phạm Văn G",
     studentId: "7",
     faculty: "Khoa Công nghệ Thông tin",
     department: "Khoa CNTT",
     researchField: "An toàn thông tin",
-    keywords: ["End-to-End Encryption", "Signal Protocol", "Double Ratchet", "Secure Messaging"],
+    keywords: [
+      "End-to-End Encryption",
+      "Signal Protocol",
+      "Double Ratchet",
+      "Secure Messaging",
+    ],
     status: PROPOSAL_STATUSES.DRAFT,
     currentStage: 1,
     readinessScore: 6.8,
@@ -373,7 +442,8 @@ export const mockProposals = [
     version: 1,
     sections: makeSections({
       abstract: "Phát triển ứng dụng chat an toàn sử dụng mã hóa end-to-end.",
-      problem: "Các ứng dụng chat hiện có vẫn có rủi ro bảo mật. Cần triển khai mã hóa end-to-end mạnh mẽ.",
+      problem:
+        "Các ứng dụng chat hiện có vẫn có rủi ro bảo mật. Cần triển khai mã hóa end-to-end mạnh mẽ.",
       question: "",
       objectives: "Phát triển ứng dụng chat với mã hóa end-to-end.",
       literature: "",
@@ -396,14 +466,21 @@ export const mockProposals = [
   },
   {
     id: "prop-005",
-    title: "Phân tích sentiment đa phương thức cho đánh giá sản phẩm thương mại điện tử",
-    abstract: "Nghiên cứu phương pháp phân tích sentiment kết hợp văn bản và hình ảnh từ đánh giá sản phẩm trên các nền tảng thương mại điện tử, sử dụng mô hình đa phương thức (multimodal) deep learning.",
+    title:
+      "Phân tích sentiment đa phương thức cho đánh giá sản phẩm thương mại điện tử",
+    abstract:
+      "Nghiên cứu phương pháp phân tích sentiment kết hợp văn bản và hình ảnh từ đánh giá sản phẩm trên các nền tảng thương mại điện tử, sử dụng mô hình đa phương thức (multimodal) deep learning.",
     studentName: "Trần Thị E",
     studentId: "5",
     faculty: "Khoa Công nghệ Thông tin",
     department: "Khoa CNTT",
     researchField: "Trí tuệ nhân tạo",
-    keywords: ["Sentiment Analysis", "Multimodal Learning", "Deep Learning", "E-commerce"],
+    keywords: [
+      "Sentiment Analysis",
+      "Multimodal Learning",
+      "Deep Learning",
+      "E-commerce",
+    ],
     status: PROPOSAL_STATUSES.AI_PRE_CHECK,
     currentStage: 2,
     readinessScore: 7.0,
@@ -419,16 +496,25 @@ export const mockProposals = [
     riskFlags: ["scope_too_broad"],
     version: 1,
     sections: makeSections({
-      abstract: "Phân tích sentiment đa phương thức kết hợp text và image từ đánh giá sản phẩm Shopee/Tiki, sử dụng mô hình CLIP và BERT để tăng độ chính xác.",
-      problem: "Phân tích sentiment truyền thống chỉ dựa trên văn bản, bỏ qua thông tin từ hình ảnh sản phẩm — nơi chứa nhiều tín hiệu quan trọng về chất lượng và trải nghiệm thực tế.",
-      question: "1. Mô hình đa phương thức nào cho hiệu suất tốt nhất trên dữ liệu tiếng Việt? 2. Image sentiment có cải thiện accuracy so với text-only không? 3. Làm thế nào để align text và image features?",
-      objectives: "1. Xây dựng dataset đa phương thức từ TMĐT. 2. Phát triển mô hình fusion text-image. 3. So sánh với baseline text-only. 4. Đạt accuracy > 85%.",
-      literature: "Phân tích sentiment đa phương thức là hướng nghiên cứu mới (Xu 2023, Zhang 2024). Các mô hình CLIP (Radford 2021) và ViLT (Kim 2021) cho thấy tiềm năng. Tuy nhiên, chưa có nghiên cứu cho tiếng Việt.",
-      methodology: "Thu thập 10,000 đánh giá từ Shopee/Tiki. Sử dụng CLIP cho image features, PhoBERT cho text features. Fusion bằng attention mechanism. Đánh giá bằng accuracy, F1.",
-      feasibility: "Dữ liệu có thể thu thập qua API. Cần GPU cho training. Thời gian 14 tuần. Rủi ro: chi phí GPU.",
-      contribution: "1. Dataset đa phương thức tiếng Việt đầu tiên. 2. Mô hình baseline cho sentiment analysis đa phương thức tiếng Việt.",
+      abstract:
+        "Phân tích sentiment đa phương thức kết hợp text và image từ đánh giá sản phẩm Shopee/Tiki, sử dụng mô hình CLIP và BERT để tăng độ chính xác.",
+      problem:
+        "Phân tích sentiment truyền thống chỉ dựa trên văn bản, bỏ qua thông tin từ hình ảnh sản phẩm — nơi chứa nhiều tín hiệu quan trọng về chất lượng và trải nghiệm thực tế.",
+      question:
+        "1. Mô hình đa phương thức nào cho hiệu suất tốt nhất trên dữ liệu tiếng Việt? 2. Image sentiment có cải thiện accuracy so với text-only không? 3. Làm thế nào để align text và image features?",
+      objectives:
+        "1. Xây dựng dataset đa phương thức từ TMĐT. 2. Phát triển mô hình fusion text-image. 3. So sánh với baseline text-only. 4. Đạt accuracy > 85%.",
+      literature:
+        "Phân tích sentiment đa phương thức là hướng nghiên cứu mới (Xu 2023, Zhang 2024). Các mô hình CLIP (Radford 2021) và ViLT (Kim 2021) cho thấy tiềm năng. Tuy nhiên, chưa có nghiên cứu cho tiếng Việt.",
+      methodology:
+        "Thu thập 10,000 đánh giá từ Shopee/Tiki. Sử dụng CLIP cho image features, PhoBERT cho text features. Fusion bằng attention mechanism. Đánh giá bằng accuracy, F1.",
+      feasibility:
+        "Dữ liệu có thể thu thập qua API. Cần GPU cho training. Thời gian 14 tuần. Rủi ro: chi phí GPU.",
+      contribution:
+        "1. Dataset đa phương thức tiếng Việt đầu tiên. 2. Mô hình baseline cho sentiment analysis đa phương thức tiếng Việt.",
       ethics: "Dữ liệu công khai, không chứa thông tin cá nhân.",
-      references: "1. Radford, A. (2021). Learning Transferable Visual Models From Natural Language Supervision. 2. Kim, W. (2021). ViLT: Vision-and-Language Transformer.",
+      references:
+        "1. Radford, A. (2021). Learning Transferable Visual Models From Natural Language Supervision. 2. Kim, W. (2021). ViLT: Vision-and-Language Transformer.",
       ethicsHealth: "strong",
       methodologyHealth: "needs_evidence",
     }),
@@ -436,13 +522,19 @@ export const mockProposals = [
   {
     id: "prop-006",
     title: "Phát hiện tấn công mạng sử dụng học sâu trên dữ liệu dòng mạng",
-    abstract: "Xây dựng hệ thống phát hiện tấn công mạng thời gian thực sử dụng deep learning (LSTM, Transformer) trên dữ liệu dòng mạng (network flows) từ môi trường doanh nghiệp.",
+    abstract:
+      "Xây dựng hệ thống phát hiện tấn công mạng thời gian thực sử dụng deep learning (LSTM, Transformer) trên dữ liệu dòng mạng (network flows) từ môi trường doanh nghiệp.",
     studentName: "Nguyễn Văn A",
     studentId: "1",
     faculty: "Khoa Công nghệ Thông tin",
     department: "Khoa CNTT",
     researchField: "An toàn thông tin",
-    keywords: ["Network Security", "Deep Learning", "LSTM", "Anomaly Detection"],
+    keywords: [
+      "Network Security",
+      "Deep Learning",
+      "LSTM",
+      "Anomaly Detection",
+    ],
     status: PROPOSAL_STATUSES.COMPLETED,
     currentStage: 10,
     readinessScore: 9.0,
@@ -458,16 +550,26 @@ export const mockProposals = [
     riskFlags: [],
     version: 3,
     sections: makeSections({
-      abstract: "Hệ thống phát hiện tấn công mạng sử dụng LSTM và Transformer trên bộ dữ liệu CIC-IDS2017 và CSE-CIC-IDS2018. Đạt F1-score 97.2% trên tập kiểm tra, giảm 23% false alarm so với phương pháp truyền thống.",
-      problem: "Các hệ thống phát hiện xâm nhập (IDS) truyền thống dựa trên signature không thể phát hiện tấn công zero-day. Học sâu cho phép phát hiện bất thường dựa trên hành vi thay vì chữ ký cố định.",
-      question: "1. Kiến trúc deep learning nào cho hiệu suất phát hiện tấn công tốt nhất trên dữ liệu dòng mạng? 2. Làm thế nào để giảm tỷ lệ false positive xuống dưới 5%? 3. Mô hình có thể hoạt động real-time với throughput > 100 Gbps không?",
-      objectives: "1. Tiền xử lý và feature engineering trên CIC-IDS2017. 2. Xây dựng mô hình LSTM và Transformer. 3. Tối ưu hyperparameter. 4. Triển khai prototype với giao diện dashboard.",
-      literature: "IDS sử dụng ML đã được nghiên cứu rộng (Mukherjee 2024, Javaid 2023). Transformer trong an ninh mạng là hướng mới (Wu 2024). Tuy nhiên, hầu hết dừng ở accuracy, chưa xét đến deployment thực tế.",
-      methodology: "Preprocessing: one-hot encoding, normalization, sliding window. Models: LSTM (2 layers, 128 units), Transformer (4 heads, 2 layers). Baseline: Random Forest, XGBoost. Evaluation: 5-fold cross-validation, precision-recall curves.",
-      feasibility: "Hoàn toàn khả thi. Bộ dữ liệu công khai. Mô hình chạy được trên GPU một card. Timeline 14 tuần đã được chứng minh qua prototype hiện tại.",
-      contribution: "1. So sánh toàn diện giữa LSTM và Transformer trên IDS. 2. Pipeline tiền xử lý dữ liệu dòng mạng mở. 3. Prototype dashboard real-time. 4. Bài báo cho hội thảo ISC 2026.",
-      ethics: "Chỉ sử dụng dữ liệu công khai. Không thu thập dữ liệu người dùng thực.",
-      references: "1. Javaid, A. (2023). A Deep Learning Approach for Network Intrusion Detection System. 2. Wu, Z. (2024). Transformer for Network Attack Detection.",
+      abstract:
+        "Hệ thống phát hiện tấn công mạng sử dụng LSTM và Transformer trên bộ dữ liệu CIC-IDS2017 và CSE-CIC-IDS2018. Đạt F1-score 97.2% trên tập kiểm tra, giảm 23% false alarm so với phương pháp truyền thống.",
+      problem:
+        "Các hệ thống phát hiện xâm nhập (IDS) truyền thống dựa trên signature không thể phát hiện tấn công zero-day. Học sâu cho phép phát hiện bất thường dựa trên hành vi thay vì chữ ký cố định.",
+      question:
+        "1. Kiến trúc deep learning nào cho hiệu suất phát hiện tấn công tốt nhất trên dữ liệu dòng mạng? 2. Làm thế nào để giảm tỷ lệ false positive xuống dưới 5%? 3. Mô hình có thể hoạt động real-time với throughput > 100 Gbps không?",
+      objectives:
+        "1. Tiền xử lý và feature engineering trên CIC-IDS2017. 2. Xây dựng mô hình LSTM và Transformer. 3. Tối ưu hyperparameter. 4. Triển khai prototype với giao diện dashboard.",
+      literature:
+        "IDS sử dụng ML đã được nghiên cứu rộng (Mukherjee 2024, Javaid 2023). Transformer trong an ninh mạng là hướng mới (Wu 2024). Tuy nhiên, hầu hết dừng ở accuracy, chưa xét đến deployment thực tế.",
+      methodology:
+        "Preprocessing: one-hot encoding, normalization, sliding window. Models: LSTM (2 layers, 128 units), Transformer (4 heads, 2 layers). Baseline: Random Forest, XGBoost. Evaluation: 5-fold cross-validation, precision-recall curves.",
+      feasibility:
+        "Hoàn toàn khả thi. Bộ dữ liệu công khai. Mô hình chạy được trên GPU một card. Timeline 14 tuần đã được chứng minh qua prototype hiện tại.",
+      contribution:
+        "1. So sánh toàn diện giữa LSTM và Transformer trên IDS. 2. Pipeline tiền xử lý dữ liệu dòng mạng mở. 3. Prototype dashboard real-time. 4. Bài báo cho hội thảo ISC 2026.",
+      ethics:
+        "Chỉ sử dụng dữ liệu công khai. Không thu thập dữ liệu người dùng thực.",
+      references:
+        "1. Javaid, A. (2023). A Deep Learning Approach for Network Intrusion Detection System. 2. Wu, Z. (2024). Transformer for Network Attack Detection.",
     }),
   },
 ];
@@ -489,14 +591,17 @@ export const mockRubricReviews = [
         score: 9,
         maxScore: 10,
         aiObservation: "Vấn đề được định nghĩa rõ ràng, có bối cảnh thực tế.",
-        reviewerComment: "Xuất sắc. Vấn đề và khoảng trống nghiên cứu được trình bày thuyết phục.",
+        reviewerComment:
+          "Xuất sắc. Vấn đề và khoảng trống nghiên cứu được trình bày thuyết phục.",
       },
       {
         id: "literature_grounding",
         score: 8,
         maxScore: 10,
-        aiObservation: "Cơ sở lý thuyết đầy đủ nhưng cần thêm tài liệu cập nhật.",
-        reviewerComment: "Tốt, nhưng nên bổ sung thêm các công trình 2024-2025.",
+        aiObservation:
+          "Cơ sở lý thuyết đầy đủ nhưng cần thêm tài liệu cập nhật.",
+        reviewerComment:
+          "Tốt, nhưng nên bổ sung thêm các công trình 2024-2025.",
       },
       {
         id: "question_quality",
@@ -510,7 +615,8 @@ export const mockRubricReviews = [
         score: 8,
         maxScore: 10,
         aiObservation: "Phương pháp phù hợp, có kế hoạch chi tiết.",
-        reviewerComment: "Nên bổ sung thêm chi tiết về cách đánh giá hiệu suất.",
+        reviewerComment:
+          "Nên bổ sung thêm chi tiết về cách đánh giá hiệu suất.",
       },
       {
         id: "feasibility",
@@ -531,18 +637,21 @@ export const mockRubricReviews = [
         score: 7,
         maxScore: 10,
         aiObservation: "Đã đề cập nhưng chưa đầy đủ.",
-        reviewerComment: "Cần bổ sung quy trình xử lý khi phát hiện lỗ hổng bảo mật.",
+        reviewerComment:
+          "Cần bổ sung quy trình xử lý khi phát hiện lỗ hổng bảo mật.",
       },
       {
         id: "writing_quality",
         score: 8,
         maxScore: 10,
         aiObservation: "Trình bày rõ ràng, có cấu trúc.",
-        reviewerComment: "Văn phong học thuật tốt. Cần chỉnh sửa một số lỗi chính tả.",
+        reviewerComment:
+          "Văn phong học thuật tốt. Cần chỉnh sửa một số lỗi chính tả.",
       },
     ],
     totalScore: 8.25,
-    comments: "Đề tài rất tốt, đáp ứng đầy đủ các tiêu chí. Khuyến nghị phê duyệt sau khi bổ sung phần đạo đức nghiên cứu.",
+    comments:
+      "Đề tài rất tốt, đáp ứng đầy đủ các tiêu chí. Khuyến nghị phê duyệt sau khi bổ sung phần đạo đức nghiên cứu.",
   },
   {
     id: "rubric-002",
@@ -555,29 +664,35 @@ export const mockRubricReviews = [
         id: "problem_clarity",
         score: 7,
         maxScore: 10,
-        aiObservation: "Vấn đề có ý nghĩa xã hội, nhưng cần dẫn chứng cụ thể hơn.",
-        reviewerComment: "Tốt. Nên trích dẫn số liệu thống kê cụ thể của Bộ GD&ĐT.",
+        aiObservation:
+          "Vấn đề có ý nghĩa xã hội, nhưng cần dẫn chứng cụ thể hơn.",
+        reviewerComment:
+          "Tốt. Nên trích dẫn số liệu thống kê cụ thể của Bộ GD&ĐT.",
       },
       {
         id: "literature_grounding",
         score: 7,
         maxScore: 10,
         aiObservation: "Cơ sở lý thuyết còn thiếu tài liệu cập nhật.",
-        reviewerComment: "Cần bổ sung các nghiên cứu gần đây về ứng dụng ML trong giáo dục.",
+        reviewerComment:
+          "Cần bổ sung các nghiên cứu gần đây về ứng dụng ML trong giáo dục.",
       },
       {
         id: "question_quality",
         score: 7,
         maxScore: 10,
         aiObservation: "Câu hỏi rõ ràng nhưng thiếu câu hỏi phụ.",
-        reviewerComment: "Nên thêm câu hỏi về khả năng tổng quát hóa của mô hình.",
+        reviewerComment:
+          "Nên thêm câu hỏi về khả năng tổng quát hóa của mô hình.",
       },
       {
         id: "methodology_fit",
         score: 7,
         maxScore: 10,
-        aiObservation: "Phương pháp phù hợp nhưng thiếu chi tiết về preprocessing.",
-        reviewerComment: "Cần mô tả cách xử lý dữ liệu mất cân bằng (imbalanced data).",
+        aiObservation:
+          "Phương pháp phù hợp nhưng thiếu chi tiết về preprocessing.",
+        reviewerComment:
+          "Cần mô tả cách xử lý dữ liệu mất cân bằng (imbalanced data).",
       },
       {
         id: "feasibility",
@@ -598,7 +713,8 @@ export const mockRubricReviews = [
         score: 6,
         maxScore: 10,
         aiObservation: "Chưa đề cập đầy đủ về quyền riêng tư.",
-        reviewerComment: "Cần xin phép hội đồng đạo đức và mô tả quy trình ẩn danh hóa.",
+        reviewerComment:
+          "Cần xin phép hội đồng đạo đức và mô tả quy trình ẩn danh hóa.",
       },
       {
         id: "writing_quality",
@@ -609,7 +725,8 @@ export const mockRubricReviews = [
       },
     ],
     totalScore: 7.375,
-    comments: "Đề tài tốt, có giá trị thực tiễn cao. Cần bổ sung phần đạo đức và xin phép dữ liệu trước khi phê duyệt.",
+    comments:
+      "Đề tài tốt, có giá trị thực tiễn cao. Cần bổ sung phần đạo đức và xin phép dữ liệu trước khi phê duyệt.",
   },
   {
     id: "rubric-003",
@@ -623,7 +740,8 @@ export const mockRubricReviews = [
         score: 5,
         maxScore: 10,
         aiObservation: "Vấn đề chưa được định nghĩa rõ ràng.",
-        reviewerComment: "Phạm vi quá rộng. Cần tập trung vào một lĩnh vực cụ thể.",
+        reviewerComment:
+          "Phạm vi quá rộng. Cần tập trung vào một lĩnh vực cụ thể.",
       },
       {
         id: "literature_grounding",
@@ -637,14 +755,16 @@ export const mockRubricReviews = [
         score: 4,
         maxScore: 10,
         aiObservation: "Câu hỏi nghiên cứu chưa được định nghĩa.",
-        reviewerComment: "Cần viết lại câu hỏi nghiên cứu theo cấu trúc rõ ràng.",
+        reviewerComment:
+          "Cần viết lại câu hỏi nghiên cứu theo cấu trúc rõ ràng.",
       },
       {
         id: "methodology_fit",
         score: 3,
         maxScore: 10,
         aiObservation: "Phương pháp chưa được mô tả đầy đủ.",
-        reviewerComment: "Cần chi tiết về kiến trúc hệ thống, framework, dataset.",
+        reviewerComment:
+          "Cần chi tiết về kiến trúc hệ thống, framework, dataset.",
       },
       {
         id: "feasibility",
@@ -665,7 +785,8 @@ export const mockRubricReviews = [
         score: 2,
         maxScore: 10,
         aiObservation: "Không đề cập đến đạo đức nghiên cứu.",
-        reviewerComment: "Cần bổ sung phần này — đặc biệt là bảo mật dữ liệu sinh viên.",
+        reviewerComment:
+          "Cần bổ sung phần này — đặc biệt là bảo mật dữ liệu sinh viên.",
       },
       {
         id: "writing_quality",
@@ -676,7 +797,8 @@ export const mockRubricReviews = [
       },
     ],
     totalScore: 4.125,
-    comments: "Đề tài có ý tưởng tốt nhưng đề cương chưa đạt yêu cầu. Yêu cầu sửa chữa: giới hạn phạm vi, bổ sung cơ sở lý thuyết, chi tiết phương pháp, và phần đạo đức nghiên cứu.",
+    comments:
+      "Đề tài có ý tưởng tốt nhưng đề cương chưa đạt yêu cầu. Yêu cầu sửa chữa: giới hạn phạm vi, bổ sung cơ sở lý thuyết, chi tiết phương pháp, và phần đạo đức nghiên cứu.",
     decision: "revision_required",
   },
 ];
@@ -718,19 +840,24 @@ export const mockAIFeedback = [
     suggestedRevisions: [
       {
         section: "literature",
-        instruction: "Bổ sung 5-7 tài liệu tham khảo từ các hội thảo IEEE/ACM gần đây",
+        instruction:
+          "Bổ sung 5-7 tài liệu tham khảo từ các hội thảo IEEE/ACM gần đây",
       },
       {
         section: "ethics",
-        instruction: "Mở rộng phần đạo đức: quy trình xử lý khi phát hiện lỗ hổng bảo mật",
+        instruction:
+          "Mở rộng phần đạo đức: quy trình xử lý khi phát hiện lỗ hổng bảo mật",
       },
       {
         section: "scope",
-        instruction: "Giới hạn phạm vi: tập trung vào một use case cụ thể (VD: lưu trữ hồ sơ sinh viên)",
+        instruction:
+          "Giới hạn phạm vi: tập trung vào một use case cụ thể (VD: lưu trữ hồ sơ sinh viên)",
       },
     ],
-    limitations: "AI chưa có khả năng đánh giá tính khả thi về nguồn lực thực tế tại trường. Cần reviewer con người xác nhận.",
-    advisoryNotice: "Phản hồi này chỉ mang tính chất tham khảo. Quyết định cuối cùng thuộc về hội đồng đánh giá.",
+    limitations:
+      "AI chưa có khả năng đánh giá tính khả thi về nguồn lực thực tế tại trường. Cần reviewer con người xác nhận.",
+    advisoryNotice:
+      "Phản hồi này chỉ mang tính chất tham khảo. Quyết định cuối cùng thuộc về hội đồng đánh giá.",
   },
   {
     id: "fb-002",
@@ -770,8 +897,10 @@ export const mockAIFeedback = [
         instruction: "Chi tiết quy trình ẩn danh hóa và bảo vệ dữ liệu",
       },
     ],
-    limitations: "Đánh giá dựa trên nội dung đề cương. Không có thông tin về chất lượng dữ liệu thực tế.",
-    advisoryNotice: "Phản hồi này chỉ mang tính chất tham khảo. Quyết định cuối cùng thuộc về hội đồng đánh giá.",
+    limitations:
+      "Đánh giá dựa trên nội dung đề cương. Không có thông tin về chất lượng dữ liệu thực tế.",
+    advisoryNotice:
+      "Phản hồi này chỉ mang tính chất tham khảo. Quyết định cuối cùng thuộc về hội đồng đánh giá.",
   },
   {
     id: "fb-003",
@@ -803,7 +932,8 @@ export const mockAIFeedback = [
     suggestedRevisions: [
       {
         section: "scope",
-        instruction: "Giới hạn chatbot hỗ trợ một khoa cụ thể thay vì toàn trường",
+        instruction:
+          "Giới hạn chatbot hỗ trợ một khoa cụ thể thay vì toàn trường",
       },
       {
         section: "methodology",
@@ -814,8 +944,10 @@ export const mockAIFeedback = [
         instruction: "Xây dựng kế hoạch thu thập dataset Q&A",
       },
     ],
-    limitations: "Đề cương quá sơ sài để đánh giá chi tiết. Cần sinh viên bổ sung trước khi review.",
-    advisoryNotice: "Phản hồi này chỉ mang tính chất tham khảo. Quyết định cuối cùng thuộc về hội đồng đánh giá.",
+    limitations:
+      "Đề cương quá sơ sài để đánh giá chi tiết. Cần sinh viên bổ sung trước khi review.",
+    advisoryNotice:
+      "Phản hồi này chỉ mang tính chất tham khảo. Quyết định cuối cùng thuộc về hội đồng đánh giá.",
   },
   {
     id: "fb-004",
@@ -847,11 +979,13 @@ export const mockAIFeedback = [
       },
       {
         section: "ethics",
-        instruction: "Xác nhận dữ liệu công khai và tuân thủ điều khoản sử dụng API",
+        instruction:
+          "Xác nhận dữ liệu công khai và tuân thủ điều khoản sử dụng API",
       },
     ],
     limitations: "Chi phí GPU chưa được tính toán cụ thể.",
-    advisoryNotice: "Phản hồi này chỉ mang tính chất tham khảo. Quyết định cuối cùng thuộc về hội đồng đánh giá.",
+    advisoryNotice:
+      "Phản hồi này chỉ mang tính chất tham khảo. Quyết định cuối cùng thuộc về hội đồng đánh giá.",
   },
 ];
 
@@ -890,7 +1024,10 @@ export const mockLecturers = [
     title: "Giảng viên",
     department: "Khoa CNTT",
     expertise: ["Blockchain", "Smart Contracts", "Ethereum", "Web3"],
-    activeProjects: ["Nghiên cứu Layer 2 scaling", "Blockchain cho supply chain"],
+    activeProjects: [
+      "Nghiên cứu Layer 2 scaling",
+      "Blockchain cho supply chain",
+    ],
     currentLoad: 1,
     maxLoad: 3,
     matchScore: 8.8,
@@ -918,10 +1055,7 @@ export const mockLecturers = [
     currentLoad: 3,
     maxLoad: 3,
     matchScore: 7.9,
-    matchReasons: [
-      "Chuyên gia NLP hàng đầu",
-      "Đã hướng dẫn 12 đề tài NLP",
-    ],
+    matchReasons: ["Chuyên gia NLP hàng đầu", "Đã hướng dẫn 12 đề tài NLP"],
     scoreBreakdown: {
       topicSimilarity: 9.5,
       expertiseFit: 9.0,
@@ -981,7 +1115,8 @@ export const mockMatchingSuggestions = [
           capacityAvailability: 9.5,
           priorSupervision: 8.0,
         },
-        reason: "Chuyên gia blockchain, phù hợp tuyệt đối với đề tài về Ethereum và smart contracts.",
+        reason:
+          "Chuyên gia blockchain, phù hợp tuyệt đối với đề tài về Ethereum và smart contracts.",
       },
       {
         lecturerId: "lec-001",
@@ -994,7 +1129,8 @@ export const mockMatchingSuggestions = [
           capacityAvailability: 8.0,
           priorSupervision: 7.8,
         },
-        reason: "Có kinh nghiệm hệ thống phân tán, có thể hỗ trợ phần distributed storage.",
+        reason:
+          "Có kinh nghiệm hệ thống phân tán, có thể hỗ trợ phần distributed storage.",
       },
     ],
   },
@@ -1013,7 +1149,8 @@ export const mockMatchingSuggestions = [
           capacityAvailability: 8.0,
           priorSupervision: 9.5,
         },
-        reason: "Chuyên gia ML với 5 năm kinh nghiệm trong educational data mining.",
+        reason:
+          "Chuyên gia ML với 5 năm kinh nghiệm trong educational data mining.",
       },
       {
         lecturerId: "lec-003",
@@ -1090,24 +1227,168 @@ export const mockMatchingSuggestions = [
 // ═══════════════════════════════════════════
 export const mockMilestones = [
   // prop-001 (approved — needs execution milestones)
-  { id: "ms-001", proposalId: "prop-001", name: "Đề tài được duyệt", type: "proposal_approved", order: 1, dueDate: "2026-02-20", status: "completed", progress: 100 },
-  { id: "ms-002", proposalId: "prop-001", name: "Phân công GVHD", type: "supervisor_assigned", order: 2, dueDate: "2026-03-01", status: "completed", progress: 100 },
-  { id: "ms-003", proposalId: "prop-001", name: "Tổng quan tài liệu", type: "literature_review", order: 3, dueDate: "2026-03-31", status: "in-progress", progress: 60 },
-  { id: "ms-004", proposalId: "prop-001", name: "Hoàn thiện phương pháp", type: "methodology_finalized", order: 4, dueDate: "2026-04-15", status: "not-started", progress: 0 },
-  { id: "ms-005", proposalId: "prop-001", name: "Thu thập dữ liệu", type: "data_collection", order: 5, dueDate: "2026-05-15", status: "not-started", progress: 0 },
-  { id: "ms-006", proposalId: "prop-001", name: "Phân tích dữ liệu", type: "analysis_complete", order: 6, dueDate: "2026-06-15", status: "not-started", progress: 0 },
-  { id: "ms-007", proposalId: "prop-001", name: "Báo cáo cuối kỳ", type: "final_report", order: 7, dueDate: "2026-06-30", status: "not-started", progress: 0 },
-  { id: "ms-008", proposalId: "prop-001", name: "Bảo vệ / Trình bày", type: "presentation", order: 8, dueDate: "2026-07-15", status: "not-started", progress: 0 },
+  {
+    id: "ms-001",
+    proposalId: "prop-001",
+    name: "Đề tài được duyệt",
+    type: "proposal_approved",
+    order: 1,
+    dueDate: "2026-02-20",
+    status: "completed",
+    progress: 100,
+  },
+  {
+    id: "ms-002",
+    proposalId: "prop-001",
+    name: "Phân công GVHD",
+    type: "supervisor_assigned",
+    order: 2,
+    dueDate: "2026-03-01",
+    status: "completed",
+    progress: 100,
+  },
+  {
+    id: "ms-003",
+    proposalId: "prop-001",
+    name: "Tổng quan tài liệu",
+    type: "literature_review",
+    order: 3,
+    dueDate: "2026-03-31",
+    status: "in-progress",
+    progress: 60,
+  },
+  {
+    id: "ms-004",
+    proposalId: "prop-001",
+    name: "Hoàn thiện phương pháp",
+    type: "methodology_finalized",
+    order: 4,
+    dueDate: "2026-04-15",
+    status: "not-started",
+    progress: 0,
+  },
+  {
+    id: "ms-005",
+    proposalId: "prop-001",
+    name: "Thu thập dữ liệu",
+    type: "data_collection",
+    order: 5,
+    dueDate: "2026-05-15",
+    status: "not-started",
+    progress: 0,
+  },
+  {
+    id: "ms-006",
+    proposalId: "prop-001",
+    name: "Phân tích dữ liệu",
+    type: "analysis_complete",
+    order: 6,
+    dueDate: "2026-06-15",
+    status: "not-started",
+    progress: 0,
+  },
+  {
+    id: "ms-007",
+    proposalId: "prop-001",
+    name: "Báo cáo cuối kỳ",
+    type: "final_report",
+    order: 7,
+    dueDate: "2026-06-30",
+    status: "not-started",
+    progress: 0,
+  },
+  {
+    id: "ms-008",
+    proposalId: "prop-001",
+    name: "Bảo vệ / Trình bày",
+    type: "presentation",
+    order: 8,
+    dueDate: "2026-07-15",
+    status: "not-started",
+    progress: 0,
+  },
 
   // prop-006 (completed)
-  { id: "ms-009", proposalId: "prop-006", name: "Đề tài được duyệt", type: "proposal_approved", order: 1, dueDate: "2026-01-20", status: "completed", progress: 100 },
-  { id: "ms-010", proposalId: "prop-006", name: "Phân công GVHD", type: "supervisor_assigned", order: 2, dueDate: "2026-02-01", status: "completed", progress: 100 },
-  { id: "ms-011", proposalId: "prop-006", name: "Tổng quan tài liệu", type: "literature_review", order: 3, dueDate: "2026-02-28", status: "completed", progress: 100 },
-  { id: "ms-012", proposalId: "prop-006", name: "Hoàn thiện phương pháp", type: "methodology_finalized", order: 4, dueDate: "2026-03-15", status: "completed", progress: 100 },
-  { id: "ms-013", proposalId: "prop-006", name: "Thu thập dữ liệu", type: "data_collection", order: 5, dueDate: "2026-04-15", status: "completed", progress: 100 },
-  { id: "ms-014", proposalId: "prop-006", name: "Phân tích dữ liệu", type: "analysis_complete", order: 6, dueDate: "2026-05-30", status: "completed", progress: 100 },
-  { id: "ms-015", proposalId: "prop-006", name: "Báo cáo cuối kỳ", type: "final_report", order: 7, dueDate: "2026-06-20", status: "completed", progress: 100 },
-  { id: "ms-016", proposalId: "prop-006", name: "Bảo vệ / Trình bày", type: "presentation", order: 8, dueDate: "2026-06-30", status: "completed", progress: 100 },
+  {
+    id: "ms-009",
+    proposalId: "prop-006",
+    name: "Đề tài được duyệt",
+    type: "proposal_approved",
+    order: 1,
+    dueDate: "2026-01-20",
+    status: "completed",
+    progress: 100,
+  },
+  {
+    id: "ms-010",
+    proposalId: "prop-006",
+    name: "Phân công GVHD",
+    type: "supervisor_assigned",
+    order: 2,
+    dueDate: "2026-02-01",
+    status: "completed",
+    progress: 100,
+  },
+  {
+    id: "ms-011",
+    proposalId: "prop-006",
+    name: "Tổng quan tài liệu",
+    type: "literature_review",
+    order: 3,
+    dueDate: "2026-02-28",
+    status: "completed",
+    progress: 100,
+  },
+  {
+    id: "ms-012",
+    proposalId: "prop-006",
+    name: "Hoàn thiện phương pháp",
+    type: "methodology_finalized",
+    order: 4,
+    dueDate: "2026-03-15",
+    status: "completed",
+    progress: 100,
+  },
+  {
+    id: "ms-013",
+    proposalId: "prop-006",
+    name: "Thu thập dữ liệu",
+    type: "data_collection",
+    order: 5,
+    dueDate: "2026-04-15",
+    status: "completed",
+    progress: 100,
+  },
+  {
+    id: "ms-014",
+    proposalId: "prop-006",
+    name: "Phân tích dữ liệu",
+    type: "analysis_complete",
+    order: 6,
+    dueDate: "2026-05-30",
+    status: "completed",
+    progress: 100,
+  },
+  {
+    id: "ms-015",
+    proposalId: "prop-006",
+    name: "Báo cáo cuối kỳ",
+    type: "final_report",
+    order: 7,
+    dueDate: "2026-06-20",
+    status: "completed",
+    progress: 100,
+  },
+  {
+    id: "ms-016",
+    proposalId: "prop-006",
+    name: "Bảo vệ / Trình bày",
+    type: "presentation",
+    order: 8,
+    dueDate: "2026-06-30",
+    status: "completed",
+    progress: 100,
+  },
 ];
 
 // ═══════════════════════════════════════════
@@ -1131,8 +1412,8 @@ export const mockAdminOverview = {
   overdueMilestones: 1,
   averageReadinessScore: 7.6,
   reviewerWorkload: {
-    "2": { name: "Trần Thị B", pending: 2 },
-    "4": { name: "Phạm Thị D", pending: 0 },
+    2: { name: "Trần Thị B", pending: 2 },
+    4: { name: "Phạm Thị D", pending: 0 },
   },
   lecturerCapacity: mockLecturers.map((l) => ({
     id: l.id,
@@ -1142,8 +1423,20 @@ export const mockAdminOverview = {
     available: l.maxLoad - l.currentLoad,
   })),
   bottlenecks: [
-    { label: "Chờ phân công GVHD", count: 1, description: "Đề tài prop-001 đã duyệt nhưng chưa có GVHD" },
-    { label: "Quá hạn milestone", count: 1, description: "prop-001 milestone 'Tổng quan tài liệu' quá hạn 2 tuần" },
-    { label: "GVHD đầy tải", count: 1, description: "Nguyễn Thị I đã đạt tối đa 3/3" },
+    {
+      label: "Chờ phân công GVHD",
+      count: 1,
+      description: "Đề tài prop-001 đã duyệt nhưng chưa có GVHD",
+    },
+    {
+      label: "Quá hạn milestone",
+      count: 1,
+      description: "prop-001 milestone 'Tổng quan tài liệu' quá hạn 2 tuần",
+    },
+    {
+      label: "GVHD đầy tải",
+      count: 1,
+      description: "Nguyễn Thị I đã đạt tối đa 3/3",
+    },
   ],
 };

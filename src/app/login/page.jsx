@@ -11,19 +11,21 @@ import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 
 const DEMO_CREDENTIALS = [
-  { role: "Student",  email: "student@example.edu",  password: "password123" },
-  { role: "Reviewer", email: "reviewer@example.edu", password: "password123" },
-  { role: "Admin",    email: "admin@example.edu",    password: "password123" },
-  { role: "Lecturer", email: "lecturer@example.edu", password: "password123" },
+  { role: "Super Admin", email: "superadmin@srpplatform.com", password: "password123" },
+  { role: "Student",     email: "student@example.edu",       password: "password123" },
+  { role: "Reviewer",    email: "reviewer@example.edu",      password: "password123" },
+  { role: "Admin",       email: "admin@example.edu",         password: "password123" },
+  { role: "Lecturer",    email: "lecturer@example.edu",      password: "password123" },
 ];
 
 function getRedirectPath(role) {
   switch (role) {
-    case "reviewer": return "/review";
-    case "admin":    return "/admin";
-    case "lecturer": return "/dashboard";
+    case "super_admin": return "/super-admin/overview";
+    case "reviewer":    return "/review";
+    case "admin":       return "/admin";
+    case "lecturer":    return "/dashboard";
     case "student":
-    default:         return "/dashboard";
+    default:            return "/dashboard";
   }
 }
 
@@ -49,12 +51,17 @@ export default function LoginPage() {
       const userData = await login(email.trim(), password);
       if (userData) router.push(getRedirectPath(userData.role));
     } catch (err) {
+      const status = err.status || err.message;
       const msg =
-        err.message?.includes("401") || err.message?.includes("Invalid")
-          ? "Invalid email or password."
-          : err.message?.includes("fetch") || err.message?.includes("Failed to fetch")
-            ? "Unable to connect to the server. Please check your connection and try again."
-            : err.message || "Login failed. Please try again.";
+        status === 404
+          ? "Authentication service not found. Please check the API URL configuration."
+          : status === 422
+            ? "Please check your input and try again."
+            : status === 401 || status === 403 || String(status).includes("401")
+              ? "Invalid email or password."
+              : String(status).includes("fetch") || String(status).includes("Failed to fetch")
+                ? "Unable to connect to the server. Please check your connection and try again."
+                : err.message || "Login failed. Please try again.";
       setLocalError(msg);
     }
   };
@@ -65,11 +72,16 @@ export default function LoginPage() {
       const userData = await login(demoEmail, demoPassword);
       if (userData) router.push(getRedirectPath(userData.role));
     } catch (err) {
-      setLocalError(
-        err.message?.includes("fetch") || err.message?.includes("Failed to fetch")
+      const status = err.status || err.message;
+      const msg =
+        String(status).includes("fetch") || String(status).includes("Failed to fetch")
           ? "Demo backend is not available. Please ensure the API server is running."
-          : "Demo login failed. The credentials may have changed on the server."
-      );
+          : status === 404
+            ? "Authentication service not found. Please check the API URL."
+            : status === 422
+              ? "The demo credentials may not match the expected format on the server."
+              : "Demo login failed. Please check that the backend is running and the credentials are correct.";
+      setLocalError(msg);
     }
   };
 

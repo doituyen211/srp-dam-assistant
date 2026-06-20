@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { AIFeedbackPanel, RubricScoreCard } from "@/components/ai";
 import { AppShell } from "@/components/layout/AppShell";
@@ -16,15 +16,20 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LoadingState } from "@/components/ui/LoadingState";
-import { WorkflowTimeline } from "@/components/ui/WorkflowTimeline";
 import { useAuth } from "@/hooks/useAuth";
 import { api } from "@/lib/api";
 import {
   USER_ROLES,
   WORKFLOW_STAGES,
   SECTION_TYPES,
+  PROPOSAL_STATUSES,
 } from "@/lib/constants";
-import { mockMilestones } from "@/lib/mockData";
+
+const EDITABLE_STATUSES = [
+  PROPOSAL_STATUSES.DRAFT,
+  PROPOSAL_STATUSES.AI_PRE_CHECK,
+  PROPOSAL_STATUSES.NEEDS_REVISION,
+];
 
 const formatDate = (value) => {
   if (!value) return "N/A";
@@ -35,22 +40,65 @@ const formatDate = (value) => {
   }).format(new Date(value));
 };
 
-const formatDateTime = (value) => {
-  if (!value) return "";
-  return new Intl.DateTimeFormat("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(value));
-};
+function StatusHistoryCard({ history = [] }) {
+  if (!history.length) {
+    return (
+      <div className="text-xs text-muted">No status changes recorded yet.</div>
+    );
+  }
+  return (
+    <div className="space-y-2">
+      {history.map((entry, i) => (
+        <div key={entry.id || i} className="rounded border border-hairline bg-canvas p-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <ProposalStatusBadge status={entry.to_status || entry.status} />
+            <span className="font-mono text-[10px] text-muted">
+              {formatDate(entry.created_at || entry.timestamp)}
+            </span>
+          </div>
+          {(entry.from_status || entry.changed_by) && (
+            <p className="mt-1 text-[11px] text-body-muted">
+              {entry.from_status && `From: ${entry.from_status}`}
+              {entry.changed_by && ` · by ${entry.changed_by}`}
+            </p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
 
-function SectionDisplay({ section, sectionDef }) {
-  if (!section || !section.content) {
+function SectionDisplay({ section, sectionDef, isEditing, editContent, onEditChange, onSave, onCancel, saving }) {
+  if (!section && !isEditing) {
     return (
       <div className="rounded border border-dashed border-hairline bg-subdued/30 p-4 text-center">
         <p className="text-sm text-muted">This section has not been written yet.</p>
+      </div>
+    );
+  }
+
+  if (isEditing) {
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-base font-semibold text-ink">
+            {sectionDef?.label}: Edit
+          </h2>
+        </div>
+        <textarea
+          value={editContent}
+          onChange={(e) => onEditChange(e.target.value)}
+          rows={10}
+          className="w-full resize-y rounded border border-hairline bg-canvas px-4 py-3 text-base text-ink outline-none transition-all focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+        />
+        <div className="flex gap-2">
+          <Button variant="primary" loading={saving} disabled={saving} onClick={onSave}>
+            Save
+          </Button>
+          <Button variant="ghost" onClick={onCancel} disabled={saving}>
+            Cancel
+          </Button>
+        </div>
       </div>
     );
   }
@@ -60,37 +108,25 @@ function SectionDisplay({ section, sectionDef }) {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-ink">
-            {sectionDef?.label || section.label}
+            {sectionDef?.label || section?.label}
           </h2>
-          {sectionDef?.description && (
-            <p className="mt-0.5 text-xs text-body-muted">
-              {sectionDef.description}
-            </p>
-          )}
         </div>
-        <SectionHealthBadge health={section.health} />
+        <SectionHealthBadge health={section?.health || "missing"} />
       </div>
 
       <div className="whitespace-pre-wrap rounded border border-hairline bg-canvas p-4 font-serif text-sm leading-7 text-ink">
-        {section.content}
+        {section?.content || ""}
       </div>
 
-      {/* AI comment */}
-      {section.aiComment && (
+      {section?.aiComment && (
         <div className="rounded border border-info/20 bg-info-bg/30 px-3 py-2">
-          <p className="font-mono text-[9px] uppercase tracking-[0.06em] text-info">
-            AI Pre-review Note
-          </p>
+          <p className="font-mono text-[9px] uppercase tracking-[0.06em] text-info">AI Pre-review Note</p>
           <p className="mt-0.5 text-xs text-body-muted">{section.aiComment}</p>
         </div>
       )}
-
-      {/* Rubric hint */}
-      {section.rubricHint && (
+      {section?.rubricHint && (
         <div className="rounded border border-warning/20 bg-warning-bg/30 px-3 py-2">
-          <p className="font-mono text-[9px] uppercase tracking-[0.06em] text-warning">
-            Reviewer Consideration
-          </p>
+          <p className="font-mono text-[9px] uppercase tracking-[0.06em] text-warning">Reviewer Consideration</p>
           <p className="mt-0.5 text-xs text-body-muted">{section.rubricHint}</p>
         </div>
       )}
@@ -100,6 +136,7 @@ function SectionDisplay({ section, sectionDef }) {
 
 function ProposalDetailContent() {
   const params = useParams();
+  const router = useRouter();
   const proposalId = params?.id;
   const { user } = useAuth();
   const [proposal, setProposal] = useState(null);
@@ -108,97 +145,91 @@ function ProposalDetailContent() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState("");
   const [activeSection, setActiveSection] = useState(null);
+  const [editSectionId, setEditSectionId] = useState(null);
+  const [editContent, setEditContent] = useState("");
+  const [savingSection, setSavingSection] = useState(false);
   const [auditLogs, setAuditLogs] = useState([]);
   const [loadingAudit, setLoadingAudit] = useState(false);
 
+  const isOwner = proposal?.studentId === user?.id || proposal?.student_id === user?.id;
+  const isEditableStatus = EDITABLE_STATUSES.includes(proposal?.status);
+  const canEdit = isEditableStatus && (isOwner || user?.role === USER_ROLES.ADMIN || user?.role === USER_ROLES.SUPER_ADMIN);
+  const canSubmit = isOwner && (proposal?.status === PROPOSAL_STATUSES.DRAFT || proposal?.status === PROPOSAL_STATUSES.NEEDS_REVISION);
+
+  const refetchAll = async () => {
+    if (!proposalId) return;
+    try {
+      const [p, fb, rv] = await Promise.allSettled([
+        api.getProposalById(proposalId),
+        api.getAIFeedback(proposalId),
+        api.getRubricReview(proposalId),
+      ]);
+      if (p.status === "fulfilled") setProposal(p.value);
+      if (fb.status === "fulfilled") setFeedback(fb.value);
+      if (rv.status === "fulfilled") setRubricReview(rv.value);
+    } catch {
+      setError("Failed to refresh proposal data.");
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
-    const loadDetail = async () => {
+    const load = async () => {
       setLoading(true);
       setNotFound(false);
       setError("");
       try {
         const proposalData = await api.getProposalById(proposalId);
-        const [feedbackResult, reviewResult] = await Promise.allSettled([
+        const [fb, rv] = await Promise.allSettled([
           api.getAIFeedback(proposalId),
           api.getRubricReview(proposalId),
         ]);
         if (!mounted) return;
-        const feedbackData = feedbackResult.status === "fulfilled" ? feedbackResult.value : null;
-        const reviewData = reviewResult.status === "fulfilled" ? reviewResult.value : null;
         setProposal(proposalData);
-        setFeedback(feedbackData?.proposalId === proposalId ? feedbackData : null);
-        setRubricReview(reviewData || null);
-        // Set initial section
-        const initialSections = proposalData?.sections || [];
-        if (initialSections.length > 0) {
-          setActiveSection(initialSections[0]?.id || SECTION_TYPES[0]?.id);
-        } else {
-          setActiveSection(SECTION_TYPES[0]?.id);
-        }
-        if (feedbackResult.status === "rejected" || reviewResult.status === "rejected") {
-          setError("Some assessment data could not be loaded.");
-        }
+        setFeedback(fb.status === "fulfilled" ? fb.value : null);
+        setRubricReview(rv.status === "fulfilled" ? rv.value : null);
+        const sects = proposalData?.sections || [];
+        if (sects.length > 0) setActiveSection(sects[0]?.id || SECTION_TYPES[0]?.id);
+        else setActiveSection(SECTION_TYPES[0]?.id);
       } catch {
-        if (!mounted) return;
-        setNotFound(true);
+        if (mounted) setNotFound(true);
       } finally {
         if (mounted) setLoading(false);
       }
     };
-
     const loadAudit = async () => {
       if (!proposalId) return;
       setLoadingAudit(true);
       try {
         const logs = await api.getAuditLogs();
-        const filtered = logs.filter((log) => log.details?.includes(proposalId));
-        setAuditLogs(filtered || []);
+        setAuditLogs((logs || []).filter((l) => l.details?.includes(proposalId)));
       } catch {
         // silent
       } finally {
         setLoadingAudit(false);
       }
     };
-
-    if (proposalId) {
-      loadDetail();
-      loadAudit();
-    }
-
-    return () => {
-      mounted = false;
-    };
+    if (proposalId) { load(); loadAudit(); }
+    return () => { mounted = false; };
   }, [proposalId]);
-
-  const milestones = useMemo(
-    () => mockMilestones.filter((m) => m.proposalId === proposalId),
-    [proposalId],
-  );
 
   const sections = useMemo(() => proposal?.sections || [], [proposal]);
   const sectionDefs = SECTION_TYPES;
-
-
-
-  const currentSection = useMemo(
-    () => sections.find((s) => s.id === activeSection),
-    [sections, activeSection],
-  );
-  const currentSectionDef = useMemo(
-    () => sectionDefs.find((s) => s.id === activeSection),
-    [sectionDefs, activeSection],
-  );
+  const currentSection = useMemo(() => sections.find((s) => s.id === activeSection), [sections, activeSection]);
+  const currentSectionDef = useMemo(() => sectionDefs.find((s) => s.id === activeSection), [sectionDefs, activeSection]);
 
   const handleRunAIFeedback = async () => {
     setAiLoading(true);
     setAiError("");
+    setMessage("");
     try {
       const nextFeedback = await api.runAIFeedback(proposalId);
       setFeedback(nextFeedback);
+      setMessage("AI pre-review completed. Results are advisory only.");
     } catch {
       setAiError("Unable to run AI pre-review. Please try again.");
     } finally {
@@ -206,9 +237,48 @@ function ProposalDetailContent() {
     }
   };
 
-  if (loading) {
-    return <LoadingState message="Loading proposal..." variant="default" />;
-  }
+  const handleSubmit = async () => {
+    setAiLoading(true);
+    setAiError("");
+    setMessage("");
+    try {
+      const updated = await api.submitProposal(proposalId);
+      setProposal(updated);
+      setMessage("Proposal submitted for review.");
+    } catch {
+      setAiError("Unable to submit proposal. Please try again.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleEditSection = (sectionId) => {
+    const section = sections.find((s) => s.id === sectionId);
+    setEditSectionId(sectionId);
+    setEditContent(section?.content || "");
+  };
+
+  const handleSaveSection = async () => {
+    if (!editSectionId) return;
+    setSavingSection(true);
+    try {
+      await api.updateProposalSection(proposalId, editSectionId, editContent);
+      setEditSectionId(null);
+      setEditContent("");
+      await refetchAll();
+    } catch {
+      setError("Failed to save section.");
+    } finally {
+      setSavingSection(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditSectionId(null);
+    setEditContent("");
+  };
+
+  if (loading) return <LoadingState message="Loading proposal..." />;
 
   if (notFound) {
     return (
@@ -216,14 +286,7 @@ function ProposalDetailContent() {
         <EmptyState
           title="Proposal not found"
           description="This proposal may have been removed or does not exist."
-          action={
-            <Link
-              href="/proposals"
-              className="inline-flex items-center justify-center rounded bg-primary px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2"
-            >
-              Back to proposals
-            </Link>
-          }
+          action={<Link href="/proposals" className="inline-flex items-center justify-center rounded bg-primary px-5 py-2.5 text-sm font-medium text-white">Back to proposals</Link>}
         />
       </Card>
     );
@@ -231,10 +294,9 @@ function ProposalDetailContent() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
               {proposal?.researchField || proposal?.field || "Research"}
             </span>
@@ -248,56 +310,27 @@ function ProposalDetailContent() {
             {proposal?.version && ` · v${proposal.version}`}
           </p>
         </div>
-
-        <Link
-          href="/proposals"
-          className="flex-shrink-0 rounded border border-hairline px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-subdued focus:outline-none focus:ring-2 focus:ring-primary/30"
-        >
-          Back
-        </Link>
+        <Link href="/proposals" className="flex-shrink-0 rounded border border-hairline px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-subdued">Back</Link>
       </div>
 
+      {message && <Alert type="success" closable>{message}</Alert>}
       {error && <Alert type="error">{error}</Alert>}
 
-      {/* Three-zone workspace */}
       <div className="grid gap-6 lg:grid-cols-[210px_minmax(0,1fr)_340px]">
-        {/* LEFT: Section Navigation */}
+        {/* LEFT: nav */}
         <div className="hidden lg:block">
           <div className="sticky top-20 space-y-4">
-            <ProposalSectionNav
-              sections={sections}
-              activeSection={activeSection}
-              onSectionChange={setActiveSection}
-            />
-
-            {/* Stage indicator */}
+            <ProposalSectionNav sections={sections} activeSection={activeSection} onSectionChange={setActiveSection} />
             <div className="rounded border border-hairline bg-canvas p-3">
-              <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">
-                Current Stage
-              </p>
-              <p className="mt-1 text-sm font-medium text-ink">
-                {
-                  WORKFLOW_STAGES.find((s) => s.status === proposal?.status)
-                    ?.label
-                }
-              </p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">Current Stage</p>
+              <p className="mt-1 text-sm font-medium text-ink">{WORKFLOW_STAGES.find((s) => s.status === proposal?.status)?.label}</p>
             </div>
-
-            {/* Missing items summary */}
             {proposal?.missingItems?.length > 0 && (
               <div className="rounded border border-warning/20 bg-warning-bg p-3">
-                <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-warning">
-                  Items to Address
-                </p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-warning">Items to Address</p>
                 <ul className="mt-1.5 space-y-1">
                   {proposal.missingItems.map((item, i) => (
-                    <li
-                      key={i}
-                      className="flex items-center gap-1.5 text-xs text-warning/90"
-                    >
-                      <span className="h-1 w-1 rounded-full bg-warning" />
-                      {item}
-                    </li>
+                    <li key={i} className="flex items-center gap-1.5 text-xs text-warning/90"><span className="h-1 w-1 rounded-full bg-warning" />{item}</li>
                   ))}
                 </ul>
               </div>
@@ -305,136 +338,65 @@ function ProposalDetailContent() {
           </div>
         </div>
 
-        {/* CENTER: Main content */}
+        {/* CENTER: section content */}
         <div className="space-y-6 min-w-0">
-          {/* Mobile section selector */}
           <div className="lg:hidden">
-            <select
-              value={activeSection || ""}
-              onChange={(e) => setActiveSection(e.target.value)}
-              className="w-full rounded border border-hairline bg-canvas px-3 py-2 text-sm text-ink"
-            >
-              {sectionDefs.map((sd) => (
-                <option key={sd.id} value={sd.id}>
-                  {sd.label}
-                </option>
-              ))}
+            <select value={activeSection || ""} onChange={(e) => setActiveSection(e.target.value)} className="w-full rounded border border-hairline bg-canvas px-3 py-2 text-sm text-ink">
+              {sectionDefs.map((sd) => (<option key={sd.id} value={sd.id}>{sd.label}</option>))}
             </select>
           </div>
 
-          {/* Section content */}
           <Card key={activeSection}>
             <CardContent className="p-5 sm:p-6">
-              <SectionDisplay
-                section={currentSection}
-                sectionDef={currentSectionDef}
-              />
+              {editSectionId === activeSection ? (
+                <SectionDisplay section={currentSection} sectionDef={currentSectionDef} isEditing editContent={editContent} onEditChange={setEditContent} onSave={handleSaveSection} onCancel={handleCancelEdit} saving={savingSection} />
+              ) : (
+                <>
+                  <SectionDisplay section={currentSection} sectionDef={currentSectionDef} />
+                  {canEdit && (
+                    <div className="mt-4">
+                      <Button variant="secondary" onClick={() => handleEditSection(activeSection)}>Edit Section</Button>
+                    </div>
+                  )}
+                </>
+              )}
             </CardContent>
           </Card>
-
-          {/* Milestones (if available) */}
-          {milestones.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Milestones</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {milestones.map((ms) => (
-                  <div
-                    key={ms.id}
-                    className="flex items-center justify-between gap-3 rounded border border-hairline p-3"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-ink">{ms.name}</p>
-                      <p className="text-xs text-body-muted">
-                        Due: {formatDate(ms.dueDate)}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-subdued">
-                        <div
-                          className="h-full rounded-full bg-primary"
-                          style={{ width: `${ms.progress || 0}%` }}
-                        />
-                      </div>
-                      <span className="font-mono text-xs text-body-muted">
-                        {ms.progress || 0}%
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
         </div>
 
-        {/* RIGHT: AI Feedback + Rubric + Actions */}
+        {/* RIGHT: panels */}
         <aside className="space-y-6">
-          {/* AI error */}
           {aiError && <Alert type="error">{aiError}</Alert>}
 
-          {/* Run AI pre-review */}
           <Card>
-            <CardHeader>
-              <CardTitle>Actions</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle>Actions</CardTitle></CardHeader>
             <CardContent className="space-y-3">
-              <Button
-                className="w-full"
-                loading={aiLoading}
-                disabled={aiLoading}
-                onClick={handleRunAIFeedback}
-              >
-                Run AI Pre-review
-              </Button>
-              <Link
-                href={`/proposals/${proposalId}`}
-                className="flex w-full items-center justify-center rounded border border-hairline px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-subdued"
-              >
-                Edit Proposal
-              </Link>
-            </CardContent>
-          </Card>
-
-          {/* AI Feedback */}
-          <AIFeedbackPanel
-            feedback={feedback}
-            loading={aiLoading}
-            isEmpty={!feedback}
-          />
-
-          {/* Rubric */}
-          {rubricReview ? (
-            <RubricScoreCard review={rubricReview} />
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>Rubric Review</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Alert type="info" title="Not yet reviewed">
-                  Rubric evaluation will appear after a reviewer assesses this
-                  proposal.
-                </Alert>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Version History */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Revision History</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loadingAudit ? (
-                <LoadingState message="Loading history..." />
-              ) : (
-                <VersionHistory logs={auditLogs} />
+              <Button className="w-full" loading={aiLoading} disabled={aiLoading} onClick={handleRunAIFeedback}>Run AI Pre-review</Button>
+              {canSubmit && proposal?.status === PROPOSAL_STATUSES.DRAFT && (
+                <Button className="w-full" variant="secondary" loading={aiLoading} disabled={aiLoading} onClick={handleSubmit}>Submit Proposal</Button>
+              )}
+              {canSubmit && proposal?.status === PROPOSAL_STATUSES.NEEDS_REVISION && (
+                <Button className="w-full" variant="primary" loading={aiLoading} disabled={aiLoading} onClick={handleSubmit}>Resubmit Proposal</Button>
               )}
             </CardContent>
           </Card>
 
-          {/* Human-in-the-loop */}
+          <AIFeedbackPanel feedback={feedback} loading={aiLoading} isEmpty={!feedback} />
+
+          {rubricReview ? <RubricScoreCard review={rubricReview} /> : (
+            <Card><CardHeader><CardTitle>Rubric Review</CardTitle></CardHeader><CardContent><Alert type="info" title="Not yet reviewed">Rubric evaluation will appear after a reviewer assesses this proposal.</Alert></CardContent></Card>
+          )}
+
+          <Card>
+            <CardHeader><CardTitle>Status History</CardTitle></CardHeader>
+            <CardContent><StatusHistoryCard history={proposal?.statusHistory || proposal?.status_history || []} /></CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle>Revision History</CardTitle></CardHeader>
+            <CardContent>{loadingAudit ? <LoadingState message="Loading history..." /> : <VersionHistory logs={auditLogs} />}</CardContent>
+          </Card>
+
           <HumanDecisionNotice />
         </aside>
       </div>
@@ -445,9 +407,7 @@ function ProposalDetailContent() {
 export default function ProposalDetailPage() {
   return (
     <ProtectedRoute>
-      <AppShell>
-        <ProposalDetailContent />
-      </AppShell>
+      <AppShell><ProposalDetailContent /></AppShell>
     </ProtectedRoute>
   );
 }

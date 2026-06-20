@@ -37,6 +37,8 @@ export default function RegisterPage() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
       return "Please enter a valid email address.";
     }
+    if (!form.faculty) return "Faculty is required.";
+    if (!form.department) return "Department is required.";
     if (!form.password) return "Password is required.";
     if (form.password.length < 6) return "Password must be at least 6 characters.";
     if (form.password !== form.confirmPassword) return "Passwords do not match.";
@@ -70,7 +72,18 @@ export default function RegisterPage() {
         router.push("/login");
       }
     } catch (err) {
-      setLocalError(err.message || "Registration failed. Please try again.");
+      const status = err.status || err.message;
+      const msg =
+        status === 404
+          ? "Registration service not found. Please check the API URL configuration."
+          : status === 422
+            ? "Please check your input. Some fields may be invalid or missing."
+            : status === 409
+              ? "An account with this email already exists."
+              : String(status).includes("fetch") || String(status).includes("Failed to fetch")
+                ? "Unable to connect to the server. Please check your connection and try again."
+                : err.message || "Registration failed. Please try again.";
+      setLocalError(msg);
     }
   };
 
@@ -140,6 +153,7 @@ export default function RegisterPage() {
                   value={form.faculty}
                   onChange={handleChange}
                   options={facultyOptions}
+                  required
                 />
 
                 <Select
@@ -148,6 +162,7 @@ export default function RegisterPage() {
                   value={form.department}
                   onChange={handleChange}
                   options={departmentOptions}
+                  required
                 />
 
                 <Input
