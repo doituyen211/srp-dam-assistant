@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -13,8 +12,8 @@ import { FACULTIES, DEPARTMENTS } from "@/lib/constants";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register, loading, error } = useAuth();
   const [localError, setLocalError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -32,16 +31,16 @@ export default function RegisterPage() {
   };
 
   const validate = () => {
-    if (!form.name.trim()) return "Full name is required.";
-    if (!form.email.trim()) return "Email is required.";
+    if (!form.name.trim()) return "Họ tên là bắt buộc.";
+    if (!form.email.trim()) return "Email là bắt buộc.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
-      return "Please enter a valid email address.";
+      return "Vui lòng nhập email hợp lệ.";
     }
-    if (!form.faculty) return "Faculty is required.";
-    if (!form.department) return "Department is required.";
-    if (!form.password) return "Password is required.";
-    if (form.password.length < 6) return "Password must be at least 6 characters.";
-    if (form.password !== form.confirmPassword) return "Passwords do not match.";
+    if (!form.faculty) return "Khoa là bắt buộc.";
+    if (!form.department) return "Bộ môn là bắt buộc.";
+    if (!form.password) return "Mật khẩu là bắt buộc.";
+    if (form.password.length < 6) return "Mật khẩu phải có ít nhất 6 ký tự.";
+    if (form.password !== form.confirmPassword) return "Mật khẩu không khớp.";
     return null;
   };
 
@@ -55,41 +54,15 @@ export default function RegisterPage() {
       return;
     }
 
-    const payload = {
-      name: form.name.trim(),
-      email: form.email.trim().toLowerCase(),
-      password: form.password,
-      faculty: form.faculty || undefined,
-      department: form.department || undefined,
-      role: "student",
-    };
-
-    try {
-      const user = await register(payload);
-      if (user) {
-        router.push("/dashboard");
-      } else {
-        router.push("/login");
-      }
-    } catch (err) {
-      const status = err.status || err.message;
-      const msg =
-        status === 404
-          ? "Registration service not found. Please check the API URL configuration."
-          : status === 422
-            ? "Please check your input. Some fields may be invalid or missing."
-            : status === 409
-              ? "An account with this email already exists."
-              : String(status).includes("fetch") || String(status).includes("Failed to fetch")
-                ? "Unable to connect to the server. Please check your connection and try again."
-                : err.message || "Registration failed. Please try again.";
-      setLocalError(msg);
-    }
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      router.push("/dashboard");
+    }, 500);
   };
 
   return (
     <div className="flex min-h-screen flex-col bg-app-bg">
-      {/* Header */}
       <div className="border-b border-hairline bg-canvas px-5 py-3">
         <Link
           href="/login"
@@ -98,7 +71,7 @@ export default function RegisterPage() {
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M19 12H5m7-7l-7 7 7 7" />
           </svg>
-          Back to sign in
+          Quay lại đăng nhập
         </Link>
       </div>
 
@@ -106,37 +79,37 @@ export default function RegisterPage() {
         <div className="w-full max-w-lg">
           <div className="mb-8 text-center">
             <h1 className="text-2xl font-semibold text-ink">
-              Create student research account
+              Tạo tài khoản nghiên cứu sinh viên
             </h1>
             <p className="mt-2 text-sm text-body-muted">
-              Use your institutional email to start drafting and tracking your research proposal.
+              Sử dụng email viện trợ để bắt đầu soạn và theo dõi đề tài nghiên cứu.
             </p>
           </div>
 
-          {(error || localError) && (
+          {localError && (
             <div className="mb-6">
-              <Alert type="error">{error || localError}</Alert>
+              <Alert type="error">{localError}</Alert>
             </div>
           )}
 
           <Card>
             <CardHeader>
-              <CardTitle>Registration</CardTitle>
+              <CardTitle>Đăng ký</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-5">
                 <Input
-                  label="Full name"
+                  label="Họ và tên"
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  placeholder="e.g. Nguyen Van A"
+                  placeholder="VD: Nguyen Van A"
                   required
                   disabled={loading}
                 />
 
                 <Input
-                  label="Institutional email"
+                  label="Email viện trợ"
                   type="email"
                   name="email"
                   value={form.email}
@@ -144,11 +117,11 @@ export default function RegisterPage() {
                   placeholder="you@university.edu"
                   required
                   disabled={loading}
-                  helperText="Use your institutional email address."
+                  helperText="Sử dụng email viện trợ."
                 />
 
                 <Select
-                  label="Faculty"
+                  label="Khoa"
                   name="faculty"
                   value={form.faculty}
                   onChange={handleChange}
@@ -157,7 +130,7 @@ export default function RegisterPage() {
                 />
 
                 <Select
-                  label="Department"
+                  label="Bộ môn"
                   name="department"
                   value={form.department}
                   onChange={handleChange}
@@ -166,23 +139,23 @@ export default function RegisterPage() {
                 />
 
                 <Input
-                  label="Password"
+                  label="Mật khẩu"
                   type="password"
                   name="password"
                   value={form.password}
                   onChange={handleChange}
-                  placeholder="At least 6 characters"
+                  placeholder="Ít nhất 6 ký tự"
                   required
                   disabled={loading}
                 />
 
                 <Input
-                  label="Confirm password"
+                  label="Xác nhận mật khẩu"
                   type="password"
                   name="confirmPassword"
                   value={form.confirmPassword}
                   onChange={handleChange}
-                  placeholder="Re-enter your password"
+                  placeholder="Nhập lại mật khẩu"
                   required
                   disabled={loading}
                 />
@@ -194,27 +167,27 @@ export default function RegisterPage() {
                   disabled={loading}
                   className="w-full justify-center"
                 >
-                  Create account
+                  Tạo tài khoản
                 </Button>
               </form>
 
               <div className="mt-6 space-y-4">
                 <div className="rounded border border-info/20 bg-info-bg px-3 py-2.5 text-xs leading-5 text-info">
-                  Student self-registration is available for eligible institutional domains.
+                  Đăng ký tự động dành cho sinh viên thuộc các domain viện trợ đủ điều kiện.
                 </div>
                 <div className="rounded border border-hairline bg-subdued px-3 py-2.5 text-xs leading-5 text-body-muted">
-                  <strong>Staff accounts:</strong> Reviewer, lecturer, and admin accounts are
-                  created by institutional administrators.
+                  <strong>Tài khoản nhân viên:</strong> Tài khoản phản biện, giảng viên, và quản trị viên
+                  được tạo bởi quản trị viên viện trợ.
                 </div>
 
                 <div className="text-center">
                   <p className="text-xs text-body-muted">
-                    Already have an account?{" "}
+                    Đã có tài khoản?{" "}
                     <Link
                       href="/login"
                       className="text-primary hover:underline"
                     >
-                      Sign in
+                      Đăng nhập
                     </Link>
                   </p>
                 </div>

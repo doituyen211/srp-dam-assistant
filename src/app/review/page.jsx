@@ -1,203 +1,52 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
-import { AIFeedbackPanel, RubricScoreCard } from "@/components/ai";
-import { ReviewTable } from "@/components/review/ReviewTable";
-import { ReviewQueueFilters } from "@/components/review/ReviewQueueFilters";
-import { ProposalSummaryPanel } from "@/components/review/ProposalSummaryPanel";
-import { ReviewDecisionPanel } from "@/components/review/ReviewDecisionPanel";
-import { Alert } from "@/components/ui/Alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { LoadingState } from "@/components/ui/LoadingState";
 import { HumanInLoopBanner } from "@/components/ui/HumanInLoopBanner";
-import { useAuth } from "@/hooks/useAuth";
-import { api } from "@/lib/api";
 import { PROPOSAL_STATUSES, USER_ROLES } from "@/lib/constants";
 
 function ReviewPageContent() {
-  const { user } = useAuth();
-  const [queueItems, setQueueItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-
+  const [queueItems] = useState([]);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [fieldFilter, setFieldFilter] = useState("all");
-  const [urgencyFilter, setUrgencyFilter] = useState("all");
-  const [riskFilter, setRiskFilter] = useState("all");
-
-  const [selectedId, setSelectedId] = useState(null);
-  const [selectedDetail, setSelectedDetail] = useState({ feedback: null, rubric: null });
-  const [decisionLoading, setDecisionLoading] = useState(false);
-
-  // Load queue
-  useEffect(() => {
-    let mounted = true;
-    const load = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const data = await api.getReviewQueue();
-        if (mounted) setQueueItems(Array.isArray(data) ? data : []);
-      } catch {
-        if (mounted) setError("Unable to load review queue.");
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-    load();
-    return () => { mounted = false; };
-  }, []);
-
-  // Load detail when selected
-  useEffect(() => {
-    if (!selectedId) return;
-    let mounted = true;
-    api.getAIFeedback(selectedId)
-      .then((fb) => { if (mounted) setSelectedDetail({ loading: false, feedback: fb || null, rubric: null }); })
-      .catch(() => { if (mounted) setSelectedDetail({ loading: false, feedback: null, rubric: null }); });
-    api.getRubricReview(selectedId)
-      .then((rv) => { if (mounted) setSelectedDetail((prev) => ({ ...prev, rubric: rv || null })); })
-      .catch(() => { if (mounted) setSelectedDetail((prev) => ({ ...prev, rubric: null })); });
-    return () => { mounted = false; };
-  }, [selectedId]);
-
-  const filteredQueue = useMemo(() => {
-    const keyword = search.trim().toLowerCase();
-    return queueItems.filter((p) => {
-      if (statusFilter !== "all" && p.status !== statusFilter) return false;
-      if (fieldFilter !== "all" && (p.researchField || p.field) !== fieldFilter) return false;
-      if (urgencyFilter === "urgent" && p.deadline) {
-        const days = (new Date(p.deadline) - new Date()) / (1000 * 60 * 60 * 24);
-        if (days > 7) return false;
-      }
-      if (urgencyFilter === "soon" && p.deadline) {
-        const days = (new Date(p.deadline) - new Date()) / (1000 * 60 * 60 * 24);
-        if (days < 7 || days > 30) return false;
-      }
-      if (urgencyFilter === "normal" && p.deadline) {
-        const days = (new Date(p.deadline) - new Date()) / (1000 * 60 * 60 * 24);
-        if (days <= 30) return false;
-      }
-      if (riskFilter !== "all") {
-        const flags = p.riskFlags || [];
-        const score = p.readinessScore || p.aiScore || 10;
-        const risk = flags.length > 1 || score < 5 ? "high" : flags.length === 1 || score < 7 ? "medium" : "low";
-        if (risk !== riskFilter) return false;
-      }
-      if (keyword) {
-        const haystack = [p.title, p.studentName, p.researchField, p.field, ...(p.keywords || [])]
-          .filter(Boolean).join(" ").toLowerCase();
-        if (!haystack.includes(keyword)) return false;
-      }
-      return true;
-    }).sort((a, b) => new Date(b.updatedAt || b.updated_at) - new Date(a.updatedAt || a.updated_at));
-  }, [queueItems, search, statusFilter, fieldFilter, urgencyFilter, riskFilter]);
-
-  const kpi = useMemo(() => {
-    const pending = queueItems.filter((p) => p.status === PROPOSAL_STATUSES.SUBMITTED || p.status === PROPOSAL_STATUSES.UNDER_REVIEW).length;
-    const revisions = queueItems.filter((p) => p.status === PROPOSAL_STATUSES.NEEDS_REVISION).length;
-    const approved = queueItems.filter((p) => p.status === PROPOSAL_STATUSES.APPROVED).length;
-    return { pending, revisions, approved, total: queueItems.length };
-  }, [queueItems]);
-
-  const handleDecision = async (decision, comment) => {
-    if (!selectedId) return;
-    setDecisionLoading(true);
-    setError("");
-    setMessage("");
-    try {
-      await api.createReviewDecision(selectedId, { decision, decision_comment: comment, criteria: [] });
-      setMessage(decision === "approved" ? "Approval recommended." : decision === "rejected" ? "Proposal rejected." : "Revision requested.");
-      setSelectedId(null);
-      // Refetch queue
-      const data = await api.getReviewQueue();
-      setQueueItems(Array.isArray(data) ? data : []);
-    } catch (err) {
-      setError(err.message || "Unable to record decision.");
-    } finally {
-      setDecisionLoading(false);
-    }
-  };
-
-  if (loading) return <LoadingState variant="review" />;
+  const [statusFilter] = useState("all");
+  const [fieldFilter] = useState("all");
+  const [urgencyFilter] = useState("all");
+  const [riskFilter] = useState("all");
+  const [selectedId] = useState(null);
 
   return (
     <div className="space-y-6">
       <Card className="border-primary bg-primary text-white">
         <CardContent className="p-6 md:p-8">
           <div className="space-y-3">
-            <div className="inline-flex rounded border border-white/15 bg-white/[0.06] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-white/60">Reviewer Panel</div>
-            <h1 className="text-2xl font-semibold leading-tight md:text-3xl">Proposal Review Queue</h1>
-            <p className="max-w-3xl text-sm leading-6 text-white/65">Reviewers are the accountable decision makers. Use AI pre-reviews as reference only — your judgment determines the outcome.</p>
+            <div className="inline-flex rounded border border-white/15 bg-white/[0.06] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-white/60">Bảng Phản biện</div>
+            <h1 className="text-2xl font-semibold leading-tight md:text-3xl">Hàng chờ Phản biện Đề tài</h1>
+            <p className="max-w-3xl text-sm leading-6 text-white/65">Phản biện là người ra quyết định cuối cùng. Sử dụng AI pre-review chỉ để tham khảo.</p>
           </div>
         </CardContent>
       </Card>
 
       <HumanInLoopBanner />
 
-      {message && <Alert type="success" title="Decision Recorded" closable>{message}</Alert>}
-      {error && <Alert type="error">{error}</Alert>}
-
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <Card><CardContent className="p-4"><p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">Assigned</p><p className="mt-1 text-2xl font-semibold text-ink">{kpi.total}</p></CardContent></Card>
-        <Card accent="info"><CardContent className="p-4"><p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">Pending Review</p><p className="mt-1 text-2xl font-semibold text-info">{kpi.pending}</p></CardContent></Card>
-        <Card accent="warning"><CardContent className="p-4"><p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">Revisions</p><p className="mt-1 text-2xl font-semibold text-warning">{kpi.revisions}</p></CardContent></Card>
-        <Card accent="success"><CardContent className="p-4"><p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">Approved</p><p className="mt-1 text-2xl font-semibold text-success">{kpi.approved}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">Total</p><p className="mt-1 text-2xl font-semibold text-ink">{queueItems.length}</p></CardContent></Card>
+        <Card><CardContent className="p-4"><p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">Đã phân công</p><p className="mt-1 text-2xl font-semibold text-ink">0</p></CardContent></Card>
+        <Card accent="info"><CardContent className="p-4"><p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">Chờ phản biện</p><p className="mt-1 text-2xl font-semibold text-info">0</p></CardContent></Card>
+        <Card accent="warning"><CardContent className="p-4"><p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">Cần sửa</p><p className="mt-1 text-2xl font-semibold text-warning">0</p></CardContent></Card>
+        <Card accent="success"><CardContent className="p-4"><p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">Đã phê duyệt</p><p className="mt-1 text-2xl font-semibold text-success">0</p></CardContent></Card>
+        <Card><CardContent className="p-4"><p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">Tổng</p><p className="mt-1 text-2xl font-semibold text-ink">0</p></CardContent></Card>
       </div>
 
       <Card>
-        <CardHeader><CardTitle>Filters</CardTitle></CardHeader>
-        <CardContent>
-          <ReviewQueueFilters
-            search={search} onSearchChange={setSearch}
-            statusFilter={statusFilter} onStatusChange={setStatusFilter}
-            fieldFilter={fieldFilter} onFieldChange={setFieldFilter}
-            urgencyFilter={urgencyFilter} onUrgencyChange={setUrgencyFilter}
-            riskFilter={riskFilter} onRiskChange={setRiskFilter}
-          />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader><CardTitle>Review Queue</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Hàng chờ Phản biện</CardTitle></CardHeader>
         <CardContent className="p-0">
-          {filteredQueue.length === 0 ? (
-            <div className="p-6"><EmptyState title="No proposals match current filters" description="Try adjusting your search or filter criteria." /></div>
-          ) : (
-            <ReviewTable proposals={filteredQueue} reviews={{}} selectedId={selectedId} onSelectProposal={setSelectedId} />
-          )}
+          <div className="p-6">
+            <EmptyState title="Chưa có đề tài nào trong hàng chờ" description="Các đề tài sẽ xuất hiện khi được gửi phản biện." />
+          </div>
         </CardContent>
       </Card>
-
-      {selectedId && (
-        <div className="space-y-6">
-          <Card>
-            <CardHeader className="flex items-center justify-between">
-              <CardTitle>Review Detail</CardTitle>
-              <button type="button" onClick={() => setSelectedId(null)} className="text-sm text-body-muted hover:text-ink">Close review</button>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <ProposalSummaryPanel proposal={queueItems.find((p) => p.id === selectedId)} />
-
-              <div className="grid gap-6 lg:grid-cols-2">
-                <div className="space-y-6">
-                  <AIFeedbackPanel feedback={selectedDetail?.feedback} loading={false} isEmpty={!selectedDetail?.feedback} />
-                  {selectedDetail?.rubric && <RubricScoreCard review={selectedDetail.rubric} />}
-                </div>
-                <div className="space-y-6">
-                  <ReviewDecisionPanel proposal={queueItems.find((p) => p.id === selectedId)} onDecision={handleDecision} loading={decisionLoading} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </div>
   );
 }

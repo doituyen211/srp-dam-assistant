@@ -1,5 +1,4 @@
 import "./globals.css";
-import { AuthProvider } from "@/hooks/useAuth";
 
 export const metadata = {
   title: "SRP DAM - AI Trợ Lý Soạn & Quản Lý Đề Tài",
@@ -21,7 +20,7 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className="bg-white text-slate-900 font-sans min-h-screen flex flex-col">
-        <AuthProvider>{children}</AuthProvider>
+        {children}
       </body>
     </html>
   );

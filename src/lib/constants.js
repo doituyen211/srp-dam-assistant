@@ -1,6 +1,5 @@
 // ───────── User Roles ─────────
 export const USER_ROLES = {
-  SUPER_ADMIN: "super_admin",
   STUDENT: "student",
   REVIEWER: "reviewer",
   ADMIN: "admin",
@@ -246,7 +245,6 @@ export const ACADEMIC_TERMS = [
 export const CURRENT_TERM = "2026A";
 
 export const ACADEMIC_ROLE_LABELS = {
-  [USER_ROLES.SUPER_ADMIN]: "Super Admin",
   [USER_ROLES.STUDENT]: "Sinh viên",
   [USER_ROLES.REVIEWER]: "Phản biện",
   [USER_ROLES.ADMIN]: "Quản trị",
@@ -254,44 +252,15 @@ export const ACADEMIC_ROLE_LABELS = {
 };
 
 export const ACADEMIC_ROLE_ENGLISH = {
-  [USER_ROLES.SUPER_ADMIN]: "Super Admin",
   [USER_ROLES.STUDENT]: "Student",
   [USER_ROLES.REVIEWER]: "Reviewer",
   [USER_ROLES.ADMIN]: "Admin",
   [USER_ROLES.LECTURER]: "Lecturer",
 };
 
-export const ACADEMIC_DEPARTMENTS = {
-  research_office: "Phòng Quản lý Nghiên cứu",
-  academic_affairs: "Phòng Đào tạo",
-  faculty_office: "Văn phòng Khoa",
-};
-
-// ───────── Tiered Pricing (editable by super admin) ─────────
-export const MOCK_PRICING_PLANS = [
-  { id: "research_lab",  name: "Research Lab",  max_users: 100,  max_proposals: 30,   setup_fee: 1000, annual_license: 500,  featured: false, is_custom: false, deleted_at: null },
-  { id: "department",    name: "Department",    max_users: 1000, max_proposals: 200,  setup_fee: 3000, annual_license: 2000, featured: false, is_custom: false, deleted_at: null },
-  { id: "faculty",       name: "Faculty",       max_users: 5000, max_proposals: 1000, setup_fee: 5000, annual_license: 4000, featured: true,  is_custom: false, deleted_at: null },
-  { id: "institution",   name: "Institution",   max_users: -1,   max_proposals: -1,   setup_fee: 8000, annual_license: 6000, featured: false, is_custom: false, deleted_at: null },
-];
-
-export const LLM_PRICE_CONFIG = {
-  byok_price: 0,
-  platform_price: 0.50,
-};
-
-export const MOCK_NOTIFICATIONS = [
-  { id: "n1", type: "campaign", title: "Summer promotion",    message: "20% off annual license until Aug 31",                              read: false, created_at: "2026-06-19T10:00:00Z" },
-  { id: "n2", type: "system",   title: "Platform update",     message: "AI pre-review accuracy improved in v2.1",                          read: false, created_at: "2026-06-19T09:30:00Z" },
-  { id: "n3", type: "discount", title: "Referral program",    message: "Refer a university and get 1 month free",                          read: true,  created_at: "2026-06-18T14:00:00Z" },
-  { id: "n4", type: "campaign", title: "New feature: BYOK",   message: "Bring Your Own LLM Key is now available for all tenants",           read: false, created_at: "2026-06-17T08:00:00Z" },
-  { id: "n5", type: "system",   title: "Tenant created",      message: "Da Nang University of Technology joined the platform",              read: true,  created_at: "2026-06-15T11:00:00Z" },
-];
-
-export const TENANT_STATUSES = ["active", "suspended", "trial", "expired"];
-
-export const MOCK_SUBSCRIPTIONS = [
-  { id: "sub-001", tenant_name: "Hanoi University of Science",  tenant_domain: "hus.edu.vn",   plan_tier: "annual",  llm_option: "byok",     start_date: "2026-01-15", renewal_date: "2027-01-15", status: "active",  setup_fee_paid: true },
-  { id: "sub-002", tenant_name: "Da Nang University of Technology", tenant_domain: "dut.edu.vn", plan_tier: "annual", llm_option: "platform", start_date: "2026-03-01", renewal_date: "2027-03-01", status: "active",  setup_fee_paid: true },
-  { id: "sub-003", tenant_name: "Can Tho University",          tenant_domain: "ctu.edu.vn",   plan_tier: "trial",   llm_option: "byok",     start_date: "2026-05-01", renewal_date: "2026-08-01", status: "trial",   setup_fee_paid: false },
+export const AI_PROVIDERS = [
+  { id: "",         name: "Mặc định",           model: null,                    price: null,    description: "Sử dụng nhà cung cấp mặc định" },
+  { id: "openai",   name: "OpenAI",              model: "gpt-4o-mini",           price: 0.15,    description: "GPT-4o-mini — ~$0.15/1M input tokens, cần API key" },
+  { id: "claude",   name: "Anthropic Claude",    model: "claude-3-haiku",        price: 0.25,    description: "Claude 3 Haiku — ~$0.25/1M input tokens, cần API key" },
+  { id: "gemini",   name: "Google Gemini",       model: "gemini-2.0-flash",      price: 0.10,    description: "Gemini 2.0 Flash — ~$0.10/1M input tokens, cần API key" },
 ];
