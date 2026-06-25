@@ -258,8 +258,9 @@ export const ACADEMIC_ROLE_ENGLISH = {
   [USER_ROLES.LECTURER]: "Lecturer",
 };
 
-export const ACADEMIC_DEPARTMENTS = {
-  research_office: "Phòng Quản lý Nghiên cứu",
-  academic_affairs: "Phòng Đào tạo",
-  faculty_office: "Văn phòng Khoa",
-};
+export const AI_PROVIDERS = [
+  { id: "",         name: "Mặc định",           model: null,                    price: null,    description: "Sử dụng nhà cung cấp mặc định" },
+  { id: "openai",   name: "OpenAI",              model: "gpt-4o-mini",           price: 0.15,    description: "GPT-4o-mini — ~$0.15/1M input tokens, cần API key" },
+  { id: "claude",   name: "Anthropic Claude",    model: "claude-3-haiku",        price: 0.25,    description: "Claude 3 Haiku — ~$0.25/1M input tokens, cần API key" },
+  { id: "gemini",   name: "Google Gemini",       model: "gemini-2.0-flash",      price: 0.10,    description: "Gemini 2.0 Flash — ~$0.10/1M input tokens, cần API key" },
+];

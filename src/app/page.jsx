@@ -380,12 +380,12 @@ export default function Home() {
       </main>
 
       <footer className="border-t border-hairline bg-primary px-6 py-8 text-center text-sm text-white/50">
-        <p>
-          © 2026 SRP D&amp;M Assistant. Academic research proposal platform.
-        </p>
+        <p>© 2026 SRP D&amp;M Assistant. Academic research proposal platform.</p>
+        <div className="mt-2">
+          <Link href="/login" className="text-xs text-white/30 hover:text-white/60">Sign in</Link>
+        </div>
         <p className="mt-1 text-xs text-white/30">
-          AI-assisted workflow · Human-in-the-loop · Built for university
-          research offices
+          AI-assisted workflow · Human-in-the-loop · Built for university research offices
         </p>
       </footer>
     </div>

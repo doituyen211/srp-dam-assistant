@@ -1,0 +1,53 @@
+import { mockUsers } from "./auth";
+
+export const mockProposals = [
+  {
+    id: "prop-001",
+    title: "Test Proposal 1",
+    abstract: "This is a test proposal abstract",
+    studentName: mockUsers.student.name,
+    student_name: mockUsers.student.name,
+    studentId: mockUsers.student.id,
+    student_id: mockUsers.student.id,
+    researchField: "Trí tuệ nhân tạo",
+    research_field: "Trí tuệ nhân tạo",
+    status: "draft",
+    readinessScore: 7.5,
+    readiness_score: 7.5,
+    aiConfidence: 0.85,
+    ai_confidence: 0.85,
+    createdAt: "2026-06-01T10:00:00Z",
+    created_at: "2026-06-01T10:00:00Z",
+    updatedAt: "2026-06-10T10:00:00Z",
+    updated_at: "2026-06-10T10:00:00Z",
+    keywords: ["AI", "Machine Learning"],
+    sections: [
+      { id: "abstract", label: "Abstract", content: "Test abstract", health: "strong", aiComment: "Good", rubricHint: "Check clarity" },
+      { id: "methodology", label: "Methodology", content: "Test methodology", health: "needs_evidence", aiComment: "Add detail", rubricHint: "Be specific" },
+    ],
+  },
+  {
+    id: "prop-002",
+    title: "Test Proposal 2",
+    abstract: "Second test proposal",
+    studentName: mockUsers.student.name,
+    student_name: mockUsers.student.name,
+    studentId: mockUsers.student.id,
+    student_id: mockUsers.student.id,
+    researchField: "Khoa học máy tính",
+    research_field: "Khoa học máy tính",
+    status: "under_review",
+    readinessScore: 6.0,
+    readiness_score: 6.0,
+    aiConfidence: 0.7,
+    ai_confidence: 0.7,
+    createdAt: "2026-06-05T10:00:00Z",
+    created_at: "2026-06-05T10:00:00Z",
+    updatedAt: "2026-06-12T10:00:00Z",
+    updated_at: "2026-06-12T10:00:00Z",
+    keywords: ["NLP"],
+    sections: [],
+  },
+];
+
+export const mockSingleProposal = mockProposals[0];

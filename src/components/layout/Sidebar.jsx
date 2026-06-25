@@ -60,6 +60,8 @@ const NAV_ITEMS = {
     { label: "Supervisor Matching", href: "/matching", icon: "matching" },
     { section: "Administration" },
     { label: "System", href: "/admin", icon: "admin" },
+    { label: "AI Usage", href: "/admin/ai-usage", icon: "history" },
+    { label: "Settings", href: "/admin/settings", icon: "settings" },
   ],
   [USER_ROLES.LECTURER]: [
     { section: "Supervision" },
@@ -67,6 +69,7 @@ const NAV_ITEMS = {
     { label: "Proposals", href: "/proposals", icon: "proposals" },
     { label: "Matching Suggestions", href: "/matching", icon: "matching" },
   ],
+
 };
 
 /**
