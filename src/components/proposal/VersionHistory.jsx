@@ -38,7 +38,7 @@ export function VersionHistory({ logs = [], limit = 5, className = "" }) {
             </Badge>
             <span className="font-mono text-[9px] text-muted">
               {log.timestamp
-                ? new Date(log.timestamp).toLocaleDateString("vi-VN", {
+                ? new Date(log.timestamp).toLocaleDateString("en-US", {
                     day: "2-digit",
                     month: "2-digit",
                     hour: "2-digit",

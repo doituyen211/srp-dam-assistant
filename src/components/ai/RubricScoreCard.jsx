@@ -44,7 +44,7 @@ export function RubricScoreCard({ review }) {
             </div>
             <p className="mt-1 text-xs text-body-muted">
               {review.timestamp
-                ? new Date(review.timestamp).toLocaleDateString("vi-VN")
+                ? new Date(review.timestamp).toLocaleDateString("en-US")
                 : ""}
             </p>
           </div>

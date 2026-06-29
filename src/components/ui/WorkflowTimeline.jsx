@@ -59,10 +59,10 @@ export function WorkflowTimeline({
 
   const getRoleLabel = (role) => {
     const roleLabels = {
-      student: "Sinh viên",
+      student: "Student",
       reviewer: "Reviewer",
       admin: "Admin",
-      lecturer: "Giảng viên",
+      lecturer: "Lecturer",
     };
     return roleLabels[role] || role;
   };
@@ -84,7 +84,7 @@ export function WorkflowTimeline({
       <CardHeader>
         <CardTitle>Academic Workflow Timeline</CardTitle>
         <p className="mt-1 text-sm text-body-muted">
-          Luồng công việc học thuật từ bản nháp đến hoàn thành
+          Academic workflow from draft to completion
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -150,7 +150,7 @@ export function WorkflowTimeline({
                       {milestone && (
                         <div className="mt-3 space-y-2">
                           <div className="flex items-center justify-between text-xs">
-                            <span className="text-muted">Tiến độ</span>
+                            <span className="text-muted">Progress</span>
                             <span className="font-medium text-ink">
                               {milestone.progress || 0}%</span>
                           </div>
@@ -162,7 +162,7 @@ export function WorkflowTimeline({
                           </div>
                           {milestone.dueDate && (
                             <div className="text-xs text-muted">
-                              Hạn: {new Date(milestone.dueDate).toLocaleDateString("vi-VN")}
+                              Deadline: {new Date(milestone.dueDate).toLocaleDateString("en-US")}
                             </div>
                           )}
                         </div>
@@ -170,7 +170,7 @@ export function WorkflowTimeline({
 
                       {nextOwner && (
                         <div className="mt-3 rounded-lg bg-soft-stone/50 p-2">
-                          <div className="text-xs text-muted">Người sở hữu tiếp theo</div>
+                          <div className="text-xs text-muted">Next owner</div>
                           <div className="mt-1 flex items-center gap-2">
                             <Badge
                               intent={getRoleBadgeColor(nextOwner)}
@@ -179,7 +179,7 @@ export function WorkflowTimeline({
                               {getRoleLabel(nextOwner)}
                             </Badge>
                             <span className="text-xs text-body-muted">
-                              Quyết định tiếp theo
+                              Next decision
                             </span>
                           </div>
                         </div>
@@ -187,7 +187,7 @@ export function WorkflowTimeline({
 
                       {nextStatuses.length > 0 && (
                         <div className="mt-3 space-y-1">
-                          <div className="text-xs text-muted">Có thể chuyển đến</div>
+                          <div className="text-xs text-muted">Can transition to</div>
                           <div className="flex flex-wrap gap-1">
                             {nextStatuses.map((nextStatus) => {
                               const nextStage = getStageByStatus(nextStatus);

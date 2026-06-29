@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { HumanInLoopBanner } from "@/components/ui/HumanInLoopBanner";
-
-const DEFAULT_USER = { id: "", name: "User", email: "", role: "student", faculty: "", department: "" };
 
 /**
  * AppShell - Main layout with sidebar and topbar
@@ -14,7 +13,7 @@ export function AppShell({
   children,
   showAdvisoryBanner = false,
 }) {
-  const user = DEFAULT_USER;
+  const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleMenuToggle = () => setSidebarOpen(!sidebarOpen);
@@ -22,19 +21,21 @@ export function AppShell({
 
   return (
     <div className="min-h-screen bg-app-bg text-ink">
-      <>
-        <Sidebar user={user} isOpen={sidebarOpen} onClose={handleCloseSidebar} />
-        {sidebarOpen && (
-          <button
-            type="button"
-            aria-label="Đóng menu"
-            className="fixed inset-0 z-40 bg-ink/40 backdrop-blur-[1px] md:hidden"
-            onClick={handleCloseSidebar}
-          />
-        )}
-      </>
+      {user && (
+        <>
+          <Sidebar user={user} isOpen={sidebarOpen} onClose={handleCloseSidebar} />
+          {sidebarOpen && (
+            <button
+              type="button"
+              aria-label="Close menu"
+              className="fixed inset-0 z-40 bg-ink/40 backdrop-blur-[1px] md:hidden"
+              onClick={handleCloseSidebar}
+            />
+          )}
+        </>
+      )}
 
-      <div className="min-h-screen md:pl-[256px]">
+      <div className={user ? "min-h-screen md:pl-[256px]" : "min-h-screen"}>
         <Topbar onMenuToggle={handleMenuToggle} isMenuOpen={sidebarOpen} />
 
         <main className="min-h-[calc(100vh-56px)] overflow-x-hidden">

@@ -41,6 +41,15 @@ function NavIcon({ name }) {
 
 // ─── Navigation definitions (academic role-based) ───
 const NAV_ITEMS = {
+  [USER_ROLES.SUPER_ADMIN]: [
+    { section: "Platform" },
+    { label: "Dashboard", href: "/admin", icon: "dashboard" },
+    { label: "Users", href: "/admin/users", icon: "users" },
+    { label: "Faculties", href: "/admin/faculties", icon: "audit" },
+    { section: "School" },
+    { label: "All Proposals", href: "/proposals", icon: "proposals" },
+    { label: "Settings", href: "/admin/settings", icon: "settings" },
+  ],
   [USER_ROLES.STUDENT]: [
     { section: "Research Workspace" },
     { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
@@ -57,19 +66,16 @@ const NAV_ITEMS = {
     { section: "Operations" },
     { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
     { label: "All Proposals", href: "/proposals", icon: "proposals" },
-    { label: "Supervisor Matching", href: "/matching", icon: "matching" },
     { section: "Administration" },
+    { label: "Users", href: "/admin/users", icon: "users" },
     { label: "System", href: "/admin", icon: "admin" },
-    { label: "AI Usage", href: "/admin/ai-usage", icon: "history" },
     { label: "Settings", href: "/admin/settings", icon: "settings" },
   ],
   [USER_ROLES.LECTURER]: [
     { section: "Supervision" },
     { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
     { label: "Proposals", href: "/proposals", icon: "proposals" },
-    { label: "Matching Suggestions", href: "/matching", icon: "matching" },
   ],
-
 };
 
 /**
@@ -109,7 +115,7 @@ export function Sidebar({ user, isOpen = true, onClose }) {
             type="button"
             onClick={onClose}
             className="flex h-8 w-8 items-center justify-center rounded text-white/60 transition-colors hover:bg-white/10 hover:text-white md:hidden"
-            aria-label="Đóng menu"
+            aria-label="Close menu"
           >
             <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
               <path d="M4.22 4.22a.75.75 0 0 1 1.06 0L8 6.94l2.72-2.72a.75.75 0 1 1 1.06 1.06L9.06 8l2.72 2.72a.75.75 0 1 1-1.06 1.06L8 9.06l-2.72 2.72a.75.75 0 0 1-1.06-1.06L6.94 8 4.22 5.28a.75.75 0 0 1 0-1.06Z" />

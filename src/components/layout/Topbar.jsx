@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import {
   USER_ROLES,
@@ -11,21 +12,29 @@ import {
 } from "@/lib/constants";
 
 const ROLE_BADGE_COLORS = {
+  [USER_ROLES.SUPER_ADMIN]: "bg-danger/10 text-danger border-danger/20",
   [USER_ROLES.STUDENT]: "bg-info-bg text-info border-info/20",
   [USER_ROLES.REVIEWER]: "bg-warning-bg text-warning border-warning/20",
   [USER_ROLES.ADMIN]: "bg-danger/10 text-danger border-danger/20",
   [USER_ROLES.LECTURER]: "bg-success-bg text-success border-success/20",
 };
 
-const DEFAULT_USER = { id: "", name: "User", email: "", role: "student", faculty: "", department: "" };
-
+/**
+ * Topbar - Academic top navigation with role, user, term, and status
+ */
 export function Topbar({ onMenuToggle, isMenuOpen = false }) {
   const router = useRouter();
-  const user = DEFAULT_USER;
+  const { user, logout, loading } = useAuth();
 
-  const handleLogout = () => {
-    router.push("/login");
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } finally {
+      router.push("/login");
+    }
   };
+
+  if (!user) return null;
 
   const currentTerm = ACADEMIC_TERMS.find((t) => t.id === CURRENT_TERM);
   const roleBadgeColor = ROLE_BADGE_COLORS[user.role] || "bg-subdued text-body-muted border-hairline";
@@ -38,7 +47,7 @@ export function Topbar({ onMenuToggle, isMenuOpen = false }) {
             type="button"
             onClick={onMenuToggle}
             className="flex h-9 w-9 items-center justify-center rounded text-body-muted transition-colors hover:bg-subdued hover:text-ink md:hidden"
-            aria-label={isMenuOpen ? "Đóng menu" : "Mở menu"}
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMenuOpen}
           >
             <svg aria-hidden="true" className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,8 +81,13 @@ export function Topbar({ onMenuToggle, isMenuOpen = false }) {
             {user.name?.charAt(0)?.toUpperCase() || "?"}
           </div>
 
-          <Button variant="ghost" onClick={handleLogout} className="px-2.5 py-1 text-xs text-body-muted hover:text-danger">
-            Đăng xuất
+          <Button
+            variant="ghost"
+            onClick={handleLogout}
+            disabled={loading}
+            className="px-2.5 py-1 text-xs text-body-muted hover:text-danger"
+          >
+            Sign out
           </Button>
         </div>
       </div>

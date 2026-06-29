@@ -10,6 +10,7 @@ export function ProposalSectionNav({
   sections = [],
   activeSection,
   onSectionChange,
+  excludeIds = [],
   className = "",
 }) {
   const sectionMap = {};
@@ -17,9 +18,11 @@ export function ProposalSectionNav({
     sectionMap[s.id] = s;
   });
 
+  const filteredTypes = SECTION_TYPES.filter((s) => !excludeIds.includes(s.id));
+
   return (
     <nav className={`space-y-1 ${className}`}>
-      {SECTION_TYPES.map((sectionDef) => {
+      {filteredTypes.map((sectionDef) => {
         const section = sectionMap[sectionDef.id];
         const isActive = activeSection === sectionDef.id;
         const health = section?.health || "missing";

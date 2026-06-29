@@ -5,7 +5,7 @@ import { WORKFLOW_STAGES } from "@/lib/constants";
 
 const formatDate = (value) => {
   if (!value) return "N/A";
-  return new Intl.DateTimeFormat("vi-VN", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

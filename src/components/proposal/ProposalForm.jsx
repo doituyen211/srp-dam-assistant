@@ -37,7 +37,7 @@ const SECTION_PLACEHOLDERS = {
   references: "List references in proper academic format...",
 };
 
-function SectionField({ id, label, value, onChange, error, required }) {
+function SectionField({ id, label, value, onChange, error, required, disabled }) {
   const minLength = SECTION_MIN_LENGTHS[id] || 0;
   const placeholder = SECTION_PLACEHOLDERS[id] || "";
   const charCount = value.length;
@@ -77,6 +77,7 @@ function SectionField({ id, label, value, onChange, error, required }) {
         placeholder={placeholder}
         rows={5}
         required={required}
+        disabled={disabled}
         className="min-h-[120px] w-full resize-y rounded border border-hairline bg-canvas px-4 py-2.5 text-base text-ink outline-none transition-all placeholder:text-muted focus:border-primary/40 focus:ring-4 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-subdued disabled:text-muted"
       />
 
@@ -94,13 +95,13 @@ function SectionField({ id, label, value, onChange, error, required }) {
       )}
 
       {error && <span className="text-xs text-danger">{error}</span>}
-      {isBelowMin && (
+      {isBelowMin && !disabled && (
         <span className="text-xs text-warning">
           Add {minLength - charCount} more characters to meet minimum.
         </span>
       )}
 
-      {minLength > 0 && !error && !isBelowMin && (
+      {minLength > 0 && !error && !isBelowMin && !disabled && (
         <div className="rounded bg-subdued/50 px-3 py-1.5">
           <p className="text-xs leading-5 text-body-muted">
             {placeholder}
@@ -114,12 +115,15 @@ function SectionField({ id, label, value, onChange, error, required }) {
 export function ProposalForm({
   initialData = {},
   onSubmit,
+  onChange,
   loading = false,
   error = null,
+  isReadOnly = false,
 }) {
   const [formData, setFormData] = useState({
     title: initialData.title || "",
     researchField: initialData.researchField || initialData.field || "",
+    keywords: Array.isArray(initialData.keywords) ? initialData.keywords.join(", ") : initialData.keywords || "",
     abstract: initialData.abstract || "",
     problem: initialData.problem || "",
     question: initialData.question || "",
@@ -154,7 +158,11 @@ export function ProposalForm({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      const next = { ...prev, [name]: value };
+      if (onChange) onChange(next);
+      return next;
+    });
     if (validationErrors[name]) {
       setValidationErrors((prev) => {
         const next = { ...prev };
@@ -220,7 +228,7 @@ export function ProposalForm({
         <CardContent className="space-y-7">
           {error && <Alert type="error">{error}</Alert>}
 
-          {!initialData.id && (
+          {!initialData.id && !isReadOnly && (
             <Alert type="info" title="Academic Guidance">
               A strong proposal answers: (1) <strong>Why</strong> is this
               important? (2) <strong>What</strong> do you aim to achieve? (3)
@@ -239,6 +247,7 @@ export function ProposalForm({
               onChange={handleChange}
               error={validationErrors.title}
               required
+              disabled={isReadOnly}
             />
 
             <Select
@@ -249,6 +258,20 @@ export function ProposalForm({
               error={validationErrors.researchField}
               options={fieldOptions}
               required
+              disabled={isReadOnly}
+            />
+          </div>
+
+          {/* Keywords */}
+          <div id="section-keywords">
+            <Input
+              label="Keywords"
+              name="keywords"
+              value={formData.keywords}
+              onChange={handleChange}
+              placeholder="e.g. machine learning, computer vision, healthcare (comma-separated)"
+              helperText="Separate keywords with commas. These help categorize your proposal."
+              disabled={isReadOnly}
             />
           </div>
 
@@ -269,32 +292,35 @@ export function ProposalForm({
                   onChange={handleChange}
                   error={validationErrors[sectionDef.id]}
                   required={sectionDef.required}
+                  disabled={isReadOnly}
                 />
               </div>
             ))}
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col gap-3 border-t border-hairline pt-5 sm:flex-row sm:justify-end">
-            <Button
-              variant="secondary"
-              onClick={() => handleSubmit("draft")}
-              loading={loading}
-              disabled={loading}
-              className="sm:min-w-32"
-            >
-              Save Draft
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => handleSubmit("submit")}
-              loading={loading}
-              disabled={loading}
-              className="sm:min-w-36"
-            >
-              Submit Proposal
-            </Button>
-          </div>
+          {!isReadOnly && (
+            <div className="flex flex-col gap-3 border-t border-hairline pt-5 sm:flex-row sm:justify-end">
+              <Button
+                variant="secondary"
+                onClick={() => handleSubmit("draft")}
+                loading={loading}
+                disabled={loading}
+                className="sm:min-w-32"
+              >
+                Save Draft
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => handleSubmit("submit")}
+                loading={loading}
+                disabled={loading}
+                className="sm:min-w-36"
+              >
+                Submit Proposal
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
