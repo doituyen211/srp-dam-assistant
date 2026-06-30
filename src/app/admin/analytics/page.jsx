@@ -26,6 +26,12 @@ function AnalyticsPageContent() {
   if (loading) return <LoadingState message="Loading analytics..." />;
 
   const stageCounts = overview?.proposalsByStage || overview?.proposals_by_stage || overview?.countsByStage || {};
+  
+  // Handle both object {draft: 5} and array [{stage: "draft", count: 5}] formats
+  const stageEntries = Array.isArray(stageCounts)
+    ? stageCounts.map((item) => [item.stage || item.status, item.count || 0])
+    : Object.entries(stageCounts);
+
   const totalProposals = overview?.totalProposals || 0;
 
   return (
@@ -53,7 +59,7 @@ function AnalyticsPageContent() {
         <CardHeader><CardTitle>Workflow Pipeline</CardTitle></CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {Object.entries(stageCounts).map(([stage, count]) => (
+            {stageEntries.map(([stage, count]) => (
               <div key={stage} className="flex items-center gap-3">
                 <span className="w-40 text-sm text-body-muted capitalize">{stage.replace(/_/g, " ")}</span>
                 <div className="flex-1 h-4 overflow-hidden rounded-full bg-subdued">
