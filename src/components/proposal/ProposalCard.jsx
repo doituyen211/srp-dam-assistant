@@ -9,9 +9,9 @@ import { WORKFLOW_STAGES } from "@/lib/constants";
  * ProposalCard - Enhanced card with readiness, stage, missing items, deadline, next action
  */
 export function ProposalCard({ proposal }) {
-  const updatedDate = new Date(proposal.updatedAt).toLocaleDateString("vi-VN");
+  const updatedDate = new Date(proposal.updatedAt).toLocaleDateString("en-US");
   const deadlineDate = proposal.deadline
-    ? new Date(proposal.deadline).toLocaleDateString("vi-VN")
+    ? new Date(proposal.deadline).toLocaleDateString("en-US")
     : null;
 
   const currentStage = WORKFLOW_STAGES.find(
@@ -72,11 +72,11 @@ export function ProposalCard({ proposal }) {
           {missingItemCount > 0 && (
             <div className="rounded border border-warning/20 bg-warning-bg px-3 py-2">
               <p className="text-xs font-medium text-warning">
-                {missingItemCount} mục cần bổ sung
+                {missingItemCount} items needing attention
               </p>
               <p className="mt-0.5 text-xs text-warning/80">
                 {proposal.missingItems?.slice(0, 2).join(", ")}
-                {missingItemCount > 2 && ` +${missingItemCount - 2} mục khác`}
+                {missingItemCount > 2 && ` +${missingItemCount - 2} more items`}
               </p>
             </div>
           )}
@@ -94,13 +94,13 @@ export function ProposalCard({ proposal }) {
             {/* Deadline */}
             {deadlineDate && (
               <div className="flex items-center gap-2 text-xs text-body-muted">
-                <span>Hạn: {deadlineDate}</span>
+                <span>Deadline: {deadlineDate}</span>
               </div>
             )}
 
             {/* Updated */}
             <div className="flex items-center gap-2 text-xs text-muted">
-              <span>Cập nhật: {updatedDate}</span>
+              <span>Updated: {updatedDate}</span>
             </div>
           </div>
         </CardContent>

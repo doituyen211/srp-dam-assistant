@@ -7,7 +7,7 @@ import { WORKFLOW_STAGES } from "@/lib/constants";
 
 const formatDate = (value) => {
   if (!value) return "—";
-  return new Intl.DateTimeFormat("vi-VN", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -46,9 +46,6 @@ export function ReviewTable({
   reviews = {},
   selectedId,
   onSelectProposal,
-  onNeedsRevision,
-  onRecommendApprove,
-  onReject,
 }) {
   if (proposals.length === 0) {
     return (
@@ -168,7 +165,7 @@ export function ReviewTable({
                 </td>
                 <td className="px-4 py-4">
                   <div
-                    className="flex justify-end gap-2"
+                    className="flex justify-end"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <Button
@@ -177,19 +174,6 @@ export function ReviewTable({
                       onClick={() => onSelectProposal?.(proposal.id)}
                     >
                       Review
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      className="px-2.5 py-1.5 text-xs text-warning"
-                      onClick={() => onNeedsRevision?.(proposal.id)}
-                    >
-                      Revise
-                    </Button>
-                    <Button
-                      className="px-2.5 py-1.5 text-xs"
-                      onClick={() => onRecommendApprove?.(proposal.id)}
-                    >
-                      Approve
                     </Button>
                   </div>
                 </td>

@@ -1,4 +1,4 @@
-name: Test & Coverage
+name: CI — Test, Lint & Build
 
 on: [push, pull_request]
 
@@ -16,7 +16,14 @@ jobs:
 
       - run: npm ci
 
-      - run: npx vitest --coverage --reporter=default
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build
 
       - uses: actions/upload-artifact@v4
         if: always()

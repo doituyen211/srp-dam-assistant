@@ -1,9 +1,10 @@
 import "./globals.css";
+import { AuthProvider } from "@/hooks/useAuth";
 
 export const metadata = {
-  title: "SRP DAM - AI Trợ Lý Soạn & Quản Lý Đề Tài",
+  title: "SRP DAM - AI Research Proposal Assistant",
   description:
-    "Nền tảng AI hỗ trợ sinh viên soạn thảo, quản lý đề tài nghiên cứu khoa học và kết nối với giảng viên hướng dẫn.",
+    "AI platform helping students draft, manage scientific research proposals, and connect with supervising lecturers.",
   robots: "index, follow",
 };
 
@@ -14,13 +15,13 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="vi" className="antialiased scroll-smooth">
+    <html lang="en" className="antialiased scroll-smooth">
       <head>
         <meta charSet="utf-8" />
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className="bg-white text-slate-900 font-sans min-h-screen flex flex-col">
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

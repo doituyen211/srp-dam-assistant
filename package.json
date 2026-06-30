@@ -2,11 +2,16 @@
   "name": "srp-dam-assistant",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest --run",
+    "test:coverage": "vitest --run --coverage"
   },
   "dependencies": {
     "next": "16.2.9",

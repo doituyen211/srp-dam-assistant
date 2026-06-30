@@ -34,7 +34,7 @@ export function Select({
           } ${className}`}
           {...props}
         >
-          <option value="">-- Chọn --</option>
+          <option value="">-- Select --</option>
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}

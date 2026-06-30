@@ -1,11 +1,25 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import LoginPage from "@/app/login/page";
+
+vi.mock("@/hooks/useAuth", () => ({
+  useAuth: () => ({
+    user: null,
+    loading: false,
+    error: null,
+    login: vi.fn(),
+  }),
+}));
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => "/login",
+}));
 
 describe("LoginPage", () => {
   it("renders sign in form", () => {
     render(<LoginPage />);
-    expect(screen.getByText("Đăng nhập vào Research Office")).toBeInTheDocument();
+    expect(screen.getByText("Sign in to Research Office")).toBeInTheDocument();
   });
 
   it("renders email input", () => {
@@ -15,6 +29,6 @@ describe("LoginPage", () => {
 
   it("renders register link", () => {
     render(<LoginPage />);
-    expect(screen.getByText(/Tạo tài khoản sinh viên/i)).toBeInTheDocument();
+    expect(screen.getByText(/Create student account/i)).toBeInTheDocument();
   });
 });

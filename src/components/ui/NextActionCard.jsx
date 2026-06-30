@@ -24,9 +24,9 @@ export function NextActionCard({
       case "draft":
         if (userRole === "student") {
           return {
-            title: "Gửi đề tài để xét duyệt",
-            description: "Hoàn thiện mục tiêu, phương pháp và tính khả thi, sau đó gửi đề tài để hội đồng bắt đầu đánh giá.",
-            actionLabel: "Gửi đề tài",
+            title: "Submit proposal for review",
+            description: "Complete the objectives, methods, and feasibility, then submit the proposal for the committee to begin evaluation.",
+            actionLabel: "Submit proposal",
             actionType: "submit",
             urgency: "medium",
             owner: "reviewer",
@@ -37,9 +37,9 @@ export function NextActionCard({
       case "submitted":
         if (userRole === "reviewer") {
           return {
-            title: "Bắt đầu đánh giá",
-            description: "Xem xét đề tài, sử dụng rubric để đánh giá tính mới lạ, khả thi, ứng dụng thực tế, kỹ thuật và trình bày.",
-            actionLabel: "Đánh giá ngay",
+            title: "Begin evaluation",
+            description: "Review the proposal, use the rubric to evaluate novelty, feasibility, practical application, technique, and presentation.",
+            actionLabel: "Review now",
             actionType: "review",
             urgency: "high",
             owner: "reviewer",
@@ -50,9 +50,9 @@ export function NextActionCard({
       case "under_review":
         if (userRole === "reviewer") {
           return {
-            title: "Đưa ra quyết định",
-            description: "Dựa trên rubric và phản hồi AI, quyết định phê duyệt hoặc yêu cầu chỉnh sửa.",
-            actionLabel: "Quyết định",
+            title: "Make a decision",
+            description: "Based on the rubric and AI feedback, decide to approve or request revision.",
+            actionLabel: "Decide",
             actionType: "decide",
             urgency: "high",
             owner: "reviewer",
@@ -60,9 +60,9 @@ export function NextActionCard({
         }
         if (userRole === "student") {
           return {
-            title: "Xem xét phản hồi",
-            description: "Kiểm tra nhận xét từ reviewer, chuẩn bị chỉnh sửa nếu cần thiết.",
-            actionLabel: "Xem phản hồi",
+            title: "Review feedback",
+            description: "Check reviewer comments, prepare revisions if needed.",
+            actionLabel: "View feedback",
             actionType: "view_feedback",
             urgency: "medium",
             owner: "student",
@@ -73,9 +73,9 @@ export function NextActionCard({
       case "needs_revision":
         if (userRole === "student") {
           return {
-            title: "Chỉnh sửa đề tài",
-            description: "Cập nhật mục tiêu, phương pháp, tính khả thi và giải quyết các vấn đề được chỉ ra.",
-            actionLabel: "Chỉnh sửa ngay",
+            title: "Revise proposal",
+            description: "Update objectives, methods, feasibility and address the issues identified.",
+            actionLabel: "Revise now",
             actionType: "edit",
             urgency: "high",
             owner: "student",
@@ -86,9 +86,9 @@ export function NextActionCard({
       case "approved":
         if (userRole === "lecturer") {
           return {
-            title: "Phân công hướng dẫn",
-            description: "Chọn giảng viên hướng dẫn phù hợp dựa trên chuyên môn và tải hướng dẫn hiện tại.",
-            actionLabel: "Phân công ngay",
+            title: "Assign supervisor",
+            description: "Select an appropriate supervisor based on expertise and current advising load.",
+            actionLabel: "Assign now",
             actionType: "assign_lecturer",
             urgency: "medium",
             owner: "lecturer",
@@ -99,9 +99,9 @@ export function NextActionCard({
       case "rejected":
         if (userRole === "student") {
           return {
-            title: "Xem xét lý do rejection",
-            description: "Hiểu các điểm yếu được chỉ ra và cân nhắc chỉnh sửa đề tài để gửi lại.",
-            actionLabel: "Xem chi tiết",
+            title: "Review rejection reasons",
+            description: "Understand the identified weaknesses and consider revising the proposal for resubmission.",
+            actionLabel: "View details",
             actionType: "view_details",
             urgency: "low",
             owner: "student",
@@ -123,7 +123,7 @@ export function NextActionCard({
       <Card className="border-dashed border-2 border-hairline bg-soft-stone/30">
         <CardContent className="p-6 text-center">
           <p className="text-sm text-body-muted">
-            Không có hành động tiếp theo được yêu cầu cho vai trò này ở trạng thái này.
+            No next action required for this role in this state.
           </p>
         </CardContent>
       </Card>
@@ -141,9 +141,9 @@ export function NextActionCard({
 
   const getUrgencyLabel = (urgency) => {
     const labels = {
-      high: "Ưu tiên cao",
-      medium: "Ưu tiên trung bình",
-      low: "Ưu tiên thấp",
+      high: "High priority",
+      medium: "Medium priority",
+      low: "Low priority",
     };
     return labels[urgency] || urgency;
   };
@@ -153,13 +153,13 @@ export function NextActionCard({
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
-            <CardTitle className="text-base">Hành động tiếp theo</CardTitle>
+            <CardTitle className="text-base">Next Action</CardTitle>
             <div className="mt-1 flex items-center gap-2">
               <Badge
                 intent="info"
                 className="text-xs"
               >
-                Người sở hữu: {nextAction.owner}
+                Owner: {nextAction.owner}
               </Badge>
               <Badge
                 intent={nextAction.urgency === "high" ? "danger" : nextAction.urgency === "medium" ? "warning" : "info"}
@@ -181,16 +181,16 @@ export function NextActionCard({
 
         {proposal && (
           <div className="rounded-lg bg-soft-stone/50 p-3">
-            <div className="text-xs text-muted">Thông tin đề tài</div>
+            <div className="text-xs text-muted">Proposal info</div>
             <div className="mt-1 flex items-center gap-4 text-sm">
               <div>
-                <span className="text-muted">Tiêu đề:</span> {proposal.title}
+                <span className="text-muted">Title:</span> {proposal.title}
               </div>
               <div>
-                <span className="text-muted">Lĩnh vực:</span> {proposal.field}
+                <span className="text-muted">Field:</span> {proposal.field}
               </div>
               <div>
-                <span className="text-muted">Điểm AI:</span> {proposal.aiScore}/10
+                <span className="text-muted">AI Score:</span> {proposal.aiScore}/10
               </div>
             </div>
           </div>
@@ -209,7 +209,7 @@ export function NextActionCard({
             className="text-xs"
             onClick={() => onAction && onAction("view_details", proposal?.id)}
           >
-            Xem chi tiết
+            View details
           </Button>
         </div>
       </CardContent>
