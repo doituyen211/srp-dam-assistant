@@ -7,7 +7,7 @@ export const USER_ROLES = {
   LECTURER: "lecturer",
 };
 
-// ───────── Proposal Statuses (9 stages) ─────────
+// ───────── Proposal Statuses (10 stages) ─────────
 export const PROPOSAL_STATUSES = {
   DRAFT: "draft",
   SUBMITTED: "submitted",
@@ -16,6 +16,7 @@ export const PROPOSAL_STATUSES = {
   APPROVED: "approved",
   REJECTED: "rejected",
   SUPERVISOR_ASSIGNED: "supervisor_assigned",
+  PROJECT_ACTIVE: "project_active",
   IN_PROGRESS: "in_progress",
   COMPLETED: "completed",
 };
@@ -28,8 +29,9 @@ export const WORKFLOW_STAGES = [
   { status: "approved", label: "Approved", order: 5 },
   { status: "rejected", label: "Rejected", order: 6 },
   { status: "supervisor_assigned", label: "Supervisor Assigned", order: 7 },
-  { status: "in_progress", label: "In Progress", order: 8 },
-  { status: "completed", label: "Completed", order: 9 },
+  { status: "project_active", label: "Project Active", order: 8 },
+  { status: "in_progress", label: "In Progress", order: 9 },
+  { status: "completed", label: "Completed", order: 10 },
 ];
 
 export const WORKFLOW_TRANSITIONS = {
@@ -39,7 +41,8 @@ export const WORKFLOW_TRANSITIONS = {
   needs_revision: ["submitted", "under_review"],
   approved: ["supervisor_assigned"],
   rejected: [],
-  supervisor_assigned: ["in_progress"],
+  supervisor_assigned: ["project_active"],
+  project_active: ["in_progress"],
   in_progress: ["completed", "needs_revision"],
   completed: [],
 };
@@ -64,6 +67,7 @@ export const STATUS_LABELS = {
   approved: "Approved",
   rejected: "Rejected",
   supervisor_assigned: "Supervisor Assigned",
+  project_active: "Project Active",
   in_progress: "In Progress",
   completed: "Completed",
 };
@@ -76,8 +80,52 @@ export const STATUS_COLORS = {
   approved: "green",
   rejected: "red",
   supervisor_assigned: "teal",
+  project_active: "indigo",
   in_progress: "indigo",
   completed: "emerald",
+};
+
+// ───────── Project Statuses ─────────
+export const PROJECT_STATUSES = {
+  NOT_STARTED: "not_started",
+  IN_PROGRESS: "in_progress",
+  COMPLETED: "completed",
+};
+
+export const PROJECT_STATUS_LABELS = {
+  not_started: "Not Started",
+  in_progress: "In Progress",
+  completed: "Completed",
+};
+
+export const PROJECT_STATUS_COLORS = {
+  not_started: "slate",
+  in_progress: "blue",
+  completed: "emerald",
+};
+
+// ───────── Deliverable Types ─────────
+export const DELIVERABLE_TYPES = [
+  { id: "software", label: "Software", icon: "code" },
+  { id: "dataset", label: "Dataset", icon: "database" },
+  { id: "paper", label: "Paper", icon: "document" },
+  { id: "presentation", label: "Presentation", icon: "presentation" },
+  { id: "poster", label: "Poster", icon: "image" },
+  { id: "patent", label: "Patent", icon: "shield" },
+  { id: "book", label: "Book", icon: "book" },
+];
+
+// ───────── Report Statuses ─────────
+export const REPORT_STATUSES = {
+  DRAFT: "draft",
+  SUBMITTED: "submitted",
+  REVIEWED: "reviewed",
+};
+
+export const REPORT_STATUS_LABELS = {
+  draft: "Draft",
+  submitted: "Submitted",
+  reviewed: "Reviewed",
 };
 
 // ───────── Proposal Sections ─────────
@@ -239,6 +287,7 @@ export const ACADEMIC_TERMS = [
 
 export const CURRENT_TERM = "2026A";
 
+// ───────── Role Labels ─────────
 export const ACADEMIC_ROLE_LABELS = {
   [USER_ROLES.SUPER_ADMIN]: "Super Admin",
   [USER_ROLES.STUDENT]: "Student",
@@ -247,16 +296,7 @@ export const ACADEMIC_ROLE_LABELS = {
   [USER_ROLES.LECTURER]: "Lecturer",
 };
 
-export const ACADEMIC_ROLE_ENGLISH = {
-  [USER_ROLES.SUPER_ADMIN]: "Super Admin",
-  [USER_ROLES.STUDENT]: "Student",
-  [USER_ROLES.REVIEWER]: "Reviewer",
-  [USER_ROLES.ADMIN]: "Admin",
-  [USER_ROLES.LECTURER]: "Lecturer",
-};
-
 // ───────── Role check utility ─────────
-
 export const hasRole = (user, allowedRoles) => {
   if (!user) return false;
   const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];

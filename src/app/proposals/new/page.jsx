@@ -1,16 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { AppShell } from "@/components/layout/AppShell";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { ProposalForm } from "@/components/proposal/ProposalForm";
-import { AIWorkspace } from "@/components/ideas/AIWorkspace";
-import { ProposalBuilder } from "@/components/ideas/ProposalBuilder";
+import { IdeaList } from "@/components/ideas/IdeaList";
+import { AIChat } from "@/components/ideas/AIChat";
+import { ProposalAutofill } from "@/components/ideas/ProposalAutofill";
 import { parseAIResponse, generateSampleResponse } from "@/components/ideas/parseAIResponse";
 import { Alert } from "@/components/ui/Alert";
-import { LoadingState } from "@/components/ui/LoadingState";
 import { useAuth } from "@/hooks/useAuth";
 import { api } from "@/lib/api";
 import { USER_ROLES } from "@/lib/constants";
@@ -19,37 +19,27 @@ function NewProposalContent() {
   const router = useRouter();
   const { user } = useAuth();
   const [mode, setMode] = useState("idea"); // "idea" or "form"
-
-  if (mode === "form") {
-    return <FormFlow onBack={() => setMode("idea")} />;
-  }
-
-  return <IdeaFlow user={user} onSwitchToForm={() => setMode("form")} />;
-}
-
-// ─── Idea-to-Proposal Flow (3-column) ───
-
-function IdeaFlow({ user, onSwitchToForm }) {
-  const router = useRouter();
-  const [sessions, setSessions] = useState([]);
-  const [activeSessionId, setActiveSessionId] = useState(null);
-  const [loadingSessions, setLoadingSessions] = useState(true);
-  const [creating, setCreating] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+
+  // Idea flow state
+  const [conversations, setConversations] = useState([]);
+  const [activeConvId, setActiveConvId] = useState(null);
+  const [loadingSessions, setLoadingSessions] = useState(true);
+  const [creating, setCreating] = useState(false);
   const [proposalData, setProposalData] = useState({
     title: "", researchField: "", keywords: "", abstract: "",
-    problem: "", question: "", objectives: "", literature: "",
-    methodology: "", feasibility: "", contribution: "", ethics: "", references: "",
+    problem: "", objectives: "", methodology: "", timeline: "", outcome: "",
   });
 
-  const activeSession = sessions.find((s) => s.id === activeSessionId);
+  const activeConversation = conversations.find((c) => c.id === activeConvId);
 
   // Load chat sessions from backend
   useEffect(() => {
     let mounted = true;
     api.getChatSessions()
-      .then((data) => { if (mounted) setSessions(Array.isArray(data) ? data : []); })
+      .then((data) => { if (mounted) setConversations(Array.isArray(data) ? data : []); })
       .catch(() => {})
       .finally(() => { if (mounted) setLoadingSessions(false); });
     return () => { mounted = false; };
@@ -57,18 +47,18 @@ function IdeaFlow({ user, onSwitchToForm }) {
 
   const handleNewSession = () => {
     const tempId = `temp-${Date.now()}`;
-    const newSession = { id: tempId, title: "New conversation", messages: [], createdAt: new Date().toISOString() };
-    setSessions((prev) => [newSession, ...prev]);
-    setActiveSessionId(tempId);
+    const newConv = { id: tempId, title: "New conversation", messages: [], createdAt: new Date().toISOString() };
+    setConversations((prev) => [newConv, ...prev]);
+    setActiveConvId(tempId);
   };
 
   const handleSelectSession = (id) => {
-    setActiveSessionId(id);
-    const session = sessions.find((s) => s.id === id);
-    if (session && !session.messages?.length && !id.startsWith("temp-")) {
+    setActiveConvId(id);
+    const conv = conversations.find((c) => c.id === id);
+    if (conv && !conv.messages?.length && !id.startsWith("temp-")) {
       api.getChatMessages(id)
-        .then((messages) => {
-          setSessions((prev) => prev.map((s) => s.id === id ? { ...s, messages } : s));
+        .then((msgs) => {
+          setConversations((prev) => prev.map((c) => c.id === id ? { ...c, messages: msgs } : c));
         })
         .catch(() => {});
     }
@@ -76,77 +66,68 @@ function IdeaFlow({ user, onSwitchToForm }) {
 
   const handleSend = async (text) => {
     setError("");
-
-    // Auto-create session if none selected
-    let sessionId = activeSessionId;
-    if (!sessionId) {
+    let convId = activeConvId;
+    if (!convId) {
       try {
         const session = await api.createChatSession(text.slice(0, 50));
-        sessionId = session.id;
-        setSessions((prev) => [session, ...prev]);
-        setActiveSessionId(sessionId);
+        convId = session.id;
+        setConversations((prev) => [session, ...prev]);
+        setActiveConvId(convId);
       } catch {
-        // Fallback: create local session
-        sessionId = `temp-${Date.now()}`;
-        const localSession = { id: sessionId, title: text.slice(0, 50), messages: [], createdAt: new Date().toISOString() };
-        setSessions((prev) => [localSession, ...prev]);
-        setActiveSessionId(sessionId);
+        convId = `temp-${Date.now()}`;
+        const local = { id: convId, title: text.slice(0, 50), messages: [], createdAt: new Date().toISOString() };
+        setConversations((prev) => [local, ...prev]);
+        setActiveConvId(convId);
       }
     }
 
-    // Add user message optimistically
     const userMsg = { role: "user", content: text };
-    setSessions((prev) => prev.map((s) =>
-      s.id === sessionId
-        ? { ...s, title: s.title === "New conversation" ? text.slice(0, 50) : s.title, messages: [...(s.messages || []), userMsg] }
-        : s
+    setConversations((prev) => prev.map((c) =>
+      c.id === convId
+        ? { ...c, title: c.title === "New conversation" ? text.slice(0, 50) : c.title, messages: [...(c.messages || []), userMsg] }
+        : c
     ));
 
     try {
-      // Send to backend (skip for temp sessions)
-      if (!sessionId.startsWith("temp-")) {
-        const response = await api.sendChatMessage(sessionId, text);
+      let aiMsg;
+      if (!convId.startsWith("temp-")) {
+        const response = await api.sendChatMessage(convId, text);
         const parsed = parseAIResponse(response);
-        const aiMsg = { role: "assistant", content: "Here are suggestions based on your idea:", cards: parsed.cards };
-        setSessions((prev) => prev.map((s) =>
-          s.id === sessionId ? { ...s, messages: [...(s.messages || []), aiMsg] } : s
-        ));
+        aiMsg = { role: "assistant", content: "Here are suggestions based on your idea:", cards: parsed.cards };
       } else {
-        // Use sample response for temp sessions
         const rawResponse = generateSampleResponse(text);
         const parsed = parseAIResponse(rawResponse);
-        const aiMsg = { role: "assistant", content: "Here are suggestions based on your idea:", cards: parsed.cards };
-        setSessions((prev) => prev.map((s) =>
-          s.id === sessionId ? { ...s, messages: [...(s.messages || []), aiMsg] } : s
-        ));
+        aiMsg = { role: "assistant", content: "Here are suggestions based on your idea:", cards: parsed.cards };
       }
+      setConversations((prev) => prev.map((c) =>
+        c.id === convId ? { ...c, messages: [...(c.messages || []), aiMsg] } : c
+      ));
     } catch {
-      // Fallback to sample response
       const rawResponse = generateSampleResponse(text);
       const parsed = parseAIResponse(rawResponse);
       const aiMsg = { role: "assistant", content: "Here are suggestions based on your idea:", cards: parsed.cards };
-      setSessions((prev) => prev.map((s) =>
-        s.id === sessionId ? { ...s, messages: [...(s.messages || []), aiMsg] } : s
+      setConversations((prev) => prev.map((c) =>
+        c.id === convId ? { ...c, messages: [...(c.messages || []), aiMsg] } : c
       ));
     }
   };
 
-  const handleCardAction = (action, item) => {
+  const handleApplyCard = (cardType, item) => {
+    const content = item.content || item.label;
     setProposalData((prev) => {
       const newData = { ...prev };
-      const content = item.content || item.label;
-      switch (action) {
-        case "select_direction":
+      switch (cardType) {
+        case "research_direction":
           if (!newData.problem) newData.problem = content;
           if (!newData.title) newData.title = item.label;
           break;
-        case "select_gap":
+        case "research_gap":
           if (!newData.problem) newData.problem = content;
           break;
-        case "select_methodology":
+        case "methodology":
           if (!newData.methodology) newData.methodology = content;
           break;
-        case "select_problem":
+        case "problem":
           if (!newData.problem) newData.problem = content;
           break;
       }
@@ -154,13 +135,14 @@ function IdeaFlow({ user, onSwitchToForm }) {
     });
   };
 
-  const handleCreateProposal = async () => {
+  const handleCreateFromIdea = async () => {
     if (!proposalData.title?.trim()) {
       setError("Please enter a proposal title.");
       return;
     }
     setCreating(true);
     setError("");
+    setMessage("");
     try {
       const keywords = typeof proposalData.keywords === "string"
         ? proposalData.keywords.split(",").map((k) => k.trim()).filter(Boolean)
@@ -183,7 +165,7 @@ function IdeaFlow({ user, onSwitchToForm }) {
         { key: "literature_background", from: ["literature"] },
         { key: "methodology", from: ["methodology"] },
         { key: "feasibility_timeline", from: ["feasibility"] },
-        { key: "expected_contribution", from: ["contribution"] },
+        { key: "expected_contribution", from: ["contribution", "outcome"] },
         { key: "ethics_risks", from: ["ethics"] },
         { key: "references", from: ["references"] },
       ];
@@ -203,107 +185,7 @@ function IdeaFlow({ user, onSwitchToForm }) {
     }
   };
 
-  return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">Idea to Proposal</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-[-0.02em] text-ink md:text-3xl">New Proposal</h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <button type="button" onClick={onSwitchToForm} className="text-sm text-primary hover:underline">
-            Skip to form →
-          </button>
-          <Link href="/proposals" className="rounded-lg border border-hairline px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-subdued">
-            Back to proposals
-          </Link>
-        </div>
-      </div>
-
-      {message && <Alert type="success" closable>{message}</Alert>}
-      {error && <Alert type="error">{error}</Alert>}
-
-      {/* 3-column layout */}
-      <div className="h-[calc(100vh-180px)] min-h-[500px] grid grid-cols-1 gap-0 overflow-auto rounded-xl border border-hairline lg:grid-cols-[260px_1fr_340px]">
-        {/* Column 1: Chat Sessions */}
-        <div className="hidden lg:flex lg:flex-col min-h-0 border-r border-hairline bg-subdued/30">
-          <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">Conversations</h3>
-            <button
-              type="button"
-              onClick={handleNewSession}
-              className="rounded-lg bg-primary px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-primary/90"
-            >
-              + New
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-2">
-            {loadingSessions ? (
-              <div className="p-4"><LoadingState /></div>
-            ) : sessions.length === 0 ? (
-              <div className="p-4 text-center">
-                <p className="text-xs text-muted">No conversations yet</p>
-                <p className="mt-1 text-[11px] text-muted">Click &quot;+ New&quot; or just start typing</p>
-              </div>
-            ) : (
-              <div className="space-y-1">
-                {sessions.map((s) => (
-                  <button
-                    key={s.id}
-                    type="button"
-                    onClick={() => handleSelectSession(s.id)}
-                    className={`w-full rounded-lg px-3 py-2.5 text-left text-sm transition-colors ${
-                      activeSessionId === s.id
-                        ? "bg-primary/10 font-medium text-primary"
-                        : "text-body-muted hover:bg-white/50 hover:text-ink"
-                    }`}
-                  >
-                    <p className="truncate">{s.title || "New conversation"}</p>
-                    <p className="mt-0.5 text-[11px] text-muted">
-                      {s.messages?.length || 0} messages
-                    </p>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Column 2: AI Workspace */}
-        <div className="min-h-0">
-          <AIWorkspace
-            messages={activeSession?.messages || []}
-            onSend={handleSend}
-            onCardAction={handleCardAction}
-            isReadOnly={false}
-          />
-        </div>
-
-        {/* Column 3: Proposal Builder */}
-        <div className="min-h-0">
-          <ProposalBuilder
-            proposalData={proposalData}
-            onUpdate={setProposalData}
-            onCreate={handleCreateProposal}
-            loading={creating}
-            isReadOnly={false}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Form Flow (existing proposal form) ───
-
-function FormFlow({ onBack }) {
-  const router = useRouter();
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleSubmit = async (formData, submitMode) => {
+  const handleFormSubmit = async (formData, submitMode) => {
     setLoading(true);
     setError("");
     try {
@@ -352,19 +234,65 @@ function FormFlow({ onBack }) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">Proposal Workspace</p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-[-0.02em] text-ink md:text-3xl">New Research Proposal</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-body-muted">Complete each section carefully. Strong proposals clearly define the problem, objectives, methodology, and expected contributions.</p>
+          <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">Idea to Proposal</p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-[-0.02em] text-ink md:text-3xl">New Proposal</h1>
         </div>
-        <button onClick={onBack} className="inline-flex items-center justify-center rounded-lg border border-hairline px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-subdued">
-          ← Back to Idea Flow
-        </button>
+        <div className="flex items-center gap-3">
+          {mode === "idea" ? (
+            <button type="button" onClick={() => setMode("form")} className="text-sm text-primary hover:underline">
+              Skip to form →
+            </button>
+          ) : (
+            <button type="button" onClick={() => setMode("idea")} className="text-sm text-primary hover:underline">
+              ← Back to Idea flow
+            </button>
+          )}
+          <Link href="/proposals" className="rounded-lg border border-hairline px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-subdued">
+            Back to proposals
+          </Link>
+        </div>
       </div>
+
+      {message && <Alert type="success" closable>{message}</Alert>}
       {error && <Alert type="error">{error}</Alert>}
-      <ProposalForm onSubmit={handleSubmit} loading={loading} error={null} />
+
+      {/* Content area */}
+      {mode === "idea" ? (
+        /* 3-column Idea layout */
+        <div className="h-[calc(100vh-180px)] min-h-[500px] grid grid-cols-1 gap-0 overflow-auto rounded-xl border border-hairline lg:grid-cols-[260px_1fr_340px]">
+          <div className="min-h-0">
+            <IdeaList
+              conversations={conversations}
+              activeId={activeConvId}
+              onSelect={handleSelectSession}
+              onNew={handleNewSession}
+            />
+          </div>
+          <div className="min-h-0">
+            <AIChat
+              messages={activeConversation?.messages || []}
+              onSend={handleSend}
+              onApplyCard={handleApplyCard}
+              isReadOnly={false}
+            />
+          </div>
+          <div className="min-h-0">
+            <ProposalAutofill
+              data={proposalData}
+              onUpdate={setProposalData}
+              onCreate={handleCreateFromIdea}
+              loading={creating}
+            />
+          </div>
+        </div>
+      ) : (
+        /* ProposalForm */
+        <ProposalForm onSubmit={handleFormSubmit} loading={loading} error={null} />
+      )}
     </div>
   );
 }

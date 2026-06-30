@@ -89,6 +89,8 @@ function ReviewPageContent() {
     return { pending, revisions, approved, total: queueItems.length };
   }, [queueItems]);
 
+  const selectedProposal = queueItems.find((p) => p.id === selectedId);
+
   const handleDecision = async (decision, comment) => {
     if (!selectedId) return;
     setDecisionLoading(true);
@@ -116,7 +118,7 @@ function ReviewPageContent() {
         <CardContent className="p-6 md:p-8">
           <div className="space-y-3">
             <div className="inline-flex rounded border border-white/15 bg-white/[0.06] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-white/60">Review Panel</div>
-            <h1 className="text-2xl font-semibold leading-tight md:text-3xl">Research Proposal Review Queue</h1>
+            <h1 className="text-2xl font-semibold leading-tight md:text-3xl">Proposal Review Queue</h1>
             <p className="max-w-3xl text-sm leading-6 text-white/65">Reviewers make the final decision. Evaluate proposals based on content and rubric criteria.</p>
           </div>
         </CardContent>
@@ -125,6 +127,7 @@ function ReviewPageContent() {
       {message && <Alert type="success" title="Decision Recorded" closable>{message}</Alert>}
       {error && <Alert type="error">{error}</Alert>}
 
+      {/* KPI cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Card><CardContent className="p-4"><p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">Assigned</p><p className="mt-1 text-2xl font-semibold text-ink">{kpi.total}</p></CardContent></Card>
         <Card accent="info"><CardContent className="p-4"><p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">Awaiting review</p><p className="mt-1 text-2xl font-semibold text-info">{kpi.pending}</p></CardContent></Card>
@@ -133,6 +136,7 @@ function ReviewPageContent() {
         <Card><CardContent className="p-4"><p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">Total</p><p className="mt-1 text-2xl font-semibold text-ink">{queueItems.length}</p></CardContent></Card>
       </div>
 
+      {/* Filters */}
       <Card>
         <CardHeader><CardTitle>Filters</CardTitle></CardHeader>
         <CardContent>
@@ -146,31 +150,56 @@ function ReviewPageContent() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader><CardTitle>Review Queue</CardTitle></CardHeader>
-        <CardContent className="p-0">
-          {filteredQueue.length === 0 ? (
-            <div className="p-6"><EmptyState title="No proposals match the current filters" description="Try adjusting your search or filter criteria." /></div>
-          ) : (
-            <ReviewTable proposals={filteredQueue} reviews={{}} selectedId={selectedId} onSelectProposal={setSelectedId} />
-          )}
-        </CardContent>
-      </Card>
+      {/* Queue + Detail layout */}
+      <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
+        {/* Queue table */}
+        <Card>
+          <CardHeader className="flex items-center justify-between">
+            <CardTitle>Review Queue</CardTitle>
+            {selectedId && (
+              <button type="button" onClick={() => setSelectedId(null)} className="text-sm text-primary hover:underline">
+                ← Back to queue
+              </button>
+            )}
+          </CardHeader>
+          <CardContent className="p-0">
+            {filteredQueue.length === 0 ? (
+              <div className="p-6"><EmptyState title="No proposals match filters" description="Try adjusting your search or filter criteria." /></div>
+            ) : (
+              <ReviewTable proposals={filteredQueue} reviews={{}} selectedId={selectedId} onSelectProposal={setSelectedId} />
+            )}
+          </CardContent>
+        </Card>
 
-      {selectedId && (
-        <div className="space-y-6">
+        {/* Decision panel — fixed on right side */}
+        {selectedId && selectedProposal ? (
+          <div className="space-y-4 lg:sticky lg:top-20">
+            {/* Proposal summary */}
+            <ProposalSummaryPanel proposal={selectedProposal} />
+
+            {/* Decision panel */}
+            <Card>
+              <CardHeader><CardTitle>Decision</CardTitle></CardHeader>
+              <CardContent>
+                <ReviewDecisionPanel
+                  proposal={selectedProposal}
+                  onDecision={handleDecision}
+                  loading={decisionLoading}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
           <Card>
-            <CardHeader className="flex items-center justify-between">
-              <CardTitle>Review Details</CardTitle>
-              <button type="button" onClick={() => setSelectedId(null)} className="text-sm text-body-muted hover:text-ink">Close review</button>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <ProposalSummaryPanel proposal={queueItems.find((p) => p.id === selectedId)} />
-              <ReviewDecisionPanel proposal={queueItems.find((p) => p.id === selectedId)} onDecision={handleDecision} loading={decisionLoading} />
+            <CardContent className="py-12">
+              <EmptyState
+                title="Select a proposal"
+                description="Click a row in the queue to view details and make a decision."
+              />
             </CardContent>
           </Card>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

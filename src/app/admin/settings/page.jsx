@@ -7,7 +7,7 @@ import { USER_ROLES } from "@/lib/constants";
 
 export default function AdminSettingsPage() {
   return (
-    <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN]}>
+    <ProtectedRoute allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN]}>
       <AppShell>
         <div className="max-w-2xl space-y-6">
           <div>

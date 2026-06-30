@@ -8,7 +8,6 @@ import {
   CURRENT_TERM,
   ACADEMIC_TERMS,
   ACADEMIC_ROLE_LABELS,
-  ACADEMIC_ROLE_ENGLISH,
 } from "@/lib/constants";
 
 const ROLE_BADGE_COLORS = {
@@ -69,7 +68,7 @@ export function Topbar({ onMenuToggle, isMenuOpen = false }) {
           )}
 
           <div className={`hidden rounded border px-2.5 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.06em] md:block ${roleBadgeColor}`}>
-            {ACADEMIC_ROLE_ENGLISH[user.role] || user.role}
+            {ACADEMIC_ROLE_LABELS[user.role] || user.role}
           </div>
 
           <div className="hidden text-right sm:block">

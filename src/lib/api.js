@@ -56,6 +56,11 @@ export const logout = async () => {
   catch { /* swallow */ }
 };
 
+const updateMe = async (payload) => {
+  const data = await patchJson("/auth/me", payload);
+  return normalizeUser(data);
+};
+
 // ─── Proposals ───
 
 const getProposals = async (filters = {}) => {
@@ -193,6 +198,29 @@ const getLecturerProposals = async (lecturerId) => {
 
 const getLecturerCapacity = async (id) => {
   return getJson(`/lecturers/${id}/capacity`);
+};
+
+// ─── Matching ───
+
+const getLecturerMatches = async (proposalId) => {
+  const data = await getJson(`/matching/${proposalId}`);
+  return Array.isArray(data) ? data : [];
+};
+
+const runMatching = async (proposalId) => {
+  return postJson(`/matching/${proposalId}/run`);
+};
+
+const assignLecturer = async (proposalId, lecturerId) => {
+  return postJson(`/matching/${proposalId}/assign`, { lecturer_id: lecturerId });
+};
+
+const shortlistLecturer = async (proposalId, lecturerId) => {
+  return postJson(`/matching/${proposalId}/shortlist`, { lecturer_id: lecturerId });
+};
+
+const rejectMatch = async (proposalId, lecturerId) => {
+  return postJson(`/matching/${proposalId}/reject`, { lecturer_id: lecturerId });
 };
 
 // ─── Milestones ───
@@ -353,6 +381,84 @@ const deleteFieldOfStudy = async (id) => {
   return { success: true };
 };
 
+// ─── Projects ───
+
+const getProjects = async (filters = {}) => {
+  const params = new URLSearchParams();
+  if (filters.status) params.set("status", filters.status);
+  if (filters.student_id) params.set("student_id", filters.student_id);
+  if (filters.supervisor_id) params.set("supervisor_id", filters.supervisor_id);
+  const qs = params.toString();
+  const data = await getJson(`/projects${qs ? `?${qs}` : ""}`);
+  return Array.isArray(data) ? data : [];
+};
+
+const getProjectById = async (id) => {
+  return getJson(`/projects/${id}`);
+};
+
+const createProject = async (proposalId) => {
+  return postJson("/projects", { proposal_id: proposalId });
+};
+
+const updateProject = async (id, payload) => {
+  return patchJson(`/projects/${id}`, payload);
+};
+
+const getProjectMembers = async (id) => {
+  const data = await getJson(`/projects/${id}/members`);
+  return Array.isArray(data) ? data : [];
+};
+
+const addProjectMember = async (id, payload) => {
+  return postJson(`/projects/${id}/members`, payload);
+};
+
+const removeProjectMember = async (id, memberId) => {
+  await apiFetch(`/projects/${id}/members/${memberId}`, { method: "DELETE" });
+  return { success: true };
+};
+
+const getProjectMilestones = async (id) => {
+  const data = await getJson(`/projects/${id}/milestones`);
+  return Array.isArray(data) ? data : [];
+};
+
+const updateProjectMilestone = async (projectId, milestoneId, payload) => {
+  return patchJson(`/projects/${projectId}/milestones/${milestoneId}`, payload);
+};
+
+const getProjectReports = async (id) => {
+  const data = await getJson(`/projects/${id}/reports`);
+  return Array.isArray(data) ? data : [];
+};
+
+const uploadProjectReport = async (id, file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await apiFetch(`/projects/${id}/reports`, {
+    method: "POST",
+    body: formData,
+  });
+  return res.json();
+};
+
+const getProjectDeliverables = async (id) => {
+  const data = await getJson(`/projects/${id}/deliverables`);
+  return Array.isArray(data) ? data : [];
+};
+
+const uploadProjectDeliverable = async (id, type, file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("type", type);
+  const res = await apiFetch(`/projects/${id}/deliverables`, {
+    method: "POST",
+    body: formData,
+  });
+  return res.json();
+};
+
 // ─── Export ───
 
 export const api = {
@@ -361,6 +467,7 @@ export const api = {
   getMe,
   refreshSession,
   logout,
+  updateMe,
   getProposals,
   createProposal,
   getProposalById,
@@ -380,6 +487,11 @@ export const api = {
   getLecturerById,
   getLecturerProposals,
   getLecturerCapacity,
+  getLecturerMatches,
+  runMatching,
+  assignLecturer,
+  shortlistLecturer,
+  rejectMatch,
   getProposalMilestones,
   createMilestone,
   updateMilestone,
@@ -409,4 +521,17 @@ export const api = {
   createFieldOfStudy,
   updateFieldOfStudy,
   deleteFieldOfStudy,
+  getProjects,
+  getProjectById,
+  createProject,
+  updateProject,
+  getProjectMembers,
+  addProjectMember,
+  removeProjectMember,
+  getProjectMilestones,
+  updateProjectMilestone,
+  getProjectReports,
+  uploadProjectReport,
+  getProjectDeliverables,
+  uploadProjectDeliverable,
 };
