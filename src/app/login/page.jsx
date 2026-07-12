@@ -101,6 +101,31 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-xs text-muted">By signing in, you agree to the terms of use.</p>
           </div>
+
+          {/* Demo Accounts */}
+          <div className="mt-6 rounded-lg border border-hairline bg-canvas p-4">
+            <p className="mb-3 text-xs font-semibold text-ink">Demo Accounts</p>
+            <p className="mb-2 text-xs text-body-muted">All passwords: <code className="rounded bg-subdued px-1.5 py-0.5 font-mono text-[11px]">password123</code></p>
+            <div className="space-y-1.5">
+              {[
+                { email: "an.nguyen@university.edu", role: "Student" },
+                { email: "bich.tran@university.edu", role: "Reviewer" },
+                { email: "cuong.le@university.edu", role: "Admin" },
+                { email: "duc.pham@university.edu", role: "Lecturer" },
+                { email: "admin@platform.com", role: "Super Admin" },
+              ].map((account) => (
+                <button
+                  key={account.email}
+                  type="button"
+                  onClick={() => { setEmail(account.email); setPassword("password123"); }}
+                  className="flex w-full items-center justify-between rounded px-3 py-1.5 text-left text-xs transition-colors hover:bg-subdued"
+                >
+                  <span className="font-mono text-body-muted">{account.email}</span>
+                  <span className="rounded bg-subdued px-2 py-0.5 text-[10px] font-medium text-muted">{account.role}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
