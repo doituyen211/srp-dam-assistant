@@ -1,6 +1,7 @@
 // ───────── API Adapter ─────────
-// All methods call the backend via apiFetch with credentials: "include".
+// Supports both real backend and mock mode via NEXT_PUBLIC_USE_MOCK_API flag
 import { apiFetch } from "./httpClient";
+import { isMockMode, createMockApi } from "./mock";
 import {
   normalizeProposal,
   normalizeProposalSection,
@@ -30,28 +31,46 @@ async function patchJson(url, body) {
 }
 
 // ─── Auth ───
+// Named exports that use mock mode when enabled (used by useAuth hook)
 
 export const register = async (payload) => {
+  if (isMockMode()) {
+    const mockApi = createMockApi();
+    return mockApi.register(payload);
+  }
   const data = await postJson("/auth/register", payload);
   return normalizeUser(data);
 };
 
 export const login = async (email, password) => {
+  if (isMockMode()) {
+    const mockApi = createMockApi();
+    return mockApi.login(email, password);
+  }
   const data = await postJson("/auth/login", { email, password });
   return normalizeUser(data);
 };
 
 export const getMe = async () => {
+  if (isMockMode()) {
+    const mockApi = createMockApi();
+    return mockApi.getMe();
+  }
   const data = await getJson("/auth/me");
   return normalizeUser(data);
 };
 
 const refreshSession = async () => {
+  if (isMockMode()) return true;
   const res = await apiFetch("/auth/refresh", { method: "POST" });
   return res.ok;
 };
 
 export const logout = async () => {
+  if (isMockMode()) {
+    const mockApi = createMockApi();
+    return mockApi.logout();
+  }
   try { await apiFetch("/auth/logout", { method: "POST" }); }
   catch { /* swallow */ }
 };
@@ -461,7 +480,8 @@ const uploadProjectDeliverable = async (id, type, file) => {
 
 // ─── Export ───
 
-export const api = {
+// When mock mode is enabled, return mock API instead of real API
+const realApi = {
   register,
   login,
   getMe,
@@ -535,3 +555,6 @@ export const api = {
   getProjectDeliverables,
   uploadProjectDeliverable,
 };
+
+// Export real or mock API based on environment flag
+export const api = isMockMode() ? createMockApi() : realApi;
